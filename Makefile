@@ -1,7 +1,10 @@
 CC := g++
 SRCDIR := src
 BUILDDIR := build
-TARGET := bin/runner
+BINDIR := bin
+TESTDIR := test
+OUTPUTFILE := libhx711.a
+INSTALLDIR := .
 
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
@@ -10,24 +13,30 @@ CFLAGS := -g -Wall
 LIB := -lwiringPi
 INC := -I include
 
-$(TARGET): $(OBJECTS)
-  @echo " Linking..."
-  @echo " $(CC) $^ -o $(TARGET) $(LIB)"; $(CC) $^ -o $(TARGET) $(LIB)
+
+.PHONY: all
+all: $(OUTPUTFILE)
+
+$(OUTPUTFILE): $(BUILDDIR)/HX711.o
+	@echo " ar rcs $(BUILDDIR)/$(OUTPUTFILE) $(BUILDDIR)/HX711.o"; ar rcs $(BUILDDIR)/$(OUTPUTFILE) $(BUILDDIR)/HX711.o
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-  @mkdir -p $(BUILDDIR)
-  @echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
-
-clean:
-  @echo " Cleaning..."; 
-  @echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
-
-# Tests
-tester:
-  $(CC) $(CFLAGS) test/tester.cpp $(INC) $(LIB) -o bin/tester
-
-# Spikes
-ticket:
-  $(CC) $(CFLAGS) spikes/ticket.cpp $(INC) $(LIB) -o bin/ticket
+	@echo " Compiling..."
+	@mkdir -p $(BUILDDIR)
+	@echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 .PHONY: clean
+clean:
+	@echo " Cleaning..."; 
+	@echo " $(RM) -r $(BUILDDIR)"; $(RM) -r $(BUILDDIR)
+
+.PHONY: install
+install:
+	@echo " Installing..."
+	@echo " mkdir -p $(INSTALLDIR)"; mkdir -p $(INSTALLDIR)
+	@echo " cp -p $(BUILDDIR)/$(OUTPUTFILE) $(INSTALLDIR)"; cp -p $(BUILDDIR)/$(OUTPUTFILE) $(INSTALLDIR)
+
+.PHONY: test
+test:
+	$(CC) $(CFLAGS) $(INC) -c $(TESTDIR)/main.$(SRCEXT) -o $(BUILDDIR)/main.o
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/test $(BUILDDIR)/main.o -L. -l hx711 $(LIB)	
