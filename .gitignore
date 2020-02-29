@@ -2,6 +2,12 @@
 # Created by https://www.gitignore.io/api/c++,linux,windows,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=c++,linux,windows,visualstudiocode
 
+
+
+bin/*
+build/*
+
+
 ### C++ ###
 # Prerequisites
 *.d
