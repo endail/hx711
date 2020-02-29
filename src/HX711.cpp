@@ -313,7 +313,7 @@ double HX711::tare_B(const uint8_t times) {
     this->_setOffsetB(val);
 
     this->set_gain(backupGain);
-    this->set_reference_unit_B(backupGain);
+    this->set_reference_unit_B(backupRefUnit);
 
     return val;
 
