@@ -5,13 +5,16 @@
 #include <iomanip>
 #include <math.h>
 
-int main() {
 
-    std::cout << "Setting up..." << std::endl;
+//  wiringPi numbered pins
+//  ./test [DATA-PIN] [CLOCK-PIN]
+//
+int main(int argc, char** argv) {
 
-    HX711::HX711 hx(8, 9);
+    int dataPin = std::stoi(argv[1]);
+    int clockPin = std::stoi(argv[2]);
 
-    std::cout << "Set up hx711" << std::endl;
+    HX711::HX711 hx(dataPin, clockPin);
 
     hx.set_reference_unit(-429100);
     hx.tare();
