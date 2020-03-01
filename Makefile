@@ -30,11 +30,11 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
-	$(CC) $(CFLAGS) $(INC) $(LIB) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -l hx711
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -l hx711 $(LIB)
 
 .PHONY: test
 test: $(BUILDDIR)/test.o
-	$(CC) $(CFLAGS) $(INC) $(LIB) -o $(BINDIR)/test $(BUILDDIR)/test.o -L $(BUILDDIR)/ -l hx711	
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/test $(BUILDDIR)/test.o -L $(BUILDDIR)/ -l hx711 $(LIB)
 
 .PHONY: clean
 clean:
