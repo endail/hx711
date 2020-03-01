@@ -5,6 +5,13 @@
 
 int main(int argc, char** argv) {
 
+    const char* err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
+
+    if(argc != 4) {
+        std::cout << err << std::endl;
+        return -1;
+    }
+
     int dataPin = std::stoi(argv[1]);
     int clockPin = std::stoi(argv[2]);
     int refUnit = std::stoi(argv[3]);
