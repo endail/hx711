@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
     cout    << endl << endl
             << "Known weight (your object): " << knownWeight << " " << unit << endl 
-            << "Raw value over " << samples << ": " << val << endl
+            << "Raw value over " << samples << " samples: " << val << endl
             << endl
             << "-> REFERENCE UNIT: " << fixed << setprecision(0) << refUnit << endl
             << endl
