@@ -22,8 +22,8 @@
 
 //C++ port of https://github.com/tatobari/hx711py
 
-#ifndef _HX711_H_
-#define _HX711_H_
+#ifndef HX711_HX711_H_670BFDCD-DA15-4F8B-A15C-0F0043905889
+#define HX711_HX711_H_670BFDCD-DA15-4F8B-A15C-0F0043905889
 
 #include <stdint.h>
 #include <mutex>
