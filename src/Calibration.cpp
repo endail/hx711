@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <../include/HX711.h>
+#include "../include/HX711.h"
 #include <iostream>
 #include <iomanip>
 #include <unistd.h>
