@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
     const uint8_t dataPin = stoi(argv[1]);
     const uint8_t clockPin = stoi(argv[2]);
-    const uint8_t refUnit = stoi(argv[3]);
+    const int32_t refUnit = stoi(argv[3]);
 
     HX711::HX711 hx(dataPin, clockPin);
 
