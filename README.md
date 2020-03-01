@@ -6,7 +6,7 @@
 ```shell
 pi@raspberrypi~ $ git clone https://github.com/endail/hx711
 pi@raspberrypi~ $ cd hx711
-pi@raspberrypi~ $ make && sudo make install
+pi@raspberrypi~/hx711 $ make && sudo make install
 ```
 
 ## Calibrate
@@ -18,7 +18,7 @@ pi@raspberrypi~ $ make && sudo make install
 
 Example using WiringPi pin 8 for data and pin 9 for clock.
 ```shell
-pi@raspberrypi~ $ bin/hx711calibration 8 9
+pi@raspberrypi~/hx711 $ bin/hx711calibration 8 9
 ```
 
 
@@ -33,7 +33,7 @@ pi@raspberrypi~ $ bin/hx711calibration 8 9
 
 Example using WiringPi pin 8 for data, pin 9 for clock, and -7050 as the reference unit.
 ```shell
-pi@raspberrypi~ $ bin/test 8 9 -7050
+pi@raspberrypi~/hx711 $ bin/test 8 9 -7050
 ```
 
 
