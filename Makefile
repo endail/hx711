@@ -1,4 +1,5 @@
 CC := g++
+INCDIR := include
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
@@ -13,7 +14,7 @@ SRCEXT := cpp
 #OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g -Wall
 LIB := -l wiringPi
-INC := -I include
+INC := -I $(INCDIR)
 
 # make all
 # make install
@@ -46,11 +47,11 @@ clean:
 	$(RM) -r $(BINDIR)/*
 
 .PHONY: install
-install: $(BUILDDIR)/$(LIBFILE)
+install: $(BUILDDIR)/libhx711.a $(BINDIR)/hx711calibration
 	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -m 644 $(BUILDDIR)/$(LIBFILE) $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 $(BUILDDIR)/libhx711.a $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/
-	install -m 644 $(INC)/$(CLASSNAME).h $(DESTDIR)$(PREFIX)/include/
+	install -m 644 $(INCDIR)/HX711.h $(DESTDIR)$(PREFIX)/include/
 	install -d /usr/local/bin
 	install -m 755 $(BINDIR)/hx711calibration /usr/local/bin
 
