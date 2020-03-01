@@ -110,7 +110,7 @@ int32_t HX711::_readLong() {
 
 }
 
-double HX711::_readAverage(const uint8_t times) {
+double HX711::_readAverage(const uint16_t times) {
 
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
@@ -122,7 +122,7 @@ double HX711::_readAverage(const uint8_t times) {
     std::vector<int32_t> values;
     values.reserve(times);
 
-    for(uint8_t i = 0; i < times; ++i) {
+    for(uint16_t i = 0; i < times; ++i) {
         values.push_back(this->_readLong());
     }
 
@@ -137,7 +137,7 @@ double HX711::_readAverage(const uint8_t times) {
 
 }
 
-double HX711::_readMedian(const uint8_t times) {
+double HX711::_readMedian(const uint16_t times) {
 
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
@@ -149,7 +149,7 @@ double HX711::_readMedian(const uint8_t times) {
     std::vector<int32_t> values;
     values.reserve(times);
 
-    for(uint8_t i = 0; i < times; ++i) {
+    for(uint16_t i = 0; i < times; ++i) {
         values.push_back(this->_readLong());
     }
 
@@ -159,8 +159,8 @@ double HX711::_readMedian(const uint8_t times) {
         return values[values.size() / 2];
     }
 
-    const uint8_t midpoint = values.size() / 2;
-    const int64_t sum = std::accumulate(values.begin() + midpoint, values.end() + midpoint + 2, 0);
+    const uint16_t midpoint = values.size() / 2;
+    const int64_t sum = std::accumulate(values.begin() + midpoint, values.begin() + midpoint + 2, 0);
 
     return sum / 2.0;
 
@@ -250,15 +250,15 @@ uint8_t HX711::get_gain() const {
 
 }
 
-double HX711::get_value(const uint8_t times) {
-    return this->get_value_A();
+double HX711::get_value(const uint16_t times) {
+    return this->get_value_A(times);
 }
 
-double HX711::get_value_A(const uint8_t times) {
+double HX711::get_value_A(const uint16_t times) {
     return this->_readMedian(times) - this->_getOffsetA();
 }
 
-double HX711::get_value_B(const uint8_t times) {
+double HX711::get_value_B(const uint16_t times) {
     const uint8_t gain = this->get_gain();
     this->set_gain(32);
     const double val = this->_readMedian(times) - this->_getOffsetB();
@@ -266,27 +266,27 @@ double HX711::get_value_B(const uint8_t times) {
     return val;
 }
 
-double HX711::get_weight(const uint8_t times) {
+double HX711::get_weight(const uint16_t times) {
     return this->get_weight_A(times);
 }
 
-double HX711::get_weight_A(const uint8_t times) {
+double HX711::get_weight_A(const uint16_t times) {
     double val = this->get_value_A(times);
     val = val / this->_referenceUnit;
     return val;
 }
 
-double HX711::get_weight_B(const uint8_t times) {
+double HX711::get_weight_B(const uint16_t times) {
     double val = this->get_value_B(times);
     val = val / this->_referenceUnitB;
     return val;
 }
 
-double HX711::tare(const uint8_t times) {
+double HX711::tare(const uint16_t times) {
     return this->tare_A(times);
 }
 
-double HX711::tare_A(const uint8_t times) {
+double HX711::tare_A(const uint16_t times) {
 
     const int32_t backupRefUnit = this->get_reference_unit_A();
     this->set_reference_unit_A(1);
@@ -300,7 +300,7 @@ double HX711::tare_A(const uint8_t times) {
 
 }
 
-double HX711::tare_B(const uint8_t times) {
+double HX711::tare_B(const uint16_t times) {
 
     const int32_t backupRefUnit = this->get_reference_unit_B();
     this->set_reference_unit_B(1);
