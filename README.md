@@ -15,6 +15,8 @@ pi@raspberrypi~ $ make && sudo make install
 - **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
 
 - **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
+
+Example using WiringPi pin 8 for data and pin 9 for clock.
 ```shell
 pi@raspberrypi~ $ bin/hx711calibration 8 9
 ```
@@ -29,6 +31,7 @@ pi@raspberrypi~ $ bin/hx711calibration 8 9
 
 - **reference unit**: load cell's calibration factor. See above.
 
+Example using WiringPi pin 8 for data, pin 9 for clock, and -7050 as the reference unit.
 ```shell
 pi@raspberrypi~ $ bin/test 8 9 -7050
 ```
