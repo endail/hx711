@@ -49,7 +49,7 @@ protected:
     Format _byteFormat;
     Format _bitFormat;
 
-    static std::int32_t _convertFromTwosComplement(const std::int32_t val);
+    static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const;
     std::uint8_t _readByte() const;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
@@ -62,7 +62,7 @@ public:
     ~HX711();
     bool is_ready() const;
     void set_gain(const std::uint8_t gain);
-    std::uint8_t get_gain() const;
+    std::uint8_t get_gain() const noexcept;
     double get_value(const std::uint16_t times = 3);
     double get_value_A(const std::uint16_t times = 3);
     double get_value_B(const std::uint16_t times = 3);
@@ -72,19 +72,19 @@ public:
     double tare(const std::uint16_t times = 15);
     double tare_A(const std::uint16_t times = 15);
     double tare_B(const std::uint16_t times = 15);
-    void set_reading_format(const Format byteFormat = Format::MSB, const Format bitFormat = Format::MSB);
+    void set_reading_format(const Format byteFormat = Format::MSB, const Format bitFormat = Format::MSB) noexcept;
     void set_reference_unit(const std::int32_t refUnit);
     void set_reference_unit_A(const std::int32_t refUnit);
     void set_reference_unit_B(const std::int32_t refUnit);
-    std::int32_t get_reference_unit() const;
-    std::int32_t get_reference_unit_A() const;
-    std::int32_t get_reference_unit_B() const;
-    void setOffset(const std::int32_t offset);
-    void setOffsetA(const std::int32_t offset);
-    void setOffsetB(const std::int32_t offset);
-    std::int32_t getOffset() const;
-    std::int32_t getOffsetA() const;
-    std::int32_t getOffsetB() const;
+    std::int32_t get_reference_unit() const noexcept;
+    std::int32_t get_reference_unit_A() const noexcept;
+    std::int32_t get_reference_unit_B() const noexcept;
+    void setOffset(const std::int32_t offset) noexcept;
+    void setOffsetA(const std::int32_t offset) noexcept;
+    void setOffsetB(const std::int32_t offset) noexcept;
+    std::int32_t getOffset() const noexcept;
+    std::int32_t getOffsetA() const noexcept;
+    std::int32_t getOffsetB() const noexcept;
     void power_down();
     void power_up();
     void reset();

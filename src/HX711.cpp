@@ -31,7 +31,7 @@
 
 namespace HX711 {
 
-std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) {
+std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
@@ -216,7 +216,7 @@ void HX711::set_gain(const std::uint8_t gain) {
 
 }
 
-std::uint8_t HX711::get_gain() const {
+std::uint8_t HX711::get_gain() const noexcept {
 
     if(this->_gain == 1) {
         return 128;
@@ -301,7 +301,7 @@ double HX711::tare_B(const std::uint16_t times) {
 
 }
 
-void HX711::set_reading_format(const Format byteFormat, const Format bitFormat) {
+void HX711::set_reading_format(const Format byteFormat, const Format bitFormat) noexcept {
     this->_byteFormat = byteFormat;
     this->_bitFormat = bitFormat;
 }
@@ -330,39 +330,39 @@ void HX711::set_reference_unit_B(const std::int32_t refUnit) {
 
 }
 
-std::int32_t HX711::get_reference_unit() const {
+std::int32_t HX711::get_reference_unit() const noexcept {
     return this->get_reference_unit_A();
 }
 
-std::int32_t HX711::get_reference_unit_A() const {
+std::int32_t HX711::get_reference_unit_A() const noexcept {
     return this->_referenceUnit;
 }
 
-std::int32_t HX711::get_reference_unit_B() const {
+std::int32_t HX711::get_reference_unit_B() const noexcept {
     return this->_referenceUnitB;
 }
 
-void HX711::_setOffset(const std::int32_t offset) {
+void HX711::setOffset(const std::int32_t offset) noexcept {
     this->setOffsetA(offset);
 }
 
-void HX711::setOffsetA(const std::int32_t offset) {
+void HX711::setOffsetA(const std::int32_t offset) noexcept {
     this->_offset = offset;
 }
 
-void HX711::setOffsetB(const std::int32_t offset) {
+void HX711::setOffsetB(const std::int32_t offset) noexcept {
     this->_offsetB = offset;
 }
 
-std::int32_t HX711::getOffset() const {
+std::int32_t HX711::getOffset() const noexcept {
     return this->getOffsetA();
 }
 
-std::int32_t HX711::getOffsetA() const {
+std::int32_t HX711::getOffsetA() const noexcept {
     return this->_offset;
 }
 
-std::int32_t HX711::getOffsetB() const {
+std::int32_t HX711::getOffsetB() const noexcept {
     return this->_offsetB;
 }
 
