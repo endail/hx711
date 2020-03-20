@@ -56,12 +56,6 @@ protected:
     std::int32_t _readLong();
     double _readAverage(const std::uint16_t times = 3);
     double _readMedian(const std::uint16_t times = 3);
-    void _setOffset(const std::int32_t offset);
-    void _setOffsetA(const std::int32_t offset);
-    void _setOffsetB(const std::int32_t offset);
-    std::int32_t _getOffset() const;
-    std::int32_t _getOffsetA() const;
-    std::int32_t _getOffsetB() const;
 
 public:
     HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain = 128);
@@ -85,6 +79,12 @@ public:
     std::int32_t get_reference_unit() const;
     std::int32_t get_reference_unit_A() const;
     std::int32_t get_reference_unit_B() const;
+    void setOffset(const std::int32_t offset);
+    void setOffsetA(const std::int32_t offset);
+    void setOffsetB(const std::int32_t offset);
+    std::int32_t getOffset() const;
+    std::int32_t getOffsetA() const;
+    std::int32_t getOffsetB() const;
     void power_down();
     void power_up();
     void reset();

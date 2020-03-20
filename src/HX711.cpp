@@ -174,30 +174,6 @@ double HX711::_readMedian(const std::uint16_t times) {
 
 }
 
-void HX711::_setOffset(const std::int32_t offset) {
-    this->_setOffsetA(offset);
-}
-
-void HX711::_setOffsetA(const std::int32_t offset) {
-    this->_offset = offset;
-}
-
-void HX711::_setOffsetB(const std::int32_t offset) {
-    this->_offsetB = offset;
-}
-
-std::int32_t HX711::_getOffset() const {
-    return this->_getOffsetA();
-}
-
-std::int32_t HX711::_getOffsetA() const {
-    return this->_offset;
-}
-
-std::int32_t HX711::_getOffsetB() const {
-    return this->_offsetB;
-}
-
 HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain) {
 
     this->_dataPin = dataPin;
@@ -262,13 +238,13 @@ double HX711::get_value(const std::uint16_t times) {
 }
 
 double HX711::get_value_A(const std::uint16_t times) {
-    return this->_readMedian(times) - this->_getOffsetA();
+    return this->_readMedian(times) - this->getOffsetA();
 }
 
 double HX711::get_value_B(const std::uint16_t times) {
     const std::uint8_t gain = this->get_gain();
     this->set_gain(32);
-    const double val = this->_readMedian(times) - this->_getOffsetB();
+    const double val = this->_readMedian(times) - this->getOffsetB();
     this->set_gain(gain);
     return val;
 }
@@ -300,7 +276,7 @@ double HX711::tare_A(const std::uint16_t times) {
 
     const double val = this->_readAverage(times);
 
-    this->_setOffsetA(val);
+    this->setOffsetA(val);
     this->set_reference_unit_A(backupRefUnit);
 
     return val;
@@ -317,7 +293,7 @@ double HX711::tare_B(const std::uint16_t times) {
 
     const double val = this->_readAverage(times);
 
-    this->_setOffsetB(val);
+    this->setOffsetB(val);
 
     this->set_gain(backupGain);
     this->set_reference_unit_B(backupRefUnit);
@@ -365,6 +341,30 @@ std::int32_t HX711::get_reference_unit_A() const {
 
 std::int32_t HX711::get_reference_unit_B() const {
     return this->_referenceUnitB;
+}
+
+void HX711::_setOffset(const std::int32_t offset) {
+    this->setOffsetA(offset);
+}
+
+void HX711::setOffsetA(const std::int32_t offset) {
+    this->_offset = offset;
+}
+
+void HX711::setOffsetB(const std::int32_t offset) {
+    this->_offsetB = offset;
+}
+
+std::int32_t HX711::getOffset() const {
+    return this->getOffsetA();
+}
+
+std::int32_t HX711::getOffsetA() const {
+    return this->_offset;
+}
+
+std::int32_t HX711::getOffsetB() const {
+    return this->_offsetB;
 }
 
 void HX711::power_down() {
