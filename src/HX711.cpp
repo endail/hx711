@@ -174,10 +174,9 @@ double HX711::_readMedian(const std::uint16_t times) {
 
 }
 
-HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain) {
+HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain)
+    : _dataPin(dataPin), _clockPin(clockPin) {
 
-    this->_dataPin = dataPin;
-    this->_clockPin = clockPin;
     this->_referenceUnit = 1;
     this->_offset = 1;
     this->_byteFormat = Format::MSB;
