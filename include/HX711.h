@@ -30,7 +30,7 @@
 
 namespace HX711 {
 
-enum Format {
+enum class Format {
     MSB,
     LSB
 };
