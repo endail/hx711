@@ -71,6 +71,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     while(!this->is_ready()) {
         //DOUT falling edge to PD_SCK rising edge MIN 0.1 us
+        //0.1 us == 100 ns
         std::this_thread::sleep_for(std::chrono::nanoseconds(100));
     }
 
@@ -108,8 +109,8 @@ std::int32_t HX711::_readLong() {
     this->_readRawBytes(bytes);
 
     const std::int32_t twosComp = ((bytes[0] << 16) |
-                              (bytes[1] << 8)  |
-                              bytes[2]);
+                                   (bytes[1] << 8)  |
+                                    bytes[2]);
 
     const std::int32_t signedInt = _convertFromTwosComplement(twosComp);
 
@@ -191,7 +192,6 @@ HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std:
 }
 
 HX711::~HX711() {
-
 }
 
 bool HX711::is_ready() const {
