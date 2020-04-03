@@ -118,63 +118,6 @@ std::int32_t HX711::_readLong() {
 
 }
 
-double HX711::_readAverage(const std::uint16_t times) {
-
-    if(times == 0) {
-        throw std::invalid_argument("times must be greater than 0");
-    }
-    else if(times < 5) {
-        return this->_readMedian(times);
-    }
-
-    std::vector<std::int32_t> values;
-    values.reserve(times);
-
-    for(std::uint16_t i = 0; i < times; ++i) {
-        values.push_back(this->_readLong());
-    }
-
-    std::sort(values.begin(), values.end());
-
-    const std::uint16_t trimAmount = values.size() * 0.2;
-    values = std::vector<std::int32_t>(values.begin() + trimAmount, values.end() - trimAmount);
-
-    const std::int64_t sum = std::accumulate(values.begin(), values.end(), 0);
-
-    return (double)sum / values.size();
-
-}
-
-double HX711::_readMedian(const std::uint16_t times) {
-
-    if(times == 0) {
-        throw std::invalid_argument("times must be greater than 0");
-    }
-    else if(times == 1) {
-        return (double)this->_readLong();
-    }
-
-    std::vector<std::int32_t> values;
-    values.reserve(times);
-
-    for(std::uint16_t i = 0; i < times; ++i) {
-        values.push_back(this->_readLong());
-    }
-
-    std::sort(values.begin(), values.end());
-
-    if((times & 0x1) == 0x1) {
-        return values[values.size() / 2];
-    }
-
-    const std::uint16_t midpoint = values.size() / 2;
-    const std::int64_t sum = std::accumulate(values.begin() + midpoint, values.begin() + midpoint + 2, 0);
-
-    return sum / 2.0;
-
-
-}
-
 HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain)
     : _dataPin(dataPin), _clockPin(clockPin) {
 
@@ -242,13 +185,13 @@ double HX711::get_value(const std::uint16_t times) {
 }
 
 double HX711::get_value_A(const std::uint16_t times) {
-    return this->_readMedian(times) - this->getOffsetA();
+    return this->readMedian(times) - this->getOffsetA();
 }
 
 double HX711::get_value_B(const std::uint16_t times) {
     const std::uint8_t gain = this->get_gain();
     this->set_gain(32);
-    const double val = this->_readMedian(times) - this->getOffsetB();
+    const double val = this->readMedian(times) - this->getOffsetB();
     this->set_gain(gain);
     return val;
 }
@@ -278,7 +221,7 @@ double HX711::tare_A(const std::uint16_t times) {
     const std::int32_t backupRefUnit = this->get_reference_unit_A();
     this->set_reference_unit_A(1);
 
-    const double val = this->_readAverage(times);
+    const double val = this->readAverage(times);
 
     this->setOffsetA(val);
     this->set_reference_unit_A(backupRefUnit);
@@ -295,7 +238,7 @@ double HX711::tare_B(const std::uint16_t times) {
     const std::uint8_t backupGain = this->get_gain();
     this->set_gain(32);
 
-    const double val = this->_readAverage(times);
+    const double val = this->readAverage(times);
 
     this->setOffsetB(val);
 
@@ -369,6 +312,62 @@ std::int32_t HX711::getOffsetA() const noexcept {
 
 std::int32_t HX711::getOffsetB() const noexcept {
     return this->_offsetB;
+}
+
+double HX711::readAverage(const std::uint16_t times) {
+
+    if(times == 0) {
+        throw std::invalid_argument("times must be greater than 0");
+    }
+    else if(times < 5) {
+        return this->readMedian(times);
+    }
+
+    std::vector<std::int32_t> values;
+    values.reserve(times);
+
+    for(std::uint16_t i = 0; i < times; ++i) {
+        values.push_back(this->_readLong());
+    }
+
+    std::sort(values.begin(), values.end());
+
+    const std::uint16_t trimAmount = values.size() * 0.2;
+    values = std::vector<std::int32_t>(values.begin() + trimAmount, values.end() - trimAmount);
+
+    const std::int64_t sum = std::accumulate(values.begin(), values.end(), 0);
+
+    return (double)sum / values.size();
+
+}
+
+double HX711::readMedian(const std::uint16_t times) {
+
+    if(times == 0) {
+        throw std::invalid_argument("times must be greater than 0");
+    }
+    else if(times == 1) {
+        return (double)this->_readLong();
+    }
+
+    std::vector<std::int32_t> values;
+    values.reserve(times);
+
+    for(std::uint16_t i = 0; i < times; ++i) {
+        values.push_back(this->_readLong());
+    }
+
+    std::sort(values.begin(), values.end());
+
+    if((times & 0x1) == 0x1) {
+        return values[values.size() / 2];
+    }
+
+    const std::uint16_t midpoint = values.size() / 2;
+    const std::int64_t sum = std::accumulate(values.begin() + midpoint, values.begin() + midpoint + 2, 0);
+
+    return sum / 2.0;
+
 }
 
 void HX711::power_down() {

@@ -54,8 +54,6 @@ protected:
     std::uint8_t _readByte() const;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     std::int32_t _readLong();
-    double _readAverage(const std::uint16_t times = 3);
-    double _readMedian(const std::uint16_t times = 3);
 
 public:
     HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain = 128);
@@ -87,6 +85,8 @@ public:
     std::int32_t getOffset() const noexcept;
     std::int32_t getOffsetA() const noexcept;
     std::int32_t getOffsetB() const noexcept;
+    double readAverage(const std::uint16_t times = 3);
+    double readMedian(const std::uint16_t times = 3);
     void power_down();
     void power_up();
     void reset();
