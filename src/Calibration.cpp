@@ -23,12 +23,13 @@
 #include "../include/HX711.h"
 #include <iostream>
 #include <iomanip>
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 #include <string>
 
 bool setupHx(const int dataPin, const int clockPin);
 
-uint32_t samples;
+std::uint32_t samples;
 std::string unit;
 double knownWeight;
 HX711::HX711* hx;
@@ -111,6 +112,6 @@ int main(int argc, char** argv) {
 bool setupHx(const int dataPin, const int clockPin) {
     hx = new HX711::HX711(dataPin, clockPin);
     hx->set_reference_unit(1);
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     return hx->is_ready();
 }
