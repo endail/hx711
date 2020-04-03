@@ -21,7 +21,8 @@
 // SOFTWARE.
 
 #include <iostream>
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 #include <iomanip>
 #include "../include/HX711.h"
 
@@ -47,7 +48,7 @@ int main(int argc, char** argv) {
 
     while(true) {
         cout << fixed << setprecision(15) << hx.get_weight(1) << endl;
-        sleep(1);
+        this_thread::sleep_for(chrono::seconds(1));
     }
 
     return 0;
