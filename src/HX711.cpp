@@ -194,11 +194,11 @@ HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std:
 HX711::~HX711() {
 }
 
-std::uint8_t HX711::getDataPin() const {
+std::uint8_t HX711::getDataPin() const noexcept {
     return this->_dataPin;
 }
 
-std::uint8_t HX711::getClockPin() const {
+std::uint8_t HX711::getClockPin() const noexcept {
     return this->_clockPin;
 }
 
