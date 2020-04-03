@@ -194,6 +194,14 @@ HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std:
 HX711::~HX711() {
 }
 
+std::uint8_t HX711::getDataPin() const {
+    return this->_dataPin;
+}
+
+std::uint8_t HX711::getClockPin() const {
+    return this->_clockPin;
+}
+
 bool HX711::is_ready() const {
     return digitalRead(this->_dataPin) == LOW;
 }

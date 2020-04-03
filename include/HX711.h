@@ -60,6 +60,8 @@ protected:
 public:
     HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain = 128);
     ~HX711();
+    std::uint8_t getDataPin() const;
+    std::uint8_t getClockPin() const;
     bool is_ready() const;
     void set_gain(const std::uint8_t gain);
     std::uint8_t get_gain() const noexcept;
