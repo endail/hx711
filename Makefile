@@ -14,7 +14,7 @@ ifeq ($(PREFIX),)
 endif
 
 # Add additional libs for building on travis
-ifeq ($(TRAVIS),"true")
+ifeq ($(TRAVIS),)
 	LIB := $(LIB) -lrt -lcrypt -pthread
 endif
 
