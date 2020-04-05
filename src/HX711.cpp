@@ -133,7 +133,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
     }
 
     /**
-     *  The HX711 will supply bits in big-endian format:
+     *  The HX711 will supply bits in big-endian format;
      *  the 0th read bit is the MSB.
      *  
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
@@ -192,6 +192,12 @@ std::uint8_t HX711::getClockPin() const noexcept {
 }
 
 bool HX711::is_ready() const noexcept {
+    /**
+     *  HX711 will be "ready" when DOUT is low.
+     * 
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5
+     */
     return digitalRead(this->_dataPin) == LOW;
 }
 
