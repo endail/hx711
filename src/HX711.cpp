@@ -23,8 +23,6 @@
 #include "../include/HX711.h"
 #include <cstdint>
 #include <wiringPi.h>
-#include <thread>
-#include <chrono>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -36,19 +34,42 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
 }
 
 bool HX711::_readBit() const {
-    //https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
-    //clock should be high for 1 microsecond
-    //then low for 1 microsecond
-    //does this require a sleep just to be sure?
-    //is pi slow that it doesn't matter?
+
+    /**
+     *  A new bit will be "ready" when the clock pin
+     *  is held high for 1us, then low for 1us.
+     *  There is no subsequent delay for reading the bit.
+     * 
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5
+     * 
+     *  Problem 1: the max high time for holding clock pin
+     *  high is 50us. Typically (according to docs) 1us is
+     *  sufficient.
+     * 
+     *  Solution: stick with 1us.
+     */
+
     digitalWrite(this->_clockPin, HIGH);
+    delayMicroseconds(1);
     digitalWrite(this->_clockPin, LOW);
+    delayMicroseconds(1);
+
     return digitalRead(this->_dataPin) == HIGH;
+
 }
 
 std::uint8_t HX711::_readByte() const {
 
     std::uint8_t val = 0;
+
+    /**
+     *  ISSUE: does there need to be a delay between
+     *  reading each bit? Docs describe a 0.1us delay
+     *  prior to reading the most significant bit.
+     *  But it is unclear if this delay applies to
+     *  each bit.
+     */
 
     for(std::uint8_t i = 0; i < 8; ++i) {
         if(this->_bitFormat == Format::MSB) {
@@ -70,9 +91,27 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     std::unique_lock<std::mutex> lock(this->_readLock);
 
     while(!this->is_ready()) {
-        //DOUT falling edge to PD_SCK rising edge MIN 0.1 us
-        //0.1 us == 100 ns
-        std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+        /**
+         *  HX711 will be "ready" when DOUT is low.
+         *  The time between reading a bit and being ready
+         *  is a maximum of 0.1us. T2 in Fig.2
+         * 
+         *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+         *  pg. 5
+         *  
+         *  Problem 1: wiringPi's delay resolution is to the microsecond,
+         *  not nanosecond. A 1us delay here would be 10x the maximum
+         *  expected wait period.
+         * 
+         *  Problem 2: according to Gordon, nanosleep is unreliable. Hence,
+         *  we prefer wiringPi's delay functions instead.
+         *  https://projects.drogon.net/accurate-delays-on-the-raspberry-pi/
+         * 
+         *  Solution: no *programmed* delays.
+         * 
+         *  Any attempt to sleep for such a short amount of time is going to
+         *  far exceed the maximum documented wait time for the HX711 anyway. 
+         */
     }
 
     const std::uint8_t byte1 = this->_readByte();
@@ -377,8 +416,15 @@ void HX711::power_down() {
     digitalWrite(this->_clockPin, LOW);
     digitalWrite(this->_clockPin, HIGH);
 
-    //change to 60us?
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    /**
+     *  When PD_SCK pin changes from low to high
+     *  and stays at high for longer than 60µs, HX711
+     *  enters power down mode (Fig.3).
+     * 
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5
+     */
+    delayMicroseconds(60);
 
 }
 
@@ -388,9 +434,14 @@ void HX711::power_up() {
 
     digitalWrite(this->_clockPin, LOW);
 
-    //is sleep required here?
-    //if so, how long?
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    //There is no need to delay at this point.
+    /**
+     *  When PD_SCK returns to low,
+     *  chip will reset and enter normal operation mode
+     * 
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5   
+     */
 
     lock.unlock();
 
