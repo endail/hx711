@@ -3,7 +3,7 @@ os: linux
 dist: bionic
 arch: arm64
 compiler: g++
-
+before_script: "sudo apt-get install wiringpi"
 script: "make all"
 branches:
   only:
