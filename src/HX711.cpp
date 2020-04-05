@@ -122,7 +122,10 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
         this->_readByte()
     };
 
-    for(std::uint8_t i = 0; i < this->_gain; ++i) {
+    const uint8_t gainLeftover = 
+        PULSES[static_cast<std::int32_t>(this->_gain)] - sizeof(raw) * 8;
+
+    for(std::uint8_t i = 0; i < gainLeftover; ++i) {
         this->_readBit();
     }
 
@@ -167,19 +170,22 @@ std::int32_t HX711::_readLong() noexcept {
 
 }
 
-HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain)
-    :   _dataPin(dataPin),
-        _clockPin(clockPin),
-        _referenceUnit(1),
-        _offset(1),
-        _byteFormat(Format::MSB),
-        _bitFormat(Format::MSB) {
+HX711::HX711(
+    const std::uint8_t dataPin,
+    const std::uint8_t clockPin,
+    const Gain gain)
+        :   _dataPin(dataPin),
+            _clockPin(clockPin),
+            _referenceUnit(1),
+            _offset(1),
+            _byteFormat(Format::MSB),
+            _bitFormat(Format::MSB) {
 
-            wiringPiSetup();
-            pinMode(this->_dataPin, INPUT);
-            pinMode(this->_clockPin, OUTPUT);
+                wiringPiSetup();
+                pinMode(this->_dataPin, INPUT);
+                pinMode(this->_clockPin, OUTPUT);
 
-            this->set_gain(gain);
+                this->set_gain(gain);
 
 }
 
@@ -201,38 +207,14 @@ bool HX711::is_ready() const noexcept {
     return digitalRead(this->_dataPin) == LOW;
 }
 
-void HX711::set_gain(const std::uint8_t gain) noexcept {
-
-    if(gain == 128) {
-        this->_gain = 1;
-    }
-    else if(gain == 64) {
-        this->_gain = 3;
-    }
-    else if(gain == 32) {
-        this->_gain = 2;
-    }
-
+void HX711::set_gain(const Gain gain) noexcept {
+    this->_gain = gain;
     digitalWrite(this->_clockPin, LOW);
-
     this->_readRawBytes();
-
 }
 
-std::uint8_t HX711::get_gain() const noexcept {
-
-    if(this->_gain == 1) {
-        return 128;
-    }
-    else if(this->_gain == 3) {
-        return 64;
-    }
-    else if(this->_gain == 2) {
-        return 32;
-    }
-
-    return 0;
-
+Gain HX711::get_gain() const noexcept {
+    return this->_gain;
 }
 
 double HX711::get_value(const std::uint16_t times) noexcept {
@@ -244,8 +226,8 @@ double HX711::get_value_A(const std::uint16_t times) noexcept {
 }
 
 double HX711::get_value_B(const std::uint16_t times) noexcept {
-    const std::uint8_t gain = this->get_gain();
-    this->set_gain(32);
+    const Gain gain = this->_gain;
+    this->_gain = Gain::GAIN_32;
     const double val = this->readMedian(times) - this->getOffsetB();
     this->set_gain(gain);
     return val;
@@ -290,13 +272,12 @@ double HX711::tare_B(const std::uint16_t times) noexcept {
     const std::int32_t backupRefUnit = this->get_reference_unit_B();
     this->set_reference_unit_B(1);
 
-    const std::uint8_t backupGain = this->get_gain();
-    this->set_gain(32);
+    const Gain backupGain = this->_gain;
+    this->set_gain(Gain::GAIN_32);
 
     const double val = this->readAverage(times);
 
     this->setOffsetB(val);
-
     this->set_gain(backupGain);
     this->set_reference_unit_B(backupRefUnit);
 
@@ -460,7 +441,7 @@ void HX711::power_up() noexcept {
 
     lock.unlock();
 
-    if(this->get_gain() != 128) {
+    if(this->_gain != Gain::GAIN_128) {
         this->_readRawBytes();
     }
 

@@ -35,13 +35,25 @@ enum class Format {
     LSB
 };
 
+enum class Gain {
+    GAIN_128 = 0,
+    GAIN_32,
+    GAIN_64
+};
+
+const std::uint8_t PULSES[3] = {
+    25,
+    26,
+    27
+};
+
 class HX711 {
 
 protected:
     std::uint8_t _dataPin;
     std::uint8_t _clockPin;
     std::mutex _readLock;
-    std::uint8_t _gain;
+    Gain _gain;
     std::int32_t _referenceUnit;
     std::int32_t _referenceUnitB;
     std::int32_t _offset;
@@ -56,13 +68,17 @@ protected:
     std::int32_t _readLong() noexcept;
 
 public:
-    HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain = 128);
+    HX711(
+        const std::uint8_t dataPin,
+        const std::uint8_t clockPin,
+        const Gain gain = Gain::GAIN_128);
+
     ~HX711() = default;
     std::uint8_t getDataPin() const noexcept;
     std::uint8_t getClockPin() const noexcept;
     bool is_ready() const noexcept;
-    void set_gain(const std::uint8_t gain) noexcept;
-    std::uint8_t get_gain() const noexcept;
+    void set_gain(const Gain gain) noexcept;
+    Gain get_gain() const noexcept;
     double get_value(const std::uint16_t times = 3) noexcept;
     double get_value_A(const std::uint16_t times = 3) noexcept;
     double get_value_B(const std::uint16_t times = 3) noexcept;
@@ -72,7 +88,9 @@ public:
     double tare(const std::uint16_t times = 15) noexcept;
     double tare_A(const std::uint16_t times = 15) noexcept;
     double tare_B(const std::uint16_t times = 15) noexcept;
-    void set_reading_format(const Format byteFormat = Format::MSB, const Format bitFormat = Format::MSB) noexcept;
+    void set_reading_format(
+        const Format byteFormat = Format::MSB,
+        const Format bitFormat = Format::MSB) noexcept;
     void set_reference_unit(const std::int32_t refUnit);
     void set_reference_unit_A(const std::int32_t refUnit);
     void set_reference_unit_B(const std::int32_t refUnit);
