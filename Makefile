@@ -13,7 +13,6 @@ ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
-
 .PHONY: all
 all: dirs $(BUILDDIR)/libhx711.a test hx711calibration
 

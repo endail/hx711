@@ -1,4 +1,7 @@
 # HX711 C++ Library
+
+[![Build Status](https://travis-ci.com/endail/hx711.svg?branch=master)](https://travis-ci.com/endail/hx711)
+
 - Port of https://github.com/tatobari/hx711py
 - Use with Raspberry Pi
 
