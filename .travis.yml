@@ -1,0 +1,10 @@
+language: cpp
+os: linux
+dist: bionic
+arch: arm64
+compiler: g++
+script: "./make all"
+branches:
+  only:
+  - master
+  - "/^v\\d+\\./"
