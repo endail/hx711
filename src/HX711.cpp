@@ -26,6 +26,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <cstring>
 
 namespace HX711 {
 
@@ -115,9 +116,11 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
          */
     }
 
-    const std::uint8_t byte1 = this->_readByte();
-    const std::uint8_t byte2 = this->_readByte();
-    const std::uint8_t byte3 = this->_readByte();
+    std::uint8_t raw[3] = {
+        this->_readByte(),
+        this->_readByte(),
+        this->_readByte()
+    };
 
     for(std::uint8_t i = 0; i < this->_gain; ++i) {
         this->_readBit();
@@ -129,16 +132,22 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
         return;
     }
 
+    /**
+     *  The HX711 will supply bits in big-endian format:
+     *  the 0th read bit is the MSB.
+     *  
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 4
+     * 
+     *  If LSB format is requested, all that needs to be
+     *  done is for the bytes to be reversed.
+     */
     if(this->_byteFormat == Format::LSB) {
-        bytes[0] = byte3;
-        bytes[1] = byte2;
-        bytes[2] = byte1;
+        std::reverse(raw, raw + sizeof(raw));
     }
-    else {
-        bytes[0] = byte1;
-        bytes[1] = byte2;
-        bytes[2] = byte3;
-    }
+
+    //finally, copy the local raw bytes to the byte array
+    memcpy(bytes, raw, sizeof(raw));
 
 }
 
