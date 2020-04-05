@@ -198,6 +198,11 @@ HX711::HX711(
                 pinMode(this->_dataPin, INPUT);
                 pinMode(this->_clockPin, OUTPUT);
 
+                /**
+                 *  Cannot simply set this->_gain. this->set_gain()
+                 *  must be called to set the HX711 module at the
+                 *  hardware-level.
+                 */
                 this->set_gain(gain);
 
 }
