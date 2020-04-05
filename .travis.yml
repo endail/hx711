@@ -3,8 +3,8 @@ os: linux
 dist: bionic
 arch: arm64
 compiler: g++
-before_script: "cd; git clone git://github.com/WiringPi/WiringPi; cd WiringPi; ./build"
-script: "cd ~/endail/hx711; make all"
+before_script: "ls -al; cd; git clone git://github.com/WiringPi/WiringPi; cd WiringPi; ./build"
+script: "cd; ls -al; endail/hx711; make all"
 branches:
   only:
   - master
