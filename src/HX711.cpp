@@ -34,7 +34,7 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
-bool HX711::_readBit() const {
+bool HX711::_readBit() const noexcept {
 
     /**
      *  A new bit will be "ready" when the clock pin
@@ -60,7 +60,7 @@ bool HX711::_readBit() const {
 
 }
 
-std::uint8_t HX711::_readByte() const {
+std::uint8_t HX711::_readByte() const noexcept {
 
     std::uint8_t val = 0;
 
@@ -87,7 +87,7 @@ std::uint8_t HX711::_readByte() const {
 
 }
 
-void HX711::_readRawBytes(std::uint8_t* bytes) {
+void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
 
@@ -151,7 +151,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
 }
 
-std::int32_t HX711::_readLong() {
+std::int32_t HX711::_readLong() noexcept {
 
     std::uint8_t bytes[3];
     
@@ -191,11 +191,11 @@ std::uint8_t HX711::getClockPin() const noexcept {
     return this->_clockPin;
 }
 
-bool HX711::is_ready() const {
+bool HX711::is_ready() const noexcept {
     return digitalRead(this->_dataPin) == LOW;
 }
 
-void HX711::set_gain(const std::uint8_t gain) {
+void HX711::set_gain(const std::uint8_t gain) noexcept {
 
     if(gain == 128) {
         this->_gain = 1;
@@ -229,15 +229,15 @@ std::uint8_t HX711::get_gain() const noexcept {
 
 }
 
-double HX711::get_value(const std::uint16_t times) {
+double HX711::get_value(const std::uint16_t times) noexcept {
     return this->get_value_A(times);
 }
 
-double HX711::get_value_A(const std::uint16_t times) {
+double HX711::get_value_A(const std::uint16_t times) noexcept {
     return this->readMedian(times) - this->getOffsetA();
 }
 
-double HX711::get_value_B(const std::uint16_t times) {
+double HX711::get_value_B(const std::uint16_t times) noexcept {
     const std::uint8_t gain = this->get_gain();
     this->set_gain(32);
     const double val = this->readMedian(times) - this->getOffsetB();
@@ -245,27 +245,27 @@ double HX711::get_value_B(const std::uint16_t times) {
     return val;
 }
 
-double HX711::get_weight(const std::uint16_t times) {
+double HX711::get_weight(const std::uint16_t times) noexcept {
     return this->get_weight_A(times);
 }
 
-double HX711::get_weight_A(const std::uint16_t times) {
+double HX711::get_weight_A(const std::uint16_t times) noexcept {
     double val = this->get_value_A(times);
     val = val / this->_referenceUnit;
     return val;
 }
 
-double HX711::get_weight_B(const std::uint16_t times) {
+double HX711::get_weight_B(const std::uint16_t times) noexcept {
     double val = this->get_value_B(times);
     val = val / this->_referenceUnitB;
     return val;
 }
 
-double HX711::tare(const std::uint16_t times) {
+double HX711::tare(const std::uint16_t times) noexcept {
     return this->tare_A(times);
 }
 
-double HX711::tare_A(const std::uint16_t times) {
+double HX711::tare_A(const std::uint16_t times) noexcept {
 
     const std::int32_t backupRefUnit = this->get_reference_unit_A();
     this->set_reference_unit_A(1);
@@ -279,7 +279,7 @@ double HX711::tare_A(const std::uint16_t times) {
 
 }
 
-double HX711::tare_B(const std::uint16_t times) {
+double HX711::tare_B(const std::uint16_t times) noexcept {
 
     const std::int32_t backupRefUnit = this->get_reference_unit_B();
     this->set_reference_unit_B(1);
@@ -419,7 +419,7 @@ double HX711::readMedian(const std::uint16_t times) {
 
 }
 
-void HX711::power_down() {
+void HX711::power_down() noexcept {
 
     std::lock_guard<std::mutex> lock(this->_readLock);
 
@@ -427,9 +427,9 @@ void HX711::power_down() {
     digitalWrite(this->_clockPin, HIGH);
 
     /**
-     *  When PD_SCK pin changes from low to high
+     *  "When PD_SCK pin changes from low to high
      *  and stays at high for longer than 60µs, HX711
-     *  enters power down mode (Fig.3).
+     *  enters power down mode (Fig.3)."
      * 
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
@@ -438,16 +438,15 @@ void HX711::power_down() {
 
 }
 
-void HX711::power_up() {
+void HX711::power_up() noexcept {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
 
     digitalWrite(this->_clockPin, LOW);
 
-    //There is no need to delay at this point.
     /**
-     *  When PD_SCK returns to low,
-     *  chip will reset and enter normal operation mode
+     *  "When PD_SCK returns to low,
+     *  chip will reset and enter normal operation mode"
      * 
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5   
@@ -461,7 +460,7 @@ void HX711::power_up() {
 
 }
 
-void HX711::reset() {
+void HX711::reset() noexcept {
     this->power_down();
     this->power_up();
 }

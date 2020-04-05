@@ -50,28 +50,28 @@ protected:
     Format _bitFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
-    bool _readBit() const;
-    std::uint8_t _readByte() const;
-    void _readRawBytes(std::uint8_t* bytes = nullptr);
-    std::int32_t _readLong();
+    bool _readBit() const noexcept;
+    std::uint8_t _readByte() const noexcept;
+    void _readRawBytes(std::uint8_t* bytes = nullptr) noexcept;
+    std::int32_t _readLong() noexcept;
 
 public:
     HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain = 128);
     ~HX711() = default;
     std::uint8_t getDataPin() const noexcept;
     std::uint8_t getClockPin() const noexcept;
-    bool is_ready() const;
-    void set_gain(const std::uint8_t gain);
+    bool is_ready() const noexcept;
+    void set_gain(const std::uint8_t gain) noexcept;
     std::uint8_t get_gain() const noexcept;
-    double get_value(const std::uint16_t times = 3);
-    double get_value_A(const std::uint16_t times = 3);
-    double get_value_B(const std::uint16_t times = 3);
-    double get_weight(const std::uint16_t times = 3);
-    double get_weight_A(const std::uint16_t times = 3);
-    double get_weight_B(const std::uint16_t times = 3);
-    double tare(const std::uint16_t times = 15);
-    double tare_A(const std::uint16_t times = 15);
-    double tare_B(const std::uint16_t times = 15);
+    double get_value(const std::uint16_t times = 3) noexcept;
+    double get_value_A(const std::uint16_t times = 3) noexcept;
+    double get_value_B(const std::uint16_t times = 3) noexcept;
+    double get_weight(const std::uint16_t times = 3) noexcept;
+    double get_weight_A(const std::uint16_t times = 3) noexcept;
+    double get_weight_B(const std::uint16_t times = 3) noexcept;
+    double tare(const std::uint16_t times = 15) noexcept;
+    double tare_A(const std::uint16_t times = 15) noexcept;
+    double tare_B(const std::uint16_t times = 15) noexcept;
     void set_reading_format(const Format byteFormat = Format::MSB, const Format bitFormat = Format::MSB) noexcept;
     void set_reference_unit(const std::int32_t refUnit);
     void set_reference_unit_A(const std::int32_t refUnit);
@@ -87,9 +87,9 @@ public:
     std::int32_t getOffsetB() const noexcept;
     double readAverage(const std::uint16_t times = 3);
     double readMedian(const std::uint16_t times = 3);
-    void power_down();
-    void power_up();
-    void reset();
+    void power_down() noexcept;
+    void power_up() noexcept;
+    void reset() noexcept;
 
 };
 };
