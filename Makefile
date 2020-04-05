@@ -9,12 +9,12 @@ LIB := -lwiringPi
 INC := -I $(INCDIR)
 
 # https://stackoverflow.com/a/39895302/570787
-ifeq ($(PREFIX), "true")
+ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
 # Add additional libs for building on travis
-ifeq ($(TRAVIS))
+ifeq ($(TRAVIS),"true")
 	LIB := $(LIB) -lrt -lcrypt -pthread
 endif
 
