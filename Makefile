@@ -5,12 +5,17 @@ BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
 CFLAGS := -g -Wall
-LIB := -lwiringPi -lrt -lcrypt -pthread
+LIB := -lwiringPi
 INC := -I $(INCDIR)
 
 # https://stackoverflow.com/a/39895302/570787
-ifeq ($(PREFIX),)
+ifeq ($(PREFIX), "true")
 	PREFIX := /usr/local
+endif
+
+# Add additional libs for building on travis
+ifeq ($(TRAVIS))
+	LIB := $(LIB) -lrt -lcrypt -pthread
 endif
 
 .PHONY: all
@@ -29,11 +34,11 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
-	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -l hx711 $(LIB)
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -lhx711 $(LIB)
 
 .PHONY: test
 test: $(BUILDDIR)/test.o
-	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/test $(BUILDDIR)/test.o -L $(BUILDDIR)/ -l hx711 $(LIB)
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/test $(BUILDDIR)/test.o -L $(BUILDDIR)/ -lhx711 $(LIB)
 
 .PHONY: clean
 clean:
