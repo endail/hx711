@@ -119,18 +119,18 @@ std::int32_t HX711::_readLong() {
 }
 
 HX711::HX711(const std::uint8_t dataPin, const std::uint8_t clockPin, const std::uint8_t gain)
-    : _dataPin(dataPin), _clockPin(clockPin) {
+    :   _dataPin(dataPin),
+        _clockPin(clockPin),
+        _referenceUnit(1),
+        _offset(1),
+        _byteFormat(Format::MSB),
+        _bitFormat(Format::MSB) {
 
-    this->_referenceUnit = 1;
-    this->_offset = 1;
-    this->_byteFormat = Format::MSB;
-    this->_bitFormat = Format::MSB;
+            wiringPiSetup();
+            pinMode(this->_dataPin, INPUT);
+            pinMode(this->_clockPin, OUTPUT);
 
-    wiringPiSetup();
-    pinMode(this->_dataPin, INPUT);
-    pinMode(this->_clockPin, OUTPUT);
-
-    this->set_gain(gain);
+            this->set_gain(gain);
 
 }
 
