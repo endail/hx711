@@ -3,7 +3,8 @@ os: linux
 dist: bionic
 arch: arm64
 compiler: g++
-script: "./make all"
+
+script: "cd endail/hx711; ./make all"
 branches:
   only:
   - master
