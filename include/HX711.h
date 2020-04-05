@@ -36,12 +36,20 @@ enum class Format {
     LSB
 };
 
+/**
+ *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+ *  pg. 4
+ */
 enum class Gain {
     GAIN_128 = 0,
     GAIN_32,
     GAIN_64
 };
 
+/**
+ *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+ *  pg. 4
+ */
 const std::uint8_t PULSES[3] = {
     25,
     26,

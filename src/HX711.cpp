@@ -390,7 +390,8 @@ double HX711::readAverage(const std::uint16_t times) {
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
     }
-    else if(times < 5) {
+    
+    if(times < 5) {
         return this->readMedian(times);
     }
 
@@ -417,7 +418,8 @@ double HX711::readMedian(const std::uint16_t times) {
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
     }
-    else if(times == 1) {
+    
+    if(times == 1) {
         return (double)this->_readLong();
     }
 
