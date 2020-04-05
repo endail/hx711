@@ -102,6 +102,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
          *  Problem 1: wiringPi's delay resolution is to the microsecond,
          *  not nanosecond. A 1us delay here would be 10x the maximum
          *  expected wait period.
+         *  https://github.com/WiringPi/WiringPi/blob/master/wiringPi/wiringPi.c#L2143-L2172
          * 
          *  Problem 2: according to Gordon, nanosleep is unreliable. Hence,
          *  we prefer wiringPi's delay functions instead.
