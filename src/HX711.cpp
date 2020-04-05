@@ -122,10 +122,23 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
         this->_readByte()
     };
 
-    const uint8_t gainLeftover = 
+    /**
+     *  The HX711 requires a certain number of "positive clock
+     *  pulses" depending on the set gain value.
+     *  
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 4
+     * 
+     *  The expression below calculates the number of pulses
+     *  after having read the three bytes above. For example,
+     *  a gain of 128 requires 25 pulses: 24 pulses were made
+     *  when reading the three bytes (3 * 8), so only one
+     *  additional pulse is needed.
+     */
+    const uint8_t pulsesNeeded = 
         PULSES[static_cast<std::int32_t>(this->_gain)] - sizeof(raw) * 8;
 
-    for(std::uint8_t i = 0; i < gainLeftover; ++i) {
+    for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
         this->_readBit();
     }
 
