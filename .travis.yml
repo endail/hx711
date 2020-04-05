@@ -3,7 +3,7 @@ os: linux
 dist: bionic
 arch: arm64
 compiler: g++
-before_script: "sudo apt-get install wiringpi"
+before_script: "git clone git://github.com/WiringPi/WiringPi; cd WiringPi/WiringPi; ./build"
 script: "make all"
 branches:
   only:
