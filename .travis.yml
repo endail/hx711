@@ -4,7 +4,7 @@ dist: bionic
 arch: arm64
 compiler: g++
 before_script: "git clone git://github.com/WiringPi/WiringPi; cd WiringPi; ./build"
-script: "make all"
+script: "cd ~/endail/hx711; make all"
 branches:
   only:
   - master
