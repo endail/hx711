@@ -74,7 +74,7 @@ public:
         const std::uint8_t clockPin,
         const Gain gain = Gain::GAIN_128);
 
-    ~HX711() = default;
+    virtual ~HX711() = default;
     std::uint8_t getDataPin() const noexcept;
     std::uint8_t getClockPin() const noexcept;
     bool is_ready() const noexcept;
