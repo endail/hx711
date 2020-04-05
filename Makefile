@@ -5,7 +5,7 @@ BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
 CFLAGS := -g -Wall
-LIB := -l wiringPi
+LIB := -lwiringPi -lrt -lcrypt -pthread
 INC := -I $(INCDIR)
 
 # https://stackoverflow.com/a/39895302/570787
