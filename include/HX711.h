@@ -27,6 +27,7 @@
 
 #include <cstdint>
 #include <mutex>
+#include <vector>
 
 namespace HX711 {
 
@@ -83,6 +84,7 @@ public:
     double get_value_A(const std::uint16_t times = 3) noexcept;
     double get_value_B(const std::uint16_t times = 3) noexcept;
     double get_weight(const std::uint16_t times = 3) noexcept;
+    std::vector<double> get_weights(const std::uint16_t times = 3);
     double get_weight_A(const std::uint16_t times = 3) noexcept;
     double get_weight_B(const std::uint16_t times = 3) noexcept;
     double tare(const std::uint16_t times = 15) noexcept;

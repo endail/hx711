@@ -250,6 +250,23 @@ double HX711::get_weight(const std::uint16_t times) noexcept {
     return this->get_weight_A(times);
 }
 
+std::vector<double> HX711::get_weights(const std::uint16_t times) {
+
+    if(times == 0) {
+        throw std::invalid_argument("times must be greater than 0");
+    }
+
+    std::vector<double> values;
+    values.reserve(times);
+
+    for(std::size_t i = 0; i < times; ++i) {
+        values.push_back(this->get_value_A());
+    }
+
+    return values;
+
+}
+
 double HX711::get_weight_A(const std::uint16_t times) noexcept {
     double val = this->get_value_A(times);
     val = val / this->_referenceUnit;
