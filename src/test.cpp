@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 
     if(argc != 4) {
         cout << err << endl;
-        return -1;
+        return 1;
     }
 
     const uint8_t dataPin = stoi(argv[1]);

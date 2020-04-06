@@ -40,12 +40,12 @@ int main(int argc, char** argv) {
 
     if(argc != 3) {
         cout << "Usage: hx711calibration [data pin] [clock pin]" << endl;
-        return -1;
+        return 1;
     }
 
     if(!setupHx(stoi(argv[1]), stoi(argv[2]))) {
         cout << "Failed to connect to HX711 module" << endl;
-        return -1;
+        return 1;
     }
 
     //clear screen
