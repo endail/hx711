@@ -61,6 +61,12 @@ class HX711 {
 protected:
 
     static const std::uint8_t _BITS_PER_BYTE = 8;
+
+    /**
+     *  "Conversion period"
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5
+     */
     static const std::uint8_t _BYTES_PER_CONVERSATION_PERIOD = 3;
 
     std::uint8_t _dataPin;
