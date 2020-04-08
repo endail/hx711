@@ -71,8 +71,7 @@ std::uint8_t HX711::_readByte() const noexcept {
      *  But it is unclear if this delay applies to
      *  each bit.
      */
-
-    for(std::uint8_t i = 0; i < 8; ++i) {
+    for(std::uint8_t i = 0; i < _BITS_PER_BYTE; ++i) {
         if(this->_bitFormat == Format::MSB) {
             val <<= 1;
             val |= this->_readBit();
@@ -116,7 +115,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
          */
     }
 
-    std::uint8_t raw[3] = {
+    std::uint8_t raw[_BYTES_PER_CONVERSATION_PERIOD] = {
         this->_readByte(),
         this->_readByte(),
         this->_readByte()
@@ -136,7 +135,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  additional pulse is needed.
      */
     const uint8_t pulsesNeeded = 
-        PULSES[static_cast<std::int32_t>(this->_gain)] - sizeof(raw) * 8;
+        PULSES[static_cast<std::int32_t>(this->_gain)] -
+            _BITS_PER_BYTE * _BYTES_PER_CONVERSATION_PERIOD;
 
     for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
         this->_readBit();
@@ -159,20 +159,21 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  done is for the bytes to be reversed.
      */
     if(this->_byteFormat == Format::LSB) {
-        std::reverse(raw, raw + sizeof(raw));
+        std::reverse(raw, raw + _BYTES_PER_CONVERSATION_PERIOD);
     }
 
     //finally, copy the local raw bytes to the byte array
-    memcpy(bytes, raw, sizeof(raw));
+    memcpy(bytes, raw, _BYTES_PER_CONVERSATION_PERIOD);
 
 }
 
 std::int32_t HX711::_readLong() noexcept {
 
-    std::uint8_t bytes[3];
+    std::uint8_t bytes[_BYTES_PER_CONVERSATION_PERIOD];
     
     this->_readRawBytes(bytes);
 
+    //TODO: put in a loop?
     const std::int32_t twosComp = ((bytes[0] << 16) |
                                    (bytes[1] << 8)  |
                                     bytes[2]);

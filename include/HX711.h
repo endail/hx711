@@ -59,6 +59,10 @@ const std::uint8_t PULSES[3] = {
 class HX711 {
 
 protected:
+
+    static const std::uint8_t _BITS_PER_BYTE = 8;
+    static const std::uint8_t _BYTES_PER_CONVERSATION_PERIOD = 3;
+
     std::uint8_t _dataPin;
     std::uint8_t _clockPin;
     std::mutex _readLock;
