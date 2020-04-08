@@ -255,6 +255,11 @@ double HX711::get_weight(const std::uint16_t times) noexcept {
     return this->get_weight_A(times);
 }
 
+/**
+ *  BUG: This implementation doesn't make sense.
+ *  It needs to take the raw values (ie. this->_readLong) then
+ *  translate them to weight values. In short, don't use for now.
+ */
 std::vector<double> HX711::get_weights(const std::uint16_t times) {
 
     if(times == 0) {
@@ -265,7 +270,7 @@ std::vector<double> HX711::get_weights(const std::uint16_t times) {
     values.reserve(times);
 
     for(std::size_t i = 0; i < times; ++i) {
-        values.push_back(this->get_value_A());
+        values.push_back(this->get_weight(1));
     }
 
     return values;
@@ -391,8 +396,8 @@ double HX711::readAverage(const std::uint16_t times) {
         throw std::invalid_argument("times must be greater than 0");
     }
     
-    if(times < 5) {
-        return this->readMedian(times);
+    if(times == 1) {
+        return (double)this->_readLong();
     }
 
     std::vector<std::int32_t> values;
@@ -479,6 +484,8 @@ void HX711::power_up() noexcept {
     lock.unlock();
 
     if(this->_gain != Gain::GAIN_128) {
+        //ISSUE: is there a race condition here?
+        //ie. with this->_readLock?
         this->_readRawBytes();
     }
 
