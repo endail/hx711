@@ -390,7 +390,7 @@ std::int32_t HX711::getOffsetB() const noexcept {
     return this->_offsetB;
 }
 
-std::vector<std::int32_t> HX711::readValues(const std::uint16_t times = 3) {
+std::vector<std::int32_t> HX711::readValues(const std::uint16_t times) {
 
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
