@@ -123,8 +123,9 @@ public:
     std::int32_t getOffset() const noexcept;
     std::int32_t getOffsetA() const noexcept;
     std::int32_t getOffsetB() const noexcept;
-    double readAverage(const std::uint16_t times = 3);
-    double readMedian(const std::uint16_t times = 3);
+    std::vector<std::int32_t> readValues(const std::uint16_t times = 3);
+    double readAverageValue(const std::uint16_t times = 3);
+    double readMedianValue(const std::uint16_t times = 3);
     void power_down() noexcept;
     void power_up() noexcept;
     void reset() noexcept;

@@ -241,13 +241,13 @@ double HX711::get_value(const std::uint16_t times) noexcept {
 }
 
 double HX711::get_value_A(const std::uint16_t times) noexcept {
-    return this->readMedian(times) - this->getOffsetA();
+    return this->readMedianValue(times) - this->getOffsetA();
 }
 
 double HX711::get_value_B(const std::uint16_t times) noexcept {
     const Gain gain = this->_gain;
     this->_gain = Gain::GAIN_32;
-    const double val = this->readMedian(times) - this->getOffsetB();
+    const double val = this->readMedianValue(times) - this->getOffsetB();
     this->set_gain(gain);
     return val;
 }
@@ -269,9 +269,10 @@ std::vector<double> HX711::get_weights(const std::uint16_t times) {
 
     std::vector<double> values;
     values.reserve(times);
+    const double refUnit = (double)this->_referenceUnit;
 
     for(std::size_t i = 0; i < times; ++i) {
-        values.push_back(this->get_weight(1));
+        values.push_back(this->_readLong() / refUnit);
     }
 
     return values;
@@ -299,7 +300,7 @@ double HX711::tare_A(const std::uint16_t times) noexcept {
     const std::int32_t backupRefUnit = this->get_reference_unit_A();
     this->set_reference_unit_A(1);
 
-    const double val = this->readAverage(times);
+    const double val = this->readAverageValue(times);
 
     this->setOffsetA(val);
     this->set_reference_unit_A(backupRefUnit);
@@ -316,7 +317,7 @@ double HX711::tare_B(const std::uint16_t times) noexcept {
     const Gain backupGain = this->_gain;
     this->set_gain(Gain::GAIN_32);
 
-    const double val = this->readAverage(times);
+    const double val = this->readAverageValue(times);
 
     this->setOffsetB(val);
     this->set_gain(backupGain);
@@ -391,7 +392,24 @@ std::int32_t HX711::getOffsetB() const noexcept {
     return this->_offsetB;
 }
 
-double HX711::readAverage(const std::uint16_t times) {
+std::vector<std::int32_t> HX711::readValues(const std::uint16_t times = 3) {
+
+    if(times == 0) {
+        throw std::invalid_argument("times must be greater than 0");
+    }
+
+    std::vector<std::int32_t> values;
+    values.reserve(times);
+
+    for(std::size_t i = 0; i < times; ++i) {
+        values.push_back(this->_readLong());
+    }
+
+    return values;
+
+}
+
+double HX711::readAverageValue(const std::uint16_t times) {
 
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
@@ -401,25 +419,16 @@ double HX711::readAverage(const std::uint16_t times) {
         return (double)this->_readLong();
     }
 
-    std::vector<std::int32_t> values;
-    values.reserve(times);
+    std::vector<std::int32_t> values = this->readValues(times);
 
-    for(std::uint16_t i = 0; i < times; ++i) {
-        values.push_back(this->_readLong());
-    }
-
-    std::sort(values.begin(), values.end());
-
-    const std::uint16_t trimAmount = values.size() * 0.2;
-    values = std::vector<std::int32_t>(values.begin() + trimAmount, values.end() - trimAmount);
-
-    const std::int64_t sum = std::accumulate(values.begin(), values.end(), 0);
+    const std::int64_t sum = std::accumulate(
+        values.begin(), values.end(), 0);
 
     return (double)sum / values.size();
 
 }
 
-double HX711::readMedian(const std::uint16_t times) {
+double HX711::readMedianValue(const std::uint16_t times) {
 
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
@@ -429,13 +438,7 @@ double HX711::readMedian(const std::uint16_t times) {
         return (double)this->_readLong();
     }
 
-    std::vector<std::int32_t> values;
-    values.reserve(times);
-
-    for(std::uint16_t i = 0; i < times; ++i) {
-        values.push_back(this->_readLong());
-    }
-
+    std::vector<std::int32_t> values = this->readValues(times);
     std::sort(values.begin(), values.end());
 
     if((times & 0x1) == 0x1) {
@@ -443,7 +446,8 @@ double HX711::readMedian(const std::uint16_t times) {
     }
 
     const std::uint16_t midpoint = values.size() / 2;
-    const std::int64_t sum = std::accumulate(values.begin() + midpoint, values.begin() + midpoint + 2, 0);
+    const std::int64_t sum = std::accumulate(
+        values.begin() + midpoint, values.begin() + midpoint + 2, 0);
 
     return sum / 2.0;
 
