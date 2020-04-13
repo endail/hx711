@@ -191,7 +191,7 @@ HX711::HX711(
         :   _dataPin(dataPin),
             _clockPin(clockPin),
             _referenceUnit(1),
-            _offset(1),
+            _offset(0),
             _byteFormat(Format::MSB),
             _bitFormat(Format::MSB) {
 
@@ -256,23 +256,21 @@ double HX711::get_weight(const std::uint16_t times) noexcept {
     return this->get_weight_A(times);
 }
 
-/**
- *  BUG: This implementation doesn't make sense.
- *  It needs to take the raw values (ie. this->_readLong) then
- *  translate them to weight values. In short, don't use for now.
- */
 std::vector<double> HX711::get_weights(const std::uint16_t times) {
 
     if(times == 0) {
         throw std::invalid_argument("times must be greater than 0");
     }
 
-    std::vector<double> values;
-    values.reserve(times);
     const double refUnit = (double)this->_referenceUnit;
 
+    std::vector<std::int32_t> rawValues = this->readValues(times);
+
+    std::vector<double> values;
+    values.reserve(times);
+
     for(std::size_t i = 0; i < times; ++i) {
-        values.push_back(this->_readLong() / refUnit);
+        values.push_back((rawValues[i] / refUnit) - this->_offset);
     }
 
     return values;
@@ -439,17 +437,27 @@ double HX711::readMedianValue(const std::uint16_t times) {
     }
 
     std::vector<std::int32_t> values = this->readValues(times);
-    std::sort(values.begin(), values.end());
+    
+    //https://stackoverflow.com/a/42791986/570787
+    if(values.size() % 2 == 0) {
 
-    if((times & 0x1) == 0x1) {
-        return values[values.size() / 2];
+        const auto median_it1 = values.begin() + values.size() / 2 - 1;
+        const auto median_it2 = values.begin() + values.size() / 2;
+
+        std::nth_element(values.begin(), median_it1, values.end());
+        const auto e1 = *median_it1;
+
+        std::nth_element(values.begin(), median_it2, values.end());
+        const auto e2 = *median_it2;
+
+        return (e1 + e2) / 2.0;
+
     }
-
-    const std::uint16_t midpoint = values.size() / 2;
-    const std::int64_t sum = std::accumulate(
-        values.begin() + midpoint, values.begin() + midpoint + 2, 0);
-
-    return sum / 2.0;
+    else {
+        const auto median_it = values.begin() + values.size() / 2;
+        std::nth_element(values.begin(), median_it, values.end());
+        return (double)*median_it;
+    }
 
 }
 
