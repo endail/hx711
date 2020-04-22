@@ -38,7 +38,7 @@ bool HX711::_readBit() const noexcept {
 
     /**
      *  A new bit will be "ready" when the clock pin
-     *  is held high for 1us, then low for 1us.
+     *  is held high for 1us (T3), then low for 1us (T4).
      *  There is no subsequent delay for reading the bit.
      * 
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
@@ -48,9 +48,8 @@ bool HX711::_readBit() const noexcept {
      *  high is 50us. Typically (according to docs) 1us is
      *  sufficient.
      * 
-     *  Solution: stick with 1us.
+     *  Solution: stick with 1us. It seems to work fine.
      */
-
     digitalWrite(this->_clockPin, HIGH);
     delayMicroseconds(1);
     digitalWrite(this->_clockPin, LOW);
@@ -64,13 +63,6 @@ std::uint8_t HX711::_readByte() const noexcept {
 
     std::uint8_t val = 0;
 
-    /**
-     *  ISSUE: does there need to be a delay between
-     *  reading each bit? Docs describe a 0.1us delay
-     *  prior to reading the most significant bit.
-     *  But it is unclear if this delay applies to
-     *  each bit.
-     */
     for(std::uint8_t i = 0; i < _BITS_PER_BYTE; ++i) {
         if(this->_bitFormat == Format::MSB) {
             val <<= 1;
@@ -90,30 +82,29 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
 
-    while(!this->is_ready()) {
-        /**
-         *  HX711 will be "ready" when DOUT is low.
-         *  The time between reading a bit and being ready
-         *  is a maximum of 0.1us. T2 in Fig.2
-         * 
-         *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
-         *  pg. 5
-         *  
-         *  Problem 1: wiringPi's delay resolution is to the microsecond,
-         *  not nanosecond. A 1us delay here would be 10x the maximum
-         *  expected wait period.
-         *  https://github.com/WiringPi/WiringPi/blob/master/wiringPi/wiringPi.c#L2143-L2172
-         * 
-         *  Problem 2: according to Gordon, nanosleep is unreliable. Hence,
-         *  we prefer wiringPi's delay functions instead.
-         *  https://projects.drogon.net/accurate-delays-on-the-raspberry-pi/
-         * 
-         *  Solution: no *programmed* delays.
-         * 
-         *  Any attempt to sleep for such a short amount of time is going to
-         *  far exceed the maximum documented wait time for the HX711 anyway. 
-         */
-    }
+    /**
+     *  Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
+     *  wait until this occurs.
+     * 
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5
+     */
+    while(!this->is_ready());
+
+    /**
+     *  When DOUT goes low, there is a minimum of 0.1us until the clock pin
+     *  can go high. T1 in Fig.2.
+     * 
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5
+     * 
+     *  Problem 1: because we prefer wiringPi's timing functions, we cannot
+     *  wait less than 1us.
+     * 
+     *  Solution: wait for 1us. This is 10x longer than necessary, but it
+     *  does allow sufficient time.
+     */
+    delayMicroseconds(1);
 
     std::uint8_t raw[_BYTES_PER_CONVERSATION_PERIOD] = {
         this->_readByte(),
@@ -144,6 +135,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
 
     lock.unlock();
 
+    //if no byte pointer is given, don't try to write to it
     if(bytes == nullptr) {
         return;
     }
