@@ -63,7 +63,7 @@ std::uint8_t HX711::_readByte() const noexcept {
 
     std::uint8_t val = 0;
 
-    for(std::uint8_t i = 0; i < _BITS_PER_BYTE; ++i) {
+    for(std::size_t i = 0; i < _BITS_PER_BYTE; ++i) {
         if(this->_bitFormat == Format::MSB) {
             val <<= 1;
             val |= this->_readBit();
@@ -88,6 +88,9 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      * 
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
+     * 
+     *  ISSUE: this is essentially an infinite-loop waiting on a GPIO pin. This
+     *  may be problematic.
      */
     while(!this->is_ready());
 
@@ -106,11 +109,13 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      */
     delayMicroseconds(1);
 
-    std::uint8_t raw[_BYTES_PER_CONVERSATION_PERIOD] = {
-        this->_readByte(),
-        this->_readByte(),
-        this->_readByte()
-    };
+    //delcare array of bytes of sufficient size
+    std::uint8_t raw[_BYTES_PER_CONVERSATION_PERIOD];
+
+    //then populate it with values from the hx711
+    for(std::size_t i = 0; i < _BYTES_PER_CONVERSATION_PERIOD; ++i) {
+        raw[i] = this->_readByte();
+    }
 
     /**
      *  The HX711 requires a certain number of "positive clock
@@ -125,11 +130,11 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  when reading the three bytes (3 * 8), so only one
      *  additional pulse is needed.
      */
-    const uint8_t pulsesNeeded = 
+    const size_t pulsesNeeded = 
         PULSES[static_cast<std::int32_t>(this->_gain)] -
             _BITS_PER_BYTE * _BYTES_PER_CONVERSATION_PERIOD;
 
-    for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
+    for(std::size_t i = 0; i < pulsesNeeded; ++i) {
         this->_readBit();
     }
 
