@@ -30,6 +30,13 @@
 
 namespace HX711 {
 
+HX711::HX711(const HX711& hx2) {
+}
+
+HX711& operator=(const HX711& hx2) {
+    return *this;
+}
+
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
@@ -295,7 +302,7 @@ double HX711::tare_A(const std::uint16_t times) noexcept {
     const std::int32_t backupRefUnit = this->get_reference_unit_A();
     this->set_reference_unit_A(1);
 
-    const double val = this->readAverageValue(times);
+    const double val = this->readMedianValue(times);
 
     this->setOffsetA(val);
     this->set_reference_unit_A(backupRefUnit);
@@ -312,7 +319,7 @@ double HX711::tare_B(const std::uint16_t times) noexcept {
     const Gain backupGain = this->_gain;
     this->set_gain(Gain::GAIN_32);
 
-    const double val = this->readAverageValue(times);
+    const double val = this->readMedianValue(times);
 
     this->setOffsetB(val);
     this->set_gain(backupGain);
