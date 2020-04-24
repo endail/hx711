@@ -32,6 +32,7 @@ bool setupHx(const int dataPin, const int clockPin);
 std::uint32_t samples;
 std::string unit;
 double knownWeight;
+double zeroValue;
 HX711::HX711* hx;
 
 int main(int argc, char** argv) {
@@ -84,14 +85,14 @@ int main(int argc, char** argv) {
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    hx->tare(samples);
+    zeroValue = hx->get_value(samples);
 
     //weigh prompt
     cout    << endl << endl << "4. Place object on the scale then press enter.";
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    int64_t val = hx->get_value(samples);
+    int64_t val = hx->get_value(samples) - zeroValue;
     double refUnit = val / knownWeight;
     delete hx;
 
@@ -100,6 +101,7 @@ int main(int argc, char** argv) {
             << "Raw value over " << samples << " samples: " << val << endl
             << endl
             << "-> REFERENCE UNIT: " << fixed << setprecision(0) << refUnit << endl
+            << "-> ZERO VALUE: " << zeroValue << endl
             << endl
             << "Use the reference unit value above to set the HX711 module's "
             << "reference unit. ie. using hx.set_reference_unit()."

@@ -30,13 +30,6 @@
 
 namespace HX711 {
 
-HX711::HX711(const HX711& hx2) {
-}
-
-HX711& operator=(const HX711& hx2) {
-    return *this;
-}
-
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
