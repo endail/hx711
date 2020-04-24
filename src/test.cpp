@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     hx.tare();
 
     while(true) {
-        cout << fixed << setprecision(15) << hx.get_weight(1) << endl;
+        cout << fixed << hx.get_weight(1) << endl;
         this_thread::sleep_for(chrono::seconds(1));
     }
 
