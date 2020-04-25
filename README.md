@@ -4,6 +4,7 @@
 
 - Port of https://github.com/tatobari/hx711py
 - Use with Raspberry Pi
+- [Example code](https://github.com/endail/hx711/blob/master/src/test.cpp)
 
 ## Build and Install
 ```shell
