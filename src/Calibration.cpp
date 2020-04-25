@@ -105,6 +105,10 @@ int main(int argc, char** argv) {
             << endl
             << "Use the reference unit value above to set the HX711 module's "
             << "reference unit. ie. using hx.set_reference_unit()."
+            << endl
+            << "Use the zero value above to set the zero value of the scale "
+            << "using setOffset. You won't need to tare the scale if you use "
+            << "this."
             << endl << endl;
 
     return 0;
