@@ -192,7 +192,6 @@ HX711::HX711(
             _byteFormat(Format::MSB),
             _bitFormat(Format::MSB) {
 
-                wiringPiSetup();
                 pinMode(this->_dataPin, INPUT);
                 pinMode(this->_clockPin, OUTPUT);
 
