@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
     delete hx;
 
     cout    << endl << endl
-            << "Known weight (your object): " << knownWeight << " " << unit << endl 
+            << "Known weight (your object): " << knownWeight << unit << endl 
             << "Raw value over " << samples << " samples: " << val << endl
             << endl
             << "-> REFERENCE UNIT: " << fixed << setprecision(0) << refUnit << endl
