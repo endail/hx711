@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "../include/HX711.h"
+#include <wiringPi.h>
 #include <iostream>
 #include <iomanip>
 #include <thread>
@@ -116,6 +117,7 @@ int main(int argc, char** argv) {
 }
 
 bool setupHx(const int dataPin, const int clockPin) {
+    wiringPiSetup();
     hx = new HX711::HX711(dataPin, clockPin);
     hx->set_reference_unit(1);
     std::this_thread::sleep_for(std::chrono::seconds(1));

@@ -24,6 +24,7 @@
 #include <thread>
 #include <chrono>
 #include <iomanip>
+#include <wiringPi.h>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
@@ -40,6 +41,8 @@ int main(int argc, char** argv) {
     const uint8_t dataPin = stoi(argv[1]);
     const uint8_t clockPin = stoi(argv[2]);
     const int32_t refUnit = stoi(argv[3]);
+
+    wiringPiSetup();
 
     HX711::HX711 hx(dataPin, clockPin);
 
