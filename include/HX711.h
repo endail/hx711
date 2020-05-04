@@ -109,8 +109,8 @@ public:
     double tare_A(const std::uint16_t times = 15) noexcept;
     double tare_B(const std::uint16_t times = 15) noexcept;
     void set_reading_format(
-        const Format byteFormat = Format::MSB,
-        const Format bitFormat = Format::MSB) noexcept;
+        const Format bitFormat = Format::MSB,
+        const Format byteFormat = Format::MSB) noexcept;
     void set_reference_unit(const std::int32_t refUnit);
     void set_reference_unit_A(const std::int32_t refUnit);
     void set_reference_unit_B(const std::int32_t refUnit);

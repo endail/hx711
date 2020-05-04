@@ -321,9 +321,9 @@ double HX711::tare_B(const std::uint16_t times) noexcept {
 
 }
 
-void HX711::set_reading_format(const Format byteFormat, const Format bitFormat) noexcept {
-    this->_byteFormat = byteFormat;
+void HX711::set_reading_format(const Format bitFormat, const Format byteFormat) noexcept {
     this->_bitFormat = bitFormat;
+    this->_byteFormat = byteFormat;
 }
 
 void HX711::set_reference_unit(const std::int32_t refUnit) {
