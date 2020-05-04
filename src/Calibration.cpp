@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
     zeroValue = hx->get_value(samples);
 
     //weigh prompt
-    cout    << endl << endl << "4. Place object on the scale then press enter.";
+    cout    << endl << endl << "5. Place object on the scale then press enter.";
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
             << "reference unit. ie. using hx.set_reference_unit()."
             << endl
             << "Use the zero value above to set the zero value of the scale "
-            << "using setOffset. You won't need to tare the scale if you use "
+            << "using hx.setOffset(). You won't need to tare the scale if you use "
             << "this."
             << endl << endl;
 
