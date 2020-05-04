@@ -492,9 +492,15 @@ void HX711::power_up() noexcept {
 
     lock.unlock();
 
+    /**
+     *  "After a reset or power-down event, input
+     *  selection is default to Channel A with a gain of
+     *  128."
+     *  
+     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+     *  pg. 5 
+     */
     if(this->_gain != Gain::GAIN_128) {
-        //ISSUE: is there a race condition here?
-        //ie. with this->_readLock?
         this->_readRawBytes();
     }
 
