@@ -110,10 +110,10 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
     delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
-    std::uint8_t raw[_BYTES_PER_CONVERSATION_PERIOD];
+    std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
 
     //then populate it with values from the hx711
-    for(std::size_t i = 0; i < _BYTES_PER_CONVERSATION_PERIOD; ++i) {
+    for(std::size_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
         raw[i] = this->_readByte();
     }
 
@@ -132,7 +132,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      */
     const size_t pulsesNeeded = 
         PULSES[static_cast<std::int32_t>(this->_gain)] -
-            _BITS_PER_BYTE * _BYTES_PER_CONVERSATION_PERIOD;
+            _BITS_PER_BYTE * _BYTES_PER_CONVERSION_PERIOD;
 
     for(std::size_t i = 0; i < pulsesNeeded; ++i) {
         this->_readBit();
@@ -156,17 +156,17 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  done is for the bytes to be reversed.
      */
     if(this->_byteFormat == Format::LSB) {
-        std::reverse(raw, raw + _BYTES_PER_CONVERSATION_PERIOD);
+        std::reverse(raw, raw + _BYTES_PER_CONVERSION_PERIOD);
     }
 
     //finally, copy the local raw bytes to the byte array
-    memcpy(bytes, raw, _BYTES_PER_CONVERSATION_PERIOD);
+    memcpy(bytes, raw, _BYTES_PER_CONVERSION_PERIOD);
 
 }
 
 std::int32_t HX711::_readLong() noexcept {
 
-    std::uint8_t bytes[_BYTES_PER_CONVERSATION_PERIOD];
+    std::uint8_t bytes[_BYTES_PER_CONVERSION_PERIOD];
     
     this->_readRawBytes(bytes);
 

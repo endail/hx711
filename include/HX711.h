@@ -67,7 +67,7 @@ protected:
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
      */
-    static const std::uint8_t _BYTES_PER_CONVERSATION_PERIOD = 3;
+    static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
     std::uint8_t _dataPin;
     std::uint8_t _clockPin;
