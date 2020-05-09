@@ -63,7 +63,7 @@ std::uint8_t HX711::_readByte() const noexcept {
 
     std::uint8_t val = 0;
 
-    for(std::size_t i = 0; i < _BITS_PER_BYTE; ++i) {
+    for(std::uint8_t i = 0; i < _BITS_PER_BYTE; ++i) {
         if(this->_bitFormat == Format::MSB) {
             val <<= 1;
             val |= this->_readBit();
@@ -113,7 +113,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
     std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
 
     //then populate it with values from the hx711
-    for(std::size_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
+    for(std::uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
         raw[i] = this->_readByte();
     }
 
@@ -130,11 +130,11 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  when reading the three bytes (3 * 8), so only one
      *  additional pulse is needed.
      */
-    const size_t pulsesNeeded = 
+    const std::uint8_t pulsesNeeded = 
         PULSES[static_cast<std::int32_t>(this->_gain)] -
             _BITS_PER_BYTE * _BYTES_PER_CONVERSION_PERIOD;
 
-    for(std::size_t i = 0; i < pulsesNeeded; ++i) {
+    for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
         this->_readBit();
     }
 
@@ -170,8 +170,12 @@ std::int32_t HX711::_readLong() noexcept {
     
     this->_readRawBytes(bytes);
 
-    //TODO: put in a loop?
-    const std::int32_t twosComp = ((bytes[0] << 16) |
+    /**
+     *  An int (int32_t) is 32 bits (4 bytes), but
+     *  the HX711 only uses 24 bits (3 bytes).
+     */
+    const std::int32_t twosComp = ((       0 << 24) |
+                                   (bytes[0] << 16) |
                                    (bytes[1] << 8)  |
                                     bytes[2]);
 
@@ -265,7 +269,7 @@ std::vector<double> HX711::get_weights(const std::uint16_t times) {
     std::vector<double> values;
     values.reserve(times);
 
-    for(std::size_t i = 0; i < times; ++i) {
+    for(std::uint16_t i = 0; i < times; ++i) {
         values.push_back((rawValues[i] / refUnit) - this->_offset);
     }
 
@@ -395,7 +399,7 @@ std::vector<std::int32_t> HX711::readValues(const std::uint16_t times) {
     std::vector<std::int32_t> values;
     values.reserve(times);
 
-    for(std::size_t i = 0; i < times; ++i) {
+    for(std::uint16_t i = 0; i < times; ++i) {
         values.push_back(this->_readLong());
     }
 
