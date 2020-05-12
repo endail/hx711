@@ -152,8 +152,11 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 4
      * 
-     *  If LSB format is requested, all that needs to be
-     *  done is for the bytes to be reversed.
+     *  If this->_byteFormat indicates the HX711 is outputting
+     *  bytes in LSB format, just reverse the array.
+     * 
+     *  Remember, the bytes param expects an array of bytes
+     *  which will be converted to an int.
      */
     if(this->_byteFormat == Format::LSB) {
         std::reverse(raw, raw + _BYTES_PER_CONVERSION_PERIOD);
