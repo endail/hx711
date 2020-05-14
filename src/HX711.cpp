@@ -167,7 +167,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
 
 }
 
-std::int32_t HX711::_readLong() noexcept {
+std::int32_t HX711::_readInt() noexcept {
 
     std::uint8_t bytes[_BYTES_PER_CONVERSION_PERIOD];
     
@@ -403,7 +403,7 @@ std::vector<std::int32_t> HX711::readValues(const std::uint16_t times) {
     values.reserve(times);
 
     for(std::uint16_t i = 0; i < times; ++i) {
-        values.push_back(this->_readLong());
+        values.push_back(this->_readInt());
     }
 
     return values;
@@ -417,7 +417,7 @@ double HX711::readAverageValue(const std::uint16_t times) {
     }
     
     if(times == 1) {
-        return static_cast<double>(this->_readLong());
+        return static_cast<double>(this->_readInt());
     }
 
     std::vector<std::int32_t> values = this->readValues(times);
@@ -425,7 +425,7 @@ double HX711::readAverageValue(const std::uint16_t times) {
     const std::int64_t sum = std::accumulate(
         values.begin(), values.end(), 0);
 
-    return (double)sum / values.size();
+    return static_cast<double>(sum) / values.size();
 
 }
 
@@ -436,7 +436,7 @@ double HX711::readMedianValue(const std::uint16_t times) {
     }
     
     if(times == 1) {
-        return (double)this->_readLong();
+        return (double)this->_readInt();
     }
 
     std::vector<std::int32_t> values = this->readValues(times);
@@ -459,7 +459,7 @@ double HX711::readMedianValue(const std::uint16_t times) {
     else {
         const auto median_it = values.begin() + values.size() / 2;
         std::nth_element(values.begin(), median_it, values.end());
-        return (double)*median_it;
+        return static_cast<double>(*median_it);
     }
 
 }

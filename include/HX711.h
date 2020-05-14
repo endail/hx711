@@ -84,7 +84,7 @@ protected:
     bool _readBit() const noexcept;
     std::uint8_t _readByte() const noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr) noexcept;
-    std::int32_t _readLong() noexcept;
+    std::int32_t _readInt() noexcept;
 
 public:
     HX711(
