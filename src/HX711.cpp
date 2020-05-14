@@ -265,7 +265,7 @@ std::vector<double> HX711::get_weights(const std::uint16_t times) {
         throw std::invalid_argument("times must be greater than 0");
     }
 
-    const double refUnit = (double)this->_referenceUnit;
+    const double refUnit = static_cast<double>(this->_referenceUnit);
 
     std::vector<std::int32_t> rawValues = this->readValues(times);
 
@@ -417,7 +417,7 @@ double HX711::readAverageValue(const std::uint16_t times) {
     }
     
     if(times == 1) {
-        return (double)this->_readLong();
+        return static_cast<double>(this->_readLong());
     }
 
     std::vector<std::int32_t> values = this->readValues(times);
