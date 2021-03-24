@@ -50,12 +50,12 @@ bool HX711::_readBit() const noexcept {
      * 
      *  Solution: stick with 1us. It seems to work fine.
      */
-    digitalWrite(this->_clockPin, HIGH);
-    delayMicroseconds(1);
-    digitalWrite(this->_clockPin, LOW);
-    delayMicroseconds(1);
+    ::digitalWrite(this->_clockPin, HIGH);
+    ::delayMicroseconds(1);
+    ::digitalWrite(this->_clockPin, LOW);
+    ::delayMicroseconds(1);
 
-    return digitalRead(this->_dataPin) == HIGH;
+    return ::digitalRead(this->_dataPin) == HIGH;
 
 }
 
@@ -107,7 +107,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
      *  Solution: wait for 1us. This is 10x longer than necessary, but it
      *  does allow sufficient time.
      */
-    delayMicroseconds(1);
+    ::delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
     std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
@@ -163,7 +163,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
     }
 
     //finally, copy the local raw bytes to the byte array
-    memcpy(bytes, raw, _BYTES_PER_CONVERSION_PERIOD);
+    ::memcpy(bytes, raw, _BYTES_PER_CONVERSION_PERIOD);
 
 }
 
@@ -199,8 +199,8 @@ HX711::HX711(
             _byteFormat(Format::MSB),
             _bitFormat(Format::MSB) {
 
-                pinMode(this->_dataPin, INPUT);
-                pinMode(this->_clockPin, OUTPUT);
+                ::pinMode(this->_dataPin, INPUT);
+                ::pinMode(this->_clockPin, OUTPUT);
 
                 /**
                  *  Cannot simply set this->_gain. this->set_gain()
@@ -226,12 +226,12 @@ bool HX711::is_ready() const noexcept {
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
      */
-    return digitalRead(this->_dataPin) == LOW;
+    return ::digitalRead(this->_dataPin) == LOW;
 }
 
 void HX711::set_gain(const Gain gain) noexcept {
     this->_gain = gain;
-    digitalWrite(this->_clockPin, LOW);
+    ::digitalWrite(this->_clockPin, LOW);
     this->_readRawBytes();
 }
 
@@ -468,8 +468,8 @@ void HX711::power_down() noexcept {
 
     std::lock_guard<std::mutex> lock(this->_readLock);
 
-    digitalWrite(this->_clockPin, LOW);
-    digitalWrite(this->_clockPin, HIGH);
+    ::digitalWrite(this->_clockPin, LOW);
+    ::digitalWrite(this->_clockPin, HIGH);
 
     /**
      *  "When PD_SCK pin changes from low to high
@@ -479,7 +479,7 @@ void HX711::power_down() noexcept {
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
      */
-    delayMicroseconds(60);
+    ::delayMicroseconds(60);
 
 }
 
@@ -487,7 +487,7 @@ void HX711::power_up() noexcept {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
 
-    digitalWrite(this->_clockPin, LOW);
+    ::digitalWrite(this->_clockPin, LOW);
 
     /**
      *  "When PD_SCK returns to low,
