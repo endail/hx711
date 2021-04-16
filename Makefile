@@ -28,7 +28,6 @@ dirs:
 
 $(BUILDDIR)/libhx711.a: $(BUILDDIR)/HX711.o
 	ar rcs $(BUILDDIR)/libhx711.a $(BUILDDIR)/HX711.o
-	ranlib $(BUILDDIR)/libhx711.a
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
