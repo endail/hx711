@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <numeric>
 #include <cstring>
-#include <thread>
 
 namespace HX711 {
 
@@ -52,9 +51,9 @@ bool HX711::_readBit() const noexcept {
      *  Solution: stick with 1us. It seems to work fine.
      */
     ::digitalWrite(this->_clockPin, HIGH);
-    std::this_thread::sleep_for(std::chrono::microseconds(1));
+    ::delayMicroseconds(1);
     ::digitalWrite(this->_clockPin, LOW);
-    std::this_thread::sleep_for(std::chrono::microseconds(1));
+    ::delayMicroseconds(1);
 
     return ::digitalRead(this->_dataPin) == HIGH;
 
@@ -79,10 +78,9 @@ std::uint8_t HX711::_readByte() const noexcept {
 
 }
 
-void HX711::_readRawBytes(std::uint8_t* bytes) {
+void HX711::_readRawBytes(std::uint8_t* bytes) noexcept {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
-    std::uint8_t attempts = 0;
 
     /**
      *  Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
@@ -90,16 +88,11 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * 
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
+     * 
+     *  ISSUE: this is essentially an infinite-loop waiting on a GPIO pin. This
+     *  may be problematic.
      */
-    while(!this->is_ready()) {
-        
-        if(++attempts >= _MAX_READ_TRIES) {
-            throw runtime_error("timed out waiting for HX711");
-        }
-        
-        std::this_thread::sleep_for(_READ_TIMEOUT);
-
-    }
+    while(!this->is_ready());
 
     /**
      *  When DOUT goes low, there is a minimum of 0.1us until the clock pin
@@ -108,10 +101,13 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
      * 
+     *  Problem 1: because we prefer wiringPi's timing functions, we cannot
+     *  wait less than 1us.
+     * 
      *  Solution: wait for 1us. This is 10x longer than necessary, but it
      *  does allow sufficient time.
      */
-    std::this_thread::sleep_for(std::chrono::microseconds(1));
+    ::delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
     std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
@@ -171,7 +167,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
 }
 
-std::int32_t HX711::_readInt() {
+std::int32_t HX711::_readInt() noexcept {
 
     std::uint8_t bytes[_BYTES_PER_CONVERSION_PERIOD];
     
@@ -233,7 +229,7 @@ bool HX711::is_ready() const noexcept {
     return ::digitalRead(this->_dataPin) == LOW;
 }
 
-void HX711::set_gain(const Gain gain) {
+void HX711::set_gain(const Gain gain) noexcept {
     this->_gain = gain;
     ::digitalWrite(this->_clockPin, LOW);
     this->_readRawBytes();
@@ -243,15 +239,15 @@ Gain HX711::get_gain() const noexcept {
     return this->_gain;
 }
 
-double HX711::get_value(const std::uint16_t times) {
+double HX711::get_value(const std::uint16_t times) noexcept {
     return this->get_value_A(times);
 }
 
-double HX711::get_value_A(const std::uint16_t times) {
+double HX711::get_value_A(const std::uint16_t times) noexcept {
     return this->readMedianValue(times) - this->getOffsetA();
 }
 
-double HX711::get_value_B(const std::uint16_t times) {
+double HX711::get_value_B(const std::uint16_t times) noexcept {
     const Gain gain = this->_gain;
     this->_gain = Gain::GAIN_32;
     const double val = this->readMedianValue(times) - this->getOffsetB();
@@ -259,7 +255,7 @@ double HX711::get_value_B(const std::uint16_t times) {
     return val;
 }
 
-double HX711::get_weight(const std::uint16_t times) {
+double HX711::get_weight(const std::uint16_t times) noexcept {
     return this->get_weight_A(times);
 }
 
@@ -284,23 +280,23 @@ std::vector<double> HX711::get_weights(const std::uint16_t times) {
 
 }
 
-double HX711::get_weight_A(const std::uint16_t times) {
+double HX711::get_weight_A(const std::uint16_t times) noexcept {
     double val = this->get_value_A(times);
     val = val / this->_referenceUnit;
     return val;
 }
 
-double HX711::get_weight_B(const std::uint16_t times) {
+double HX711::get_weight_B(const std::uint16_t times) noexcept {
     double val = this->get_value_B(times);
     val = val / this->_referenceUnitB;
     return val;
 }
 
-double HX711::tare(const std::uint16_t times) {
+double HX711::tare(const std::uint16_t times) noexcept {
     return this->tare_A(times);
 }
 
-double HX711::tare_A(const std::uint16_t times) {
+double HX711::tare_A(const std::uint16_t times) noexcept {
 
     const std::int32_t backupRefUnit = this->get_reference_unit_A();
     this->set_reference_unit_A(1);
@@ -314,7 +310,7 @@ double HX711::tare_A(const std::uint16_t times) {
 
 }
 
-double HX711::tare_B(const std::uint16_t times) {
+double HX711::tare_B(const std::uint16_t times) noexcept {
 
     const std::int32_t backupRefUnit = this->get_reference_unit_B();
     this->set_reference_unit_B(1);
@@ -483,11 +479,11 @@ void HX711::power_down() noexcept {
      *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
      *  pg. 5
      */
-    std::this_thread::sleep_for(std::chrono::microseconds(60));
+    ::delayMicroseconds(60);
 
 }
 
-void HX711::power_up() {
+void HX711::power_up() noexcept {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
 
@@ -517,7 +513,7 @@ void HX711::power_up() {
 
 }
 
-void HX711::reset() {
+void HX711::reset() noexcept {
     this->power_down();
     this->power_up();
 }

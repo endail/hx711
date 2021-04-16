@@ -61,8 +61,6 @@ class HX711 {
 protected:
 
     static const std::uint8_t _BITS_PER_BYTE = 8;
-    static const std::uint8_t _MAX_READ_TRIES = 3;
-    static const auto _READ_TIMEOUT = std::chrono::duration<std::size_t, std::chrono::nanoseconds>(100);
 
     /**
      *  "Conversion period"
@@ -85,8 +83,8 @@ protected:
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const noexcept;
     std::uint8_t _readByte() const noexcept;
-    void _readRawBytes(std::uint8_t* bytes = nullptr);
-    std::int32_t _readInt();
+    void _readRawBytes(std::uint8_t* bytes = nullptr) noexcept;
+    std::int32_t _readInt() noexcept;
 
 public:
     HX711(
@@ -98,18 +96,18 @@ public:
     std::uint8_t getDataPin() const noexcept;
     std::uint8_t getClockPin() const noexcept;
     bool is_ready() const noexcept;
-    void set_gain(const Gain gain);
+    void set_gain(const Gain gain) noexcept;
     Gain get_gain() const noexcept;
-    double get_value(const std::uint16_t times = 3);
-    double get_value_A(const std::uint16_t times = 3);
-    double get_value_B(const std::uint16_t times = 3);
-    double get_weight(const std::uint16_t times = 3);
+    double get_value(const std::uint16_t times = 3) noexcept;
+    double get_value_A(const std::uint16_t times = 3) noexcept;
+    double get_value_B(const std::uint16_t times = 3) noexcept;
+    double get_weight(const std::uint16_t times = 3) noexcept;
     std::vector<double> get_weights(const std::uint16_t times = 3);
-    double get_weight_A(const std::uint16_t times = 3);
-    double get_weight_B(const std::uint16_t times = 3);
-    double tare(const std::uint16_t times = 15);
-    double tare_A(const std::uint16_t times = 15);
-    double tare_B(const std::uint16_t times = 15);
+    double get_weight_A(const std::uint16_t times = 3) noexcept;
+    double get_weight_B(const std::uint16_t times = 3) noexcept;
+    double tare(const std::uint16_t times = 15) noexcept;
+    double tare_A(const std::uint16_t times = 15) noexcept;
+    double tare_B(const std::uint16_t times = 15) noexcept;
     void set_reading_format(
         const Format bitFormat = Format::MSB,
         const Format byteFormat = Format::MSB) noexcept;
@@ -129,8 +127,8 @@ public:
     double readAverageValue(const std::uint16_t times = 3);
     double readMedianValue(const std::uint16_t times = 3);
     void power_down() noexcept;
-    void power_up();
-    void reset();
+    void power_up() noexcept;
+    void reset() noexcept;
 
 };
 };
