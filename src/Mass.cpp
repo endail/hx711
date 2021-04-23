@@ -29,11 +29,11 @@
 namespace HX711 {
 
 Mass::Mass(const double amount, const Unit u) 
-    : _g(Mass::convert(amount, u, Unit::G)) {
+    : _g(Mass::convert(amount, u, Unit::G)) noexcept {
 }
 
 Mass::Mass(const Mass& m2)
-    : _g(m2._g), _u(m2._u) {
+    : _g(m2._g), _u(m2._u) noexcept {
 }
 
 double Mass::getValue(Unit u) const noexcept {

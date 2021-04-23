@@ -51,8 +51,8 @@ protected:
     Unit _u; //unit the calling code has chosen
 
 public:
-    Mass(const double amount = 0.0, const Unit u = Unit::G);
-    Mass(const Mass& m2);
+    Mass(const double amount = 0.0, const Unit u = Unit::G) noexcept;
+    Mass(const Mass& m2) noexcept;
 
     double getValue(const Unit u = Unit::G) const noexcept;
 
