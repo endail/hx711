@@ -55,19 +55,27 @@ Mass Mass::convertTo(const Unit to) const noexcept {
 }
 
 Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g + rhs._g);
+    Mass m = Mass(lhs._g + rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g - rhs._g);
+    Mass m = Mass(lhs._g - rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g * rhs._g);
+    Mass m = Mass(lhs._g * rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass operator/(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g / rhs._g);
+    Mass m = Mass(lhs._g / rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass& Mass::operator+=(const Mass& rhs) noexcept {
