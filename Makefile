@@ -14,7 +14,7 @@ ifeq ($(PREFIX),)
 endif
 
 # Add additional libs for building on github actions
-ifeq ($(CI),true)
+ifeq ($(GITHUB_ACTIONS),true)
 	LIB := $(LIB) -lrt -lcrypt -pthread
 endif
 
