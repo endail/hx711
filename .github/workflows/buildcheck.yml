@@ -1,0 +1,23 @@
+name: buildcheck-action
+on: ["push"]
+
+jobs:
+  build:
+    name: buildcheck
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: clone wiringPi
+        uses: actions/checkout@v2
+        with:
+          repository: 'WiringPi/WiringPi'
+
+      - name: build wiringPi
+        run: |
+          sudo ./build
+          sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
+          sudo ldconfig
+
+      - uses: actions/checkout@v2
+
+      - run: make all

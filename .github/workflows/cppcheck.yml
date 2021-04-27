@@ -1,0 +1,32 @@
+name: cppcheck-action-test
+on: ["push"]
+
+jobs:
+  build:
+    name: cppcheck-test
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: clone wiringPi
+        uses: actions/checkout@v2
+        with:
+          repository: 'WiringPi/WiringPi'
+
+      - name: build wiringPi
+        run: |
+          sudo ./build
+          sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
+          sudo ldconfig
+
+      - uses: actions/checkout@v2
+
+      - name: cppcheck
+        uses: deep5050/cppcheck-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN}}
+        
+      - name: publish report    
+        uses: mikeal/publish-to-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: 'main'
