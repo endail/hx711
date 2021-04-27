@@ -62,7 +62,8 @@ std::uint8_t HX711::_readByte() const noexcept {
 
     std::uint8_t val = 0;
 
-    for(std::uint8_t i = 0; i < _BITS_PER_BYTE; ++i) {
+    //8 bits per byte...
+    for(std::uint8_t i = 0; i < 8; ++i) {
         if(this->_bitFormat == Format::MSB) {
             val <<= 1;
             val |= this->_readBit();
@@ -196,7 +197,7 @@ std::int32_t HX711::_getChannelBValue() {
 
 HX711::HX711(
     const int dataPin,
-    const int clockPin) :
+    const int clockPin) noexcept :
         _dataPin(dataPin),
         _clockPin(clockPin) {
             ::pinMode(this->_dataPin, INPUT);
@@ -238,7 +239,7 @@ bool HX711::isReady() const noexcept {
     return ::digitalRead(this->_dataPin) == LOW;
 }
 
-std::int32_t HX711::getValue(const Channel c = Channel::A) {
+std::int32_t HX711::getValue(const Channel c) {
 
     if(c == Channel::A) {
         return this->_getChannelAValue();

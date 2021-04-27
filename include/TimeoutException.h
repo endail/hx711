@@ -27,10 +27,9 @@
 
 namespace HX711 {
 class TimeoutException : public std::runtime_error {
-    virtual char const * what() const {
-        return "timeout";
-    }
+public:
     explicit TimeoutException(const char* what_arg)
 		: std::runtime_error(what_arg) {}
 };
 };
+#endif
