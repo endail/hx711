@@ -13,8 +13,8 @@ ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
-# Add additional libs for building on travis
-ifeq ($(TRAVIS),true)
+# Add additional libs for building on github actions
+ifeq ($(CI),true)
 	LIB := $(LIB) -lrt -lcrypt -pthread
 endif
 
