@@ -20,36 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-#define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-
+#include "../include/SimpleHX711.h"
+#include "../include/HX711.h"
+#include "../include/Mass.h"
 #include <cstdint>
-#include "HX711.h"
-#include "Mass.h"
 
 namespace HX711 {
-class SimpleHX711 {
 
-protected:
-	Hx711::HX711* _hx = nullptr;
-	Mass::Unit _scaleUnit = Mass::Unit::G;
+SimpleHX711::SimpleHX711(
+	const int dataPin,
+	const int clockPin,
+	const int32_t refUnit,
+	const int32_t offset) {
+		this->_hx = new HX711(dataPin, clockPin, refUnit, offset);
+}
 
-public:
-	
-	SimpleHX711(
-		const int dataPin,
-		const int clockPin,
-		const int32_t refUnit = 1,
-		const int32_t offset = 0);
+SimpleHX711::~SimpleHX711() {
+	delete this->_hx;
+}
 
-	~SimpleHX711();
+Mass::Unit SimpleHX711::getUnit() const noexcept {
+	return this->_scaleUnit;
+}
 
-	Mass getUnit() const noexcept;
-	void setUnit(const Mass::Unit unit) noexcept;
-	void tare();
-	Mass weight();
-	double raw();
+void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
+	this->_scaleUnit = unit;
+}
+
+void SimpleHX711::tare() {
+	this->_hx->tare();
+}
+
+Mass SimpleHX711::weight() {
+	return Mass(this->_hx->get_weight(), this->_scaleUnit);
+}
+
+double SimpleHX711::raw() {
+	return this->_hx->get_value();
+} 
 
 };
-};
-#endif

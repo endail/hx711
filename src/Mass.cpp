@@ -29,11 +29,11 @@
 namespace HX711 {
 
 Mass::Mass(const double amount, const Unit u) 
-    : _g(Mass::convert(amount, u, Unit::G)) {
+    : _g(Mass::convert(amount, u, Unit::G)) noexcept {
 }
 
 Mass::Mass(const Mass& m2)
-    : _g(m2._g), _u(m2._u) {
+    : _g(m2._g), _u(m2._u) noexcept {
 }
 
 double Mass::getValue(Unit u) const noexcept {
@@ -55,19 +55,27 @@ Mass Mass::convertTo(const Unit to) const noexcept {
 }
 
 Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g + rhs._g);
+    Mass m = Mass(lhs._g + rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g - rhs._g);
+    Mass m = Mass(lhs._g - rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g * rhs._g);
+    Mass m = Mass(lhs._g * rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass operator/(const Mass& lhs, const Mass& rhs) noexcept {
-    return Mass(lhs._g / rhs._g);
+    Mass m = Mass(lhs._g / rhs._g);
+    m._u = lhs._u;
+    return m;
 }
 
 Mass& Mass::operator+=(const Mass& rhs) noexcept {

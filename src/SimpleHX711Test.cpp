@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <string>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
 	hx.setUnit(Mass::Unit::G);
 
 	while(true) {
-		cout << fixed << hx.weight() << endl;
+		cout << hx.weight() << endl;
         this_thread::sleep_for(chrono::seconds(1));
 	}
 
