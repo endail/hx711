@@ -35,12 +35,12 @@ namespace HX711 {
  */
 
 enum class Format {
-    MSB,
+    MSB = 0,
     LSB
 };
 
 enum class Channel {
-    A,
+    A = 0,
     B
 };
 
