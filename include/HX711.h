@@ -72,6 +72,11 @@ protected:
     //Datasheet pg. 5
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
+    /**
+     * ints (not int32_t) are used for pins to be as compatible as possible
+     * with wiringPi calls (and to not make presumptions about pin 
+     * numbering schemes).
+     */
     const int _dataPin = -1;
     const int _clockPin = -1;
     std::mutex _readLock;
