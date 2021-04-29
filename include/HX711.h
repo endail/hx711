@@ -111,6 +111,10 @@ public:
     
     bool isReady() const noexcept;
 
+    /**
+     * If Channel B value is requested but an exception is thrown
+     * setGain MUST be called again.
+     */
     std::int32_t getValue(const Channel c = Channel::A);
 
     void setReadFormat(

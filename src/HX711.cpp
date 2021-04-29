@@ -28,8 +28,8 @@
 namespace HX711 {
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
-    const int32_t maskA = 0x800000;
-    const int32_t maskB = 0x7fffff;
+    const std::int32_t maskA = 0x800000;
+    const std::int32_t maskB = 0x7fffff;
     return -(val & maskA) + (val & maskB);
 }
 
@@ -88,7 +88,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  Datasheet pg. 5
      */
 
-    uint8_t tries = 0;
+    std::uint8_t tries = 0;
 
     do {
 
@@ -134,7 +134,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  additional pulse is needed.
      */
     const std::uint8_t pulsesNeeded = 
-        PULSES[static_cast<int>(this->_gain)] -
+        PULSES[static_cast<std::size_t>(this->_gain)] -
             8 * _BYTES_PER_CONVERSION_PERIOD;
 
     for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
@@ -160,13 +160,13 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  which will be converted to an int.
      */
     if(this->_byteFormat == Format::LSB) {
-        const uint8_t swap = raw[0];
+        const std::uint8_t swap = raw[0];
         raw[0] = raw[2];
         raw[2] = swap;
     }
 
     //finally, copy the local raw bytes to the byte array
-    for(uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
+    for(std::uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
         bytes[i] = raw[i];
     }
 
@@ -192,11 +192,25 @@ std::int32_t HX711::_readInt() {
 }
 
 std::int32_t HX711::_getChannelAValue() {
-    return 0; //yet to implement
+    return this->_readInt();
 }
 
 std::int32_t HX711::_getChannelBValue() {
-    return 0; //yet to implement
+    
+    //first, make a copy of whatever the current gain is
+    const Gain backup = this->_gain;
+
+    //for channel B, gain is set to 32
+    this->setGain(Gain::GAIN_32);
+
+    //then read the value as normal
+    const std::int32_t val = this->_readInt();
+
+    //and "reset" the gain back to whatever it was before
+    this->setGain(backup);
+
+    return val;
+
 }
 
 HX711::HX711(
