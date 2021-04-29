@@ -30,33 +30,60 @@ namespace HX711 {
 SimpleHX711::SimpleHX711(
 	const int dataPin,
 	const int clockPin,
-	const int32_t refUnit,
-	const int32_t offset) {
-		this->_hx = new HX711(dataPin, clockPin, refUnit, offset);
+	const std::int32_t refUnit,
+	const std::int32_t offset) :
+		_refUnit(refUnit),
+		_offset(offset)  {
+			this->_hx = new HX711(dataPin, clockPin);
 }
 
 SimpleHX711::~SimpleHX711() {
 	delete this->_hx;
 }
 
-Mass::Unit SimpleHX711::getUnit() const noexcept {
-	return this->_scaleUnit;
-}
-
 void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
 	this->_scaleUnit = unit;
 }
 
+Mass::Unit SimpleHX711::getUnit() const noexcept {
+	return this->_scaleUnit;
+}
+
+std::int32_t HX711::getReferenceUnit() const noexcept {
+	return this->_refUnit;
+}
+
+void HX711::setReferenceUnit(const std::int32_t refUnit) {
+	this->_refUnit = refUnit;
+}
+
+void HX711::setChannel(const Channel ch) noexcept {
+	this->_ch = ch;
+}
+
+Channel HX711::getChannel() const noexcept {
+	return this->_ch;
+}
+
 void SimpleHX711::tare() {
-	this->_hx->tare();
+
+	const std::int32_t backup = this->_refUnit;
+	this->setReferenceUnit(1);
+	this->_offset = this->raw();
+	this->setReferenceUnit(backup);
+
 }
 
 Mass SimpleHX711::weight() {
-	return Mass(this->_hx->get_weight(), this->_scaleUnit);
+	//return Mass(this->_hx->get_weight(), this->_scaleUnit);
 }
 
-double SimpleHX711::raw() {
-	return this->_hx->get_value();
+double read(const std::size_t times) {
+	
+}
+
+std::int32_t SimpleHX711::raw() {
+	return this->_hx->getValue(this->_ch);
 } 
 
 };

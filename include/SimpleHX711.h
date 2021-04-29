@@ -29,26 +29,47 @@
 
 namespace HX711 {
 class SimpleHX711 {
-
+	
 protected:
 	Hx711::HX711* _hx = nullptr;
 	Mass::Unit _scaleUnit = Mass::Unit::G;
+	Channel _ch = Channel::A;
+	std::int32_t _refUnit;
+	std::int32_t _offset;
 
 public:
 	
+	enum class ReadType {
+		Raw = 0
+		Median,
+		Average,
+		ONE_STD,
+		TWO_STD,
+		THREE_STD
+	};
+
 	SimpleHX711(
 		const int dataPin,
 		const int clockPin,
-		const int32_t refUnit = 1,
-		const int32_t offset = 0);
+		const std::int32_t refUnit = 1,
+		const std::int32_t offset = 0);
 
 	~SimpleHX711();
 
-	Mass getUnit() const noexcept;
 	void setUnit(const Mass::Unit unit) noexcept;
+	Mass getUnit() const noexcept;
+
+	std::int32_t getReferenceUnit() const noexcept;
+	void setReferenceUnit(const std::int32_t ref);
+
+	void setChannel(const Channel ch) noexcept;
+	Channel getChannel() const noexcept;
+
 	void tare();
 	Mass weight();
-	double raw();
+
+	double read(const std::size_t times = 3);
+	std::int32_t raw();
 
 };
 };
