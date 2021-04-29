@@ -154,13 +154,15 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  Datasheet pg. 4
      * 
      *  If this->_byteFormat indicates the HX711 is outputting
-     *  bytes in LSB format, just reverse the array.
+     *  bytes in LSB format, swap the first and last bytes
      * 
      *  Remember, the bytes param expects an array of bytes
      *  which will be converted to an int.
      */
     if(this->_byteFormat == Format::LSB) {
-        std::reverse(raw, raw + _BYTES_PER_CONVERSION_PERIOD);
+        const uint8_t swap = raw[0];
+        raw[0] = raw[2];
+        raw[2] = swap;
     }
 
     //finally, copy the local raw bytes to the byte array
@@ -188,11 +190,11 @@ std::int32_t HX711::_readInt() {
 }
 
 std::int32_t HX711::_getChannelAValue() {
-
+    return 0; //yet to implement
 }
 
 std::int32_t HX711::_getChannelBValue() {
-
+    return 0; //yet to implement
 }
 
 HX711::HX711(
