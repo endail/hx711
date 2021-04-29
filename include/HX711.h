@@ -67,7 +67,7 @@ protected:
      * before failing
      */
     static const std::uint8_t _MAX_READ_TRIES = 3;
-    static constexpr std::chrono::microseconds _WAIT_INTERVAL = std::chrono::microseconds(1);
+    static constexpr std::chrono::microseconds _WAIT_INTERVAL;
 
     //Datasheet pg. 5
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
