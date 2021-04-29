@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/*
+
 #include "../include/HX711.h"
 #include <wiringPi.h>
 #include <iostream>
@@ -123,3 +125,5 @@ bool setupHx(const int dataPin, const int clockPin) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
     return hx->is_ready();
 }
+
+*/

@@ -23,7 +23,6 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <iomanip>
 #include <wiringPi.h>
 #include "../include/HX711.h"
 
@@ -31,26 +30,22 @@ int main(int argc, char** argv) {
 
     using namespace std;
 
-    const char* err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
+    const char* err = "Usage: [DATA PIN] [CLOCK PIN]";
 
-    if(argc != 4) {
+    if(argc != 3) {
         cout << err << endl;
         return 1;
     }
 
     const uint8_t dataPin = stoi(argv[1]);
     const uint8_t clockPin = stoi(argv[2]);
-    const int32_t refUnit = stoi(argv[3]);
 
     wiringPiSetup();
 
     HX711::HX711 hx(dataPin, clockPin);
 
-    hx.set_reference_unit(refUnit);
-    hx.tare();
-
     while(true) {
-        cout << fixed << hx.get_weight(1) << endl;
+        cout << hx.getValue() << endl;
         this_thread::sleep_for(chrono::seconds(1));
     }
 
