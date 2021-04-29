@@ -29,7 +29,9 @@
 namespace HX711 {
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
-    return -(val & 0x800000) + (val & 0x7fffff);
+    const int32_t maskA = 0x800000;
+    const int32_t maskB = 0x7fffff;
+    return -(val & maskA) + (val & maskB);
 }
 
 bool HX711::_readBit() const noexcept {
@@ -215,18 +217,24 @@ void HX711::connect(
         this->setReadFormat(bitFormat, byteFormat);
 
         /**
-         *  Cannot simply set this->_gain. this->set_gain()
+         *  Cannot simply set this->_gain. this->setGain()
          *  must be called to set the HX711 module at the
          *  hardware-level.
+         * 
+         *  If, for whatever reason, the sensor cannot be
+         *  reached, setGain will fail and throw a
+         *  TimeoutException. Calling code can catch this
+         *  and handle as though the sensor connection has
+         *  "failed".
+         * 
+         *  try {
+         *      sensor.connect();
+         *  }
+         *  catch(TimeoutException& e) {
+         *      //sensor failed to connect
+         *  }
          */
-        try {
-            this->setGain(gain);
-        }
-        catch(TimeoutException& e) {
-            //if an exception is thrown here, use this as
-            //an opportunity to effectively declare that the
-            //sensor is "not connected"
-        }
+        this->setGain(gain);
 
 }
 
