@@ -23,7 +23,6 @@
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
 #include <cstdint>
-#include <cstring>
 #include <thread>
 #include <wiringPi.h>
 
@@ -166,7 +165,9 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     }
 
     //finally, copy the local raw bytes to the byte array
-    ::memcpy(bytes, raw, _BYTES_PER_CONVERSION_PERIOD);
+    for(uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
+        bytes[i] = raw[i];
+    }
 
 }
 
