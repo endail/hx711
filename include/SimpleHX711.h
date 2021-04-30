@@ -26,8 +26,15 @@
 #include <cstdint>
 #include "HX711.h"
 #include "Mass.h"
+#include <vector>
 
 namespace HX711 {
+
+enum class ReadType {
+	Median = 0,
+	Average,
+};
+
 class SimpleHX711 {
 	
 protected:
@@ -37,16 +44,14 @@ protected:
 	std::int32_t _refUnit;
 	std::int32_t _offset;
 
+	std::vector<std::int32_t> _readValues(const std::size_t times = 3);
+
+	static double _median(const std::vector<std::int32_t>* vals);
+	static double _average(const std::vector<std::int32_t>* vals);
+	static double _stddev(const std::vector<std::int32_t>* vals, const size_t dev = 3);
+
+
 public:
-	
-	enum class ReadType {
-		Raw = 0
-		Median,
-		Average,
-		ONE_STD,
-		TWO_STD,
-		THREE_STD
-	};
 
 	SimpleHX711(
 		const int dataPin,
@@ -60,16 +65,14 @@ public:
 	Mass getUnit() const noexcept;
 
 	std::int32_t getReferenceUnit() const noexcept;
-	void setReferenceUnit(const std::int32_t ref);
+	void setReferenceUnit(const std::int32_t ref) noexcept;
 
 	void setChannel(const Channel ch) noexcept;
 	Channel getChannel() const noexcept;
 
-	void tare();
-	Mass weight();
-
-	double read(const std::size_t times = 3);
-	std::int32_t raw();
+	void tare(const ReadType r = ReadType::Median, const size_t times = 3);
+	Mass weight(const ReadType r = ReadType::Median, const size_t times = 3);
+	double read(const ReadType r = ReadType::Median, const size_t times = 3);
 
 };
 };

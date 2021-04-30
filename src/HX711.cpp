@@ -194,24 +194,31 @@ std::int32_t HX711::_readInt() {
 }
 
 std::int32_t HX711::_getChannelAValue() {
+
+    /**
+     * "Channel A can be programmed with a gain 
+     * of 128 or 64..."
+     * Datasheet pg. 1
+     */
+    if(this->_gain == Gain::GAIN_32) {
+        this->setGain(_DEFAULT_GAIN);
+    }
+
     return this->_readInt();
+
 }
 
 std::int32_t HX711::_getChannelBValue() {
     
-    //first, make a copy of whatever the current gain is
-    const Gain backup = this->_gain;
+    /**
+     * "Channel B has a fixed gain of 32"
+     * Datasheet pg. 1
+     */
+    if(this->_gain != Gain::GAIN_32) {
+        this->setGain(Gain::GAIN_32);
+    }
 
-    //for channel B, gain is set to 32
-    this->setGain(Gain::GAIN_32);
-
-    //then read the value as normal
-    const std::int32_t val = this->_readInt();
-
-    //and "reset" the gain back to whatever it was before
-    this->setGain(backup);
-
-    return val;
+    return this->_readInt();
 
 }
 
