@@ -125,9 +125,10 @@ public:
      */
     std::int32_t getValue(const Channel c = _DEFAULT_CHANNEL);
 
-    void setReadFormat(
-        const Format bitFormat = _DEFAULT_FORMAT,
-        const Format byteFormat = _DEFAULT_FORMAT) noexcept;
+    Format getBitFormat() const noexcept;
+    Format getByteFormat() const noexcept;
+    void setBitFormat(const Format f) noexcept;
+    void setByteFormat(const Format f) noexcept;
 
     void powerDown() noexcept;
     void powerUp();

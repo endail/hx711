@@ -326,11 +326,20 @@ Gain HX711::getGain() const noexcept {
     return this->_gain;
 }
 
-void HX711::setReadFormat(
-    const Format bitFormat,
-    const Format byteFormat) noexcept {
-        this->_bitFormat = bitFormat;
-        this->_byteFormat = byteFormat;
+Format HX711::getBitFormat() const noexcept {
+    return this->_bitFormat;
+}
+
+Format HX711::getByteFormat() const noexcept {
+    return this->_byteFormat;
+}
+
+void HX711::setBitFormat(const Format f) noexcept {
+    this->_bitFormat = f;
+}
+
+void HX711::setByteFormat(const Format f) noexcept {
+    this->_byteFormat = f;
 }
 
 void HX711::powerDown() noexcept {
