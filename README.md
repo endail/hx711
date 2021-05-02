@@ -2,9 +2,37 @@
 
 [![Build Status](https://travis-ci.com/endail/hx711.svg?branch=master)](https://travis-ci.com/endail/hx711)
 
-- Port of https://github.com/tatobari/hx711py
 - Use with Raspberry Pi
-- [Example code](https://github.com/endail/hx711/blob/master/src/test.cpp)
+
+## Example
+
+```cpp
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <HX711.h>
+
+int main() {
+
+  using namespace std;
+  using namespace HX711;
+
+  wiringPiSetup();
+
+  SimpleHX711 hx(8, 9, -7050);
+  hx.setUnit(Mass::Unit::KG);
+
+  //prints something like
+  //1.2 kg
+  while(true) {
+    cout << hx.weight() << endl;
+    this_thread::sleep_for(chrono::seconds(1));
+  }
+
+  return 0;
+
+}
+```
 
 ## Build and Install
 
