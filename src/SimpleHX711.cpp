@@ -50,10 +50,6 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
         throw std::invalid_argument("vals is empty");
     }
 
-	if(vals->size() == 1) {
-		return static_cast<double>((*vals)[0]);
-	}
-
 	//to calculate the median the vector needs to be modifiable
 	//hence, a copy is made
 	std::vector<HX_VALUE> copied = *vals;
@@ -85,10 +81,6 @@ double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
 
     if(vals->empty()) {
         throw std::invalid_argument("vals is empty");
-    }
-    
-    if(vals->size()) {
-        return static_cast<double>((*vals)[0]);
     }
 
     const std::int64_t sum = std::accumulate(
