@@ -199,9 +199,11 @@ HX_VALUE HX711::_getChannelAValue() {
      * "Channel A can be programmed with a gain 
      * of 128 or 64..."
      * Datasheet pg. 1
+     * 
+     * Opt to default to 128
      */
     if(this->_gain == Gain::GAIN_32) {
-        this->setGain(_DEFAULT_GAIN);
+        this->setGain(Gain::GAIN_128);
     }
 
     return this->_readInt();
