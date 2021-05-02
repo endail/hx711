@@ -90,6 +90,13 @@ double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
 
 }
 
+SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
+}
+
+SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
+	return *this;
+}
+
 SimpleHX711::SimpleHX711(
 	const int dataPin,
 	const int clockPin,
@@ -116,7 +123,7 @@ HX_VALUE SimpleHX711::getReferenceUnit() const noexcept {
 	return this->_refUnit;
 }
 
-void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
+void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) {
 
 	if(refUnit == 0) {
 		#pragma GCC diagnostic push

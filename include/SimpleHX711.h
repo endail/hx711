@@ -48,6 +48,10 @@ protected:
 	static double _median(const std::vector<HX_VALUE>* vals);
 	static double _average(const std::vector<HX_VALUE>* vals);
 
+	//prohibit copying
+	SimpleHX711(const SimpleHX711& s2) noexcept;
+	SimpleHX711& operator=(const SimpleHX711& rhs) noexcept;
+
 
 public:
 
@@ -63,7 +67,7 @@ public:
 	Mass::Unit getUnit() const noexcept;
 
 	HX_VALUE getReferenceUnit() const noexcept;
-	void setReferenceUnit(const HX_VALUE ref) noexcept;
+	void setReferenceUnit(const HX_VALUE refUnit);
 
 	void setChannel(const Channel ch) noexcept;
 	Channel getChannel() const noexcept;
