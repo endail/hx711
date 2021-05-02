@@ -236,7 +236,8 @@ void HX711::connect(
     const Format bitFormat,
     const Format byteFormat) {
 
-        this->setReadFormat(bitFormat, byteFormat);
+        this->setBitFormat(bitFormat);
+        this->setByteFormat(byteFormat);
 
         /**
          *  Cannot simply set this->_gain. this->setGain()
