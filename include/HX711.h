@@ -75,11 +75,6 @@ protected:
     //Datasheet pg. 5
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
-    //defaults
-    static const Channel _DEFAULT_CHANNEL = Channel::A;
-    static const Gain _DEFAULT_GAIN = Gain::GAIN_128;
-    static const Format _DEFAULT_FORMAT = Format::MSB;
-
     /**
      * ints (not int32_t) are used for pins to be as compatible as possible
      * with wiringPi calls (and to not make presumptions about pin 
@@ -88,9 +83,9 @@ protected:
     const int _dataPin = -1;
     const int _clockPin = -1;
     std::mutex _readLock;
-    Gain _gain = _DEFAULT_GAIN;
-    Format _bitFormat = _DEFAULT_FORMAT;
-    Format _byteFormat = _DEFAULT_FORMAT;
+    Gain _gain = Gain::GAIN_128;
+    Format _bitFormat = Format::MSB;
+    Format _byteFormat = Format::MSB;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const noexcept;
@@ -113,9 +108,9 @@ public:
     Gain getGain() const noexcept;
 
     void connect(
-        const Gain gain = _DEFAULT_GAIN,
-        const Format bitFormat = _DEFAULT_FORMAT,
-        const Format byteFormat = _DEFAULT_FORMAT);
+        const Gain gain = Gain::GAIN_128,
+        const Format bitFormat = Format::MSB,
+        const Format byteFormat = Format::MSB);
     
     bool isReady() const noexcept;
 
@@ -123,7 +118,7 @@ public:
      * If Channel B value is requested but an exception is thrown
      * setGain MUST be called again.
      */
-    std::int32_t getValue(const Channel c = _DEFAULT_CHANNEL);
+    std::int32_t getValue(const Channel c = Channel::A);
 
     Format getBitFormat() const noexcept;
     Format getByteFormat() const noexcept;
