@@ -19,7 +19,7 @@ ifeq ($(GITHUB_ACTIONS),true)
 endif
 
 .PHONY: all
-all: dirs $(BUILDDIR)/libhx711.a #test hx711calibration
+all: dirs $(BUILDDIR)/libhx711.a test hx711calibration
 
 .PHONY: dirs
 dirs:
@@ -36,9 +36,9 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 #hx711calibration: $(BUILDDIR)/Calibration.o
 #	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -lhx711 $(LIB)
 
-#.PHONY: test
-#test: $(BUILDDIR)/test.o
-#	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/test $(BUILDDIR)/test.o -L $(BUILDDIR)/ -lhx711 $(LIB)
+.PHONY: test
+test: $(BUILDDIR)/SimpleHX711Test.o
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/simplehx711test $(BUILDDIR)/SimpleHX711Test.o -L $(BUILDDIR)/ -lhx711 $(LIB)
 
 .PHONY: clean
 clean:
