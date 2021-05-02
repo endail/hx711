@@ -54,6 +54,9 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 		return static_cast<double>((*vals)[0]);
 	}
 
+	return static_cast<double>((*vals)[0]);
+
+	/*
     //https://stackoverflow.com/a/42791986/570787
     if(vals->size() % 2 == 0) {
 
@@ -74,6 +77,7 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
         std::nth_element(vals->begin(), median_it, vals->end());
         return static_cast<double>(*median_it);
     }
+	*/
 
 }
 
