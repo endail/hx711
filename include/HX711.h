@@ -34,6 +34,8 @@ namespace HX711 {
  * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
  */
 
+typedef std::int32_t HX_VALUE;
+
 enum class Format {
     MSB = 0,
     LSB
@@ -91,10 +93,10 @@ protected:
     bool _readBit() const noexcept;
     std::uint8_t _readByte() const noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
-    std::int32_t _readInt();
+    HX_VALUE _readInt();
 
-    std::int32_t _getChannelAValue();
-    std::int32_t _getChannelBValue();
+    HX_VALUE _getChannelAValue();
+    HX_VALUE _getChannelBValue();
 
 public:
     
@@ -118,7 +120,7 @@ public:
      * If Channel B value is requested but an exception is thrown
      * setGain MUST be called again.
      */
-    std::int32_t getValue(const Channel c = Channel::A);
+    HX_VALUE getValue(const Channel c = Channel::A);
 
     Format getBitFormat() const noexcept;
     Format getByteFormat() const noexcept;

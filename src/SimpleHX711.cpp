@@ -31,9 +31,9 @@
 
 namespace HX711 {
 
-std::vector<std::int32_t> SimpleHX711::_readValues(const std::size_t times) {
+std::vector<HX_VALUE> SimpleHX711::_readValues(const std::size_t times) {
 
-	std::vector<std::int32_t> vals;
+	std::vector<HX_VALUE> vals;
 	vals.reserve(times);
 
 	for(std::size_t i = 0; i < times; ++i) {
@@ -44,7 +44,7 @@ std::vector<std::int32_t> SimpleHX711::_readValues(const std::size_t times) {
 
 }
 
-double SimpleHX711::_median(const std::vector<std::int32_t>* vals) {
+double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 
     if(vals->empty()) {
         throw std::invalid_argument("vals is empty");
@@ -77,7 +77,7 @@ double SimpleHX711::_median(const std::vector<std::int32_t>* vals) {
 
 }
 
-double SimpleHX711::_average(const std::vector<std::int32_t>* vals) {
+double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
 
     if(vals->empty()) {
         throw std::invalid_argument("vals is empty");
@@ -97,8 +97,8 @@ double SimpleHX711::_average(const std::vector<std::int32_t>* vals) {
 SimpleHX711::SimpleHX711(
 	const int dataPin,
 	const int clockPin,
-	const std::int32_t refUnit,
-	const std::int32_t offset) :
+	const HX_VALUE refUnit,
+	const HX_VALUE offset) :
 		_refUnit(refUnit),
 		_offset(offset)  {
 			this->_hx = new HX711(dataPin, clockPin);
@@ -116,11 +116,11 @@ Mass::Unit SimpleHX711::getUnit() const noexcept {
 	return this->_scaleUnit;
 }
 
-std::int32_t HX711::getReferenceUnit() const noexcept {
+HX_VALUE HX711::getReferenceUnit() const noexcept {
 	return this->_refUnit;
 }
 
-void HX711::setReferenceUnit(const std::int32_t refUnit) noexcept {
+void HX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
 	this->_refUnit = refUnit;
 }
 
@@ -133,9 +133,9 @@ Channel HX711::getChannel() const noexcept {
 }
 
 void SimpleHX711::tare(const ReadType, const size_t times) {
-	const std::int32_t backup = this->_refUnit;
+	const HX_VALUE backup = this->_refUnit;
 	this->setReferenceUnit(1);
-	this->_offset = static_cast<std::int32_t>(std::round(this->read(r, times)));
+	this->_offset = static_cast<HX_VALUE>(std::round(this->read(r, times)));
 	this->setReferenceUnit(backup);
 }
 
@@ -143,9 +143,9 @@ Mass SimpleHX711::weight(const ReadType r, const size_t times) {
 	return Mass(this->read(r, times), this->_scaleUnit);
 }
 
-double read(const ReadType r, const std::size_t times) {
+double SimpleHX711::read(const ReadType r, const std::size_t times) {
 	
-	std::vector<std::int32_t> vals = this->_readValues(times);
+	std::vector<HX_VALUE> vals = this->_readValues(times);
 	double val;
 
 	switch(r) {

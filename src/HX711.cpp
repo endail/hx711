@@ -174,7 +174,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
 }
 
-std::int32_t HX711::_readInt() {
+HX_VALUE HX711::_readInt() {
 
     std::uint8_t bytes[_BYTES_PER_CONVERSION_PERIOD];
     
@@ -193,7 +193,7 @@ std::int32_t HX711::_readInt() {
 
 }
 
-std::int32_t HX711::_getChannelAValue() {
+HX_VALUE HX711::_getChannelAValue() {
 
     /**
      * "Channel A can be programmed with a gain 
@@ -208,7 +208,7 @@ std::int32_t HX711::_getChannelAValue() {
 
 }
 
-std::int32_t HX711::_getChannelBValue() {
+HX_VALUE HX711::_getChannelBValue() {
     
     /**
      * "Channel B has a fixed gain of 32"
@@ -272,7 +272,7 @@ bool HX711::isReady() const noexcept {
     return ::digitalRead(this->_dataPin) == LOW;
 }
 
-std::int32_t HX711::getValue(const Channel c) {
+HX_VALUE HX711::getValue(const Channel c) {
 
     if(c == Channel::A) {
         return this->_getChannelAValue();

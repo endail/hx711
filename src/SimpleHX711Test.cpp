@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <string>
+#include <cstdlib>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -31,29 +31,30 @@
 int main(int argc, char** argv) {
 
     using namespace std;
-	using namespace HX711;
 
-    const char* err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
+    const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
 
     if(argc != 4) {
         cout << err << endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    const uint8_t dataPin = stoi(argv[1]);
-    const uint8_t clockPin = stoi(argv[2]);
-    const int32_t refUnit = stoi(argv[3]);
+    const int dataPin = stoi(argv[1]);
+    const int clockPin = stoi(argv[2]);
+    const HX_VALUE refUnit = stoi(argv[3]);
 
     wiringPiSetup();
 
-    SimpleHX711 hx(dataPin, clockPin, refUnit);
-	hx.setUnit(Mass::Unit::G);
-
+    HX711::SimpleHX711 hx(dataPin, clockPin, refUnit);
+	
+    //set the scale to output weights in grams
+    hx.setUnit(Mass::Unit::G);
+    
 	while(true) {
 		cout << hx.weight() << endl;
         this_thread::sleep_for(chrono::seconds(1));
 	}
 
-    return 0;
+    return EXIT_FAILURE;
 
 }

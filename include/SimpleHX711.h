@@ -41,14 +41,12 @@ protected:
 	Hx711::HX711* _hx = nullptr;
 	Mass::Unit _scaleUnit = Mass::Unit::G;
 	Channel _ch = Channel::A;
-	std::int32_t _refUnit;
-	std::int32_t _offset;
+	HX_VALUE _refUnit;
+	HX_VALUE _offset;
 
-	std::vector<std::int32_t> _readValues(const std::size_t times = 3);
-
-	static double _median(const std::vector<std::int32_t>* vals);
-	static double _average(const std::vector<std::int32_t>* vals);
-	static double _stddev(const std::vector<std::int32_t>* vals, const size_t dev = 3);
+	std::vector<HX_VALUE> _readValues(const std::size_t times = 3);
+	static double _median(const std::vector<HX_VALUE>* vals);
+	static double _average(const std::vector<HX_VALUE>* vals);
 
 
 public:
@@ -56,16 +54,16 @@ public:
 	SimpleHX711(
 		const int dataPin,
 		const int clockPin,
-		const std::int32_t refUnit = 1,
-		const std::int32_t offset = 0);
+		const HX_VALUE refUnit = 1,
+		const HX_VALUE offset = 0);
 
 	~SimpleHX711();
 
 	void setUnit(const Mass::Unit unit) noexcept;
 	Mass getUnit() const noexcept;
 
-	std::int32_t getReferenceUnit() const noexcept;
-	void setReferenceUnit(const std::int32_t ref) noexcept;
+	HX_VALUE getReferenceUnit() const noexcept;
+	void setReferenceUnit(const HX_VALUE ref) noexcept;
 
 	void setChannel(const Channel ch) noexcept;
 	Channel getChannel() const noexcept;
