@@ -132,7 +132,7 @@ Channel SimpleHX711::getChannel() const noexcept {
 	return this->_ch;
 }
 
-void SimpleHX711::tare(const ReadType, const size_t times) {
+void SimpleHX711::tare(const ReadType r, const size_t times) {
 	const HX_VALUE backup = this->_refUnit;
 	this->setReferenceUnit(1);
 	this->_offset = static_cast<HX_VALUE>(std::round(this->read(r, times)));
