@@ -51,7 +51,7 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
     }
 
 	if(vals->size() == 1) {
-		return static_cast<double>(vals[0]);
+		return static_cast<double>(*vals[0]);
 	}
 
     //https://stackoverflow.com/a/42791986/570787
@@ -84,7 +84,7 @@ double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
     }
     
     if(vals->size()) {
-        return static_cast<double>(vals[0]);
+        return static_cast<double>(*vals[0]);
     }
 
     const std::int64_t sum = std::accumulate(
