@@ -54,30 +54,30 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 		return static_cast<double>((*vals)[0]);
 	}
 
-	return static_cast<double>((*vals)[0]);
+	//to calculate the median the vector needs to be modifiable
+	//hence, a copy is made
+	std::vector<HX_VALUE> copied = *vals;
 
-	/*
     //https://stackoverflow.com/a/42791986/570787
-    if(vals->size() % 2 == 0) {
+    if(copied.size() % 2 == 0) {
 
-        const auto median_it1 = vals->begin() + vals->size() / 2 - 1;
-        const auto median_it2 = vals->begin() + vals->size() / 2;
+        const auto median_it1 = copied.begin() + copied.size() / 2 - 1;
+        const auto median_it2 = copied.begin() + copied.size() / 2;
 
-        std::nth_element(vals->begin(), median_it1, vals->end());
+        std::nth_element(copied.begin(), median_it1, copied.end());
         const auto e1 = *median_it1;
 
-        std::nth_element(vals->begin(), median_it2, vals->end());
+        std::nth_element(copied.begin(), median_it2, copied.end());
         const auto e2 = *median_it2;
 
         return (e1 + e2) / 2.0;
 
     }
     else {
-        const auto median_it = vals->begin() + vals->size() / 2;
-        std::nth_element(vals->begin(), median_it, vals->end());
+        const auto median_it = copied.begin() + copied.size() / 2;
+        std::nth_element(copied.begin(), median_it, copied.end());
         return static_cast<double>(*median_it);
     }
-	*/
 
 }
 
