@@ -7,10 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Git branch name
-        id: git-branch-name
-        uses: EthanSK/git-branch-name-action@v1
-
       - name: clone wiringPi
         uses: actions/checkout@v2
         with:
@@ -33,4 +29,4 @@ jobs:
         uses: mikeal/publish-to-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${GIT_BRANCH_NAME}
+          BRANCH_NAME: simple-hx711
