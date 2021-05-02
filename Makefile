@@ -27,7 +27,7 @@ dirs:
 	mkdir -p $(BUILDDIR)
 
 $(BUILDDIR)/libhx711.a: $(BUILDDIR)/HX711.o $(BUILDDIR)/Mass.o $(BUILDDIR)/SimpleHX711.o
-	ar rcs $(BUILDDIR)/libhx711.a $(BUILDDIR)/HX711.o
+	ar rcs $(BUILDDIR)/libhx711.a $(BUILDDIR)/HX711.o $(BUILDDIR)/Mass.o $(BUILDDIR)/SimpleHX711.o
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
