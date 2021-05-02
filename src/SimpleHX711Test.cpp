@@ -26,11 +26,13 @@
 #include <chrono>
 #include <iomanip>
 #include <wiringPi.h>
+#include "../include/Mass.h"
 #include "../include/SimpleHX711.h"
 
 int main(int argc, char** argv) {
 
     using namespace std;
+    using namespace HX711;
 
     const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
 
@@ -41,11 +43,11 @@ int main(int argc, char** argv) {
 
     const int dataPin = stoi(argv[1]);
     const int clockPin = stoi(argv[2]);
-    const HX_VALUE refUnit = stoi(argv[3]);
+    const int refUnit = stoi(argv[3]);
 
     wiringPiSetup();
 
-    HX711::SimpleHX711 hx(dataPin, clockPin, refUnit);
+    SimpleHX711 hx(dataPin, clockPin, refUnit);
 	
     //set the scale to output weights in grams
     hx.setUnit(Mass::Unit::G);
