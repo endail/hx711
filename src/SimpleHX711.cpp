@@ -46,9 +46,9 @@ std::vector<HX_VALUE> SimpleHX711::_readValues(const std::size_t times) {
 
 double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 
-    if(vals->empty()) {
-        throw std::invalid_argument("vals is empty");
-    }
+	if(vals == nullptr || vals->empty()) {
+		throw std::invalid_argument("vals is null or empty");
+	}
 
 	//to calculate the median the vector needs to be modifiable
 	//hence, a copy is made
@@ -79,9 +79,9 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 
 double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
 
-    if(vals->empty()) {
-        throw std::invalid_argument("vals is empty");
-    }
+	if(vals == nullptr || vals->empty()) {
+		throw std::invalid_argument("vals is null or empty");
+	}
 
     const std::int64_t sum = std::accumulate(
         vals->begin(), vals->end(), 0);
@@ -117,7 +117,13 @@ HX_VALUE SimpleHX711::getReferenceUnit() const noexcept {
 }
 
 void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
+
+	if(refUnit == 0) {
+		throw std::invalid_argument("reference unit cannot be 0");
+	}
+
 	this->_refUnit = refUnit;
+
 }
 
 void SimpleHX711::setChannel(const Channel ch) noexcept {
@@ -141,8 +147,9 @@ Mass SimpleHX711::weight(const ReadType r, const size_t times) {
 
 double SimpleHX711::read(const ReadType r, const std::size_t times) {
 	
-	std::vector<HX_VALUE> vals = this->_readValues(times);
 	double val;
+	
+	std::vector<HX_VALUE> vals = this->_readValues(times);
 
 	switch(r) {
 		case ReadType::Median:
