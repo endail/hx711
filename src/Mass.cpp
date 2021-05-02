@@ -29,7 +29,7 @@
 namespace HX711 {
 
 Mass::Mass(const double amount, const Unit u) noexcept
-    : _g(Mass::convert(amount, u, Unit::G)) {
+    : _g(Mass::convert(amount, u, Unit::G)), _u(u) {
 }
 
 Mass::Mass(const Mass& m2) noexcept 
