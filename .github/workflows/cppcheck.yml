@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: nelonoel/branch-name@v1
+      - uses: nelonoel/branch-name@v1.0.1
 
       - name: clone wiringPi
         uses: actions/checkout@v2
