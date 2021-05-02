@@ -38,7 +38,7 @@ enum class ReadType {
 class SimpleHX711 {
 	
 protected:
-	Hx711::HX711* _hx = nullptr;
+	HX711* _hx = nullptr;
 	Mass::Unit _scaleUnit = Mass::Unit::G;
 	Channel _ch = Channel::A;
 	HX_VALUE _refUnit;
