@@ -88,9 +88,9 @@ double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
     }
 
     const std::int64_t sum = std::accumulate(
-        values->begin(), values->end(), 0);
+        vals->begin(), vals->end(), 0);
 
-    return static_cast<double>(sum) / values->size();
+    return static_cast<double>(sum) / vals->size();
 
 }
 
@@ -116,19 +116,19 @@ Mass::Unit SimpleHX711::getUnit() const noexcept {
 	return this->_scaleUnit;
 }
 
-HX_VALUE HX711::getReferenceUnit() const noexcept {
+HX_VALUE SimpleHX711::getReferenceUnit() const noexcept {
 	return this->_refUnit;
 }
 
-void HX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
+void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
 	this->_refUnit = refUnit;
 }
 
-void HX711::setChannel(const Channel ch) noexcept {
+void SimpleHX711::setChannel(const Channel ch) noexcept {
 	this->_ch = ch;
 }
 
-Channel HX711::getChannel() const noexcept {
+Channel SimpleHX711::getChannel() const noexcept {
 	return this->_ch;
 }
 

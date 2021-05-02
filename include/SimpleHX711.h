@@ -60,7 +60,7 @@ public:
 	~SimpleHX711();
 
 	void setUnit(const Mass::Unit unit) noexcept;
-	Mass getUnit() const noexcept;
+	Mass::Unit getUnit() const noexcept;
 
 	HX_VALUE getReferenceUnit() const noexcept;
 	void setReferenceUnit(const HX_VALUE ref) noexcept;
