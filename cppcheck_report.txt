@@ -1,3 +1,6 @@
+src/SimpleHX711.cpp:160:11: style: Checking if unsigned expression 'times' is less than zero. [unsignedLessThanZero]
+ if(times <= 0) {
+          ^
 src/HX711.cpp:236:0: style: The function 'connect' is never used. [unusedFunction]
 
 ^
