@@ -41,8 +41,8 @@ protected:
 	HX711* _hx = nullptr;
 	Mass::Unit _scaleUnit = Mass::Unit::G;
 	Channel _ch = Channel::A;
-	HX_VALUE _refUnit;
-	HX_VALUE _offset;
+	HX_VALUE _refUnit = 1;
+	HX_VALUE _offset = 0;
 
 	std::vector<HX_VALUE> _readValues(const std::size_t times = 3);
 	static double _median(const std::vector<HX_VALUE>* vals);
