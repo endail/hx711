@@ -111,6 +111,10 @@ SimpleHX711::~SimpleHX711() {
 	delete this->_hx;
 }
 
+bool SimpleHX711::operator!(const SimpleHX711& hx) noexcept {
+	return !this->ready();
+}
+
 void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
 	this->_scaleUnit = unit;
 }
@@ -136,12 +140,24 @@ void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) {
 
 }
 
+HX_VALUE SimpleHX711::getOffset() const noexcept {
+	return this->_offset;
+}
+
+void SimpleHX711::setOffset(const HX_VALUE offset) noexcept {
+	this->_offset = offset;
+}
+
 void SimpleHX711::setChannel(const Channel ch) noexcept {
 	this->_ch = ch;
 }
 
 Channel SimpleHX711::getChannel() const noexcept {
 	return this->_ch;
+}
+
+bool SimpleHX711::ready() const noexcept {
+	return this->_hx->isReady();
 }
 
 void SimpleHX711::tare(const ReadType r, const size_t times) {

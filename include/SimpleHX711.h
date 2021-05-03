@@ -63,14 +63,21 @@ public:
 
 	~SimpleHX711();
 
+	friend bool operator!(const SimpleHX711& hx) noexcept;
+
 	void setUnit(const Mass::Unit unit) noexcept;
 	Mass::Unit getUnit() const noexcept;
 
 	HX_VALUE getReferenceUnit() const noexcept;
 	void setReferenceUnit(const HX_VALUE refUnit);
 
+	HX_VALUE getOffset() const noexcept;
+	void setOffset(const HX_VALUE offset) noexcept;
+
 	void setChannel(const Channel ch) noexcept;
 	Channel getChannel() const noexcept;
+
+	bool ready() const noexcept;
 
 	void tare(const ReadType r = ReadType::Median, const size_t times = 3);
 	Mass weight(const ReadType r = ReadType::Median, const size_t times = 3);

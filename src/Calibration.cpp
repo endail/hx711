@@ -20,12 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/*
-
-#include "../include/HX711.h"
+#include <hx711/SimpleHX711.h>
 #include <wiringPi.h>
+#include <cmath>
 #include <iostream>
-#include <iomanip>
 #include <thread>
 #include <chrono>
 #include <string>
@@ -36,7 +34,7 @@ std::uint32_t samples;
 std::string unit;
 double knownWeight;
 double zeroValue;
-HX711::HX711* hx;
+HX711::SimpleHX711* _hx;
 
 int main(int argc, char** argv) {
 
@@ -88,26 +86,26 @@ int main(int argc, char** argv) {
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    zeroValue = hx->get_value(samples);
+    zeroValue = hx->read(ReadType::Median, samples);
 
     //weigh prompt
     cout    << endl << endl << "5. Place object on the scale then press enter.";
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    int64_t val = hx->get_value(samples) - zeroValue;
-    double refUnit = val / knownWeight;
+    const double refUnitFloat = (hx->read(ReadType::Median, samples) - zeroValue) / knownWeight;
+    const HX_VALUE refUnitInt = static_cast<HX_VALUE>(std::round(refUnitFloat));
     delete hx;
 
     cout    << endl << endl
             << "Known weight (your object): " << knownWeight << unit << endl 
             << "Raw value over " << samples << " samples: " << val << endl
             << endl
-            << "-> REFERENCE UNIT: " << fixed << setprecision(0) << refUnit << endl
+            << "-> REFERENCE UNIT: " << refUnit << endl
             << "-> ZERO VALUE: " << zeroValue << endl
             << endl
             << "Use the reference unit value above to set the HX711 module's "
-            << "reference unit. ie. using hx.set_reference_unit()."
+            << "reference unit. ie. using hx.setReferenceUnit()."
             << endl
             << "Use the zero value above to set the zero value of the scale "
             << "using hx.setOffset(). You won't need to tare the scale if you use "
@@ -120,10 +118,7 @@ int main(int argc, char** argv) {
 
 bool setupHx(const int dataPin, const int clockPin) {
     wiringPiSetup();
-    hx = new HX711::HX711(dataPin, clockPin);
-    hx->set_reference_unit(1);
+    hx = new HX711::SimpleHX711(dataPin, clockPin, 1, 0);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    return hx->is_ready();
+    return hx->ready();
 }
-
-*/

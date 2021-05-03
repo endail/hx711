@@ -19,7 +19,7 @@ ifeq ($(GITHUB_ACTIONS),true)
 endif
 
 .PHONY: all
-all: dirs $(BUILDDIR)/libhx711.a test #hx711calibration
+all: dirs $(BUILDDIR)/libhx711.a test hx711calibration
 
 .PHONY: dirs
 dirs:
@@ -32,9 +32,9 @@ $(BUILDDIR)/libhx711.a: $(BUILDDIR)/HX711.o $(BUILDDIR)/Mass.o $(BUILDDIR)/Simpl
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
-#.PHONY: hx711calibration
-#hx711calibration: $(BUILDDIR)/Calibration.o
-#	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -lhx711 $(LIB)
+.PHONY: hx711calibration
+hx711calibration: $(BUILDDIR)/Calibration.o
+	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -lhx711 $(LIB)
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o
@@ -49,5 +49,5 @@ clean:
 install: $(BUILDDIR)/libhx711.a $(BINDIR)/hx711calibration
 	install -d $(DESTDIR)$(PREFIX)/lib/
 	install -m 644 $(BUILDDIR)/libhx711.a $(DESTDIR)$(PREFIX)/lib/
-	install -d $(DESTDIR)$(PREFIX)/include/
-	install -m 644 $(INCDIR)/HX711.h $(DESTDIR)$(PREFIX)/include/
+	install -d $(DESTDIR)$(PREFIX)/include/hx711
+	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
