@@ -1,15 +1,3 @@
-src/SimpleHX711.cpp:93:14: warning: Member variable 'SimpleHX711::_refUnit' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
-             ^
-src/SimpleHX711.cpp:93:14: warning: Member variable 'SimpleHX711::_offset' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
-             ^
-src/SimpleHX711.cpp:96:27: warning: Member variable 'SimpleHX711::_refUnit' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
-                          ^
-src/SimpleHX711.cpp:96:27: warning: Member variable 'SimpleHX711::_offset' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
-                          ^
 src/HX711.cpp:236:0: style: The function 'connect' is never used. [unusedFunction]
 
 ^
