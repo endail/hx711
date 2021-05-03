@@ -31,13 +31,18 @@
 using namespace HX711;
 using namespace std;
 
-bool setupHx(const int dataPin, const int clockPin);
-
 std::uint32_t samples;
 std::string unit;
 double knownWeight;
 double zeroValue;
 SimpleHX711* hx;
+
+bool setupHx(const int dataPin, const int clockPin) {
+    wiringPiSetup();
+    hx = new SimpleHX711(dataPin, clockPin, 1, 0);
+    this_thread::sleep_for(chrono::seconds(1));
+    return hx->ready();
+}
 
 int main(int argc, char** argv) {
 
@@ -116,11 +121,4 @@ int main(int argc, char** argv) {
 
     return 0;
 
-}
-
-bool setupHx(const int dataPin, const int clockPin) {
-    wiringPiSetup();
-    hx = new SimpleHX711(dataPin, clockPin, 1, 0);
-    this_thread::sleep_for(chrono::seconds(1));
-    return hx->ready();
 }
