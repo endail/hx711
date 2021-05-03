@@ -111,7 +111,7 @@ SimpleHX711::~SimpleHX711() {
 	delete this->_hx;
 }
 
-bool SimpleHX711::operator!(const SimpleHX711& hx) noexcept {
+bool SimpleHX711::operator!() noexcept {
 	return !this->ready();
 }
 
