@@ -54,6 +54,9 @@ public:
     Mass(const double amount = 0.0, const Unit u = Unit::G) noexcept;
     Mass(const Mass& m2) noexcept;
 
+    Mass& operator=(const Mass& rhs) noexcept;
+    Mass& operator=(const double& rhs) noexcept;
+
     double getValue(const Unit u = Unit::G) const noexcept;
 
     Unit getUnit() const noexcept;

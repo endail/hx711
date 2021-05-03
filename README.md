@@ -23,7 +23,7 @@ int main() {
   hx.setUnit(Mass::Unit::KG);
 
   while(true) {
-    cout << hx.weight() << endl; //prints eg. "1.2 kg"
+    cout << hx.weight() << endl; //prints eg. "1 kg"
     this_thread::sleep_for(chrono::seconds(1));
   }
 

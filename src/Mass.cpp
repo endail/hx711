@@ -36,6 +36,17 @@ Mass::Mass(const Mass& m2) noexcept
     : _g(m2._g), _u(m2._u) {
 }
 
+Mass& Mass::operator=(const Mass& rhs) noexcept {
+    this->_g = rhs._g;
+    //don't copy the unit
+    return *this;
+}
+
+Mass& Mass::operator=(const double& rhs) noexcept {
+    this->_g = rhs;
+    return *this;
+}
+
 double Mass::getValue(Unit u) const noexcept {
     return Mass::convert(this->_g, Unit::G, u);
 }
