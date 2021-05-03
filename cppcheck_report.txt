@@ -1,10 +1,16 @@
-src/Mass.cpp:39:13: warning: Member variable 'Mass::_u' is not assigned a value in 'Mass::operator='. [operatorEqVarError]
+src/Mass.cpp:42:13: warning: Member variable 'Mass::_u' is not assigned a value in 'Mass::operator='. [operatorEqVarError]
 Mass& Mass::operator=(const Mass& rhs) noexcept {
             ^
+src/Mass.cpp:95:9: error: Exception thrown in function declared not to throw exceptions. [throwInNoexceptFunction]
+        throw std::invalid_argument("cannot divide by 0");
+        ^
+src/Mass.cpp:125:9: error: Exception thrown in function declared not to throw exceptions. [throwInNoexceptFunction]
+        throw std::invalid_argument("cannot divide by 0");
+        ^
 src/HX711.cpp:236:0: style: The function 'connect' is never used. [unusedFunction]
 
 ^
-src/Mass.cpp:62:0: style: The function 'convertTo' is never used. [unusedFunction]
+src/Mass.cpp:65:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:332:0: style: The function 'getBitFormat' is never used. [unusedFunction]
@@ -31,7 +37,7 @@ src/SimpleHX711.cpp:143:0: style: The function 'getOffset' is never used. [unuse
 src/SimpleHX711.cpp:126:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
-src/Mass.cpp:54:0: style: The function 'getUnit' is never used. [unusedFunction]
+src/Mass.cpp:57:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:348:0: style: The function 'powerDown' is never used. [unusedFunction]
