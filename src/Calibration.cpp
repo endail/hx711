@@ -28,17 +28,18 @@
 #include <chrono>
 #include <string>
 
+using namespace HX711;
+using namespace std;
+
 bool setupHx(const int dataPin, const int clockPin);
 
 std::uint32_t samples;
 std::string unit;
 double knownWeight;
 double zeroValue;
-HX711::SimpleHX711* hx;
+SimpleHX711* hx;
 
 int main(int argc, char** argv) {
-
-    using namespace std;
 
     if(argc != 3) {
         cout << "Usage: hx711calibration [data pin] [clock pin]" << endl;
@@ -94,7 +95,7 @@ int main(int argc, char** argv) {
     cout    << endl << "Working..." << flush;
 
     const double refUnitFloat = (hx->read(ReadType::Median, samples) - zeroValue) / knownWeight;
-    const HX_VALUE refUnitInt = static_cast<HX_VALUE>(std::round(refUnitFloat));
+    const HX_VALUE refUnitInt = static_cast<HX_VALUE>(round(refUnitFloat));
     delete hx;
 
     cout    << endl << endl
@@ -118,7 +119,7 @@ int main(int argc, char** argv) {
 
 bool setupHx(const int dataPin, const int clockPin) {
     wiringPiSetup();
-    hx = new HX711::SimpleHX711(dataPin, clockPin, 1, 0);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    hx = new SimpleHX711(dataPin, clockPin, 1, 0);
+    this_thread::sleep_for(chrono::seconds(1));
     return hx->ready();
 }
