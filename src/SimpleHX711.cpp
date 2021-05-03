@@ -157,6 +157,10 @@ Mass SimpleHX711::weight(const ReadType r, const size_t times) {
 
 double SimpleHX711::read(const ReadType r, const std::size_t times) {
 	
+	if(times <= 0) {
+		throw std::range_error("times must be at least 1");
+	}
+
 	double val;
 	
 	std::vector<HX_VALUE> vals = this->_readValues(times);
