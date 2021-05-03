@@ -10,7 +10,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <HX711.h>
+#include <hx711/SimpleHX711.h>
 
 int main() {
 
@@ -22,10 +22,8 @@ int main() {
   SimpleHX711 hx(8, 9, -7050);
   hx.setUnit(Mass::Unit::KG);
 
-  //prints something like
-  //1.2 kg
   while(true) {
-    cout << hx.weight() << endl;
+    cout << hx.weight() << endl; //prints eg. "1.2 kg"
     this_thread::sleep_for(chrono::seconds(1));
   }
 
@@ -48,7 +46,7 @@ pi@raspberrypi~/hx711 $ make && sudo make install
 
 - **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
 
 Example using WiringPi pin 8 for data and pin 9 for clock.
 
@@ -77,7 +75,7 @@ pi@raspberrypi~/hx711 $ bin/test 8 9 -7050
 After writing your own code (eg. main.cpp), compile with the HX711 library as follows:
 
 ```shell
-g++ -Wall -o prog main.cpp -l wiringPi -l hx711
+g++ -Wall -o prog main.cpp -lwiringPi -lhx711
 ```
 
-Make sure to setup wiringPi with `wiringPiSetup()` ([or equivalent](http://wiringpi.com/reference/setup/)) prior to creating the HX711 object. See the [test code](https://github.com/endail/hx711/blob/master/src/test.cpp#L45) as an example.
+Make sure to setup wiringPi with `wiringPiSetup()` ([or equivalent](http://wiringpi.com/reference/setup/)) prior to creating the SimpleHX711 object. See the [test code](https://github.com/endail/hx711/blob/master/src/test.cpp#L45) as an example.
