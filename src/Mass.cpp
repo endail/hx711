@@ -25,15 +25,18 @@
 #include <sstream>
 #include <iomanip>
 #include <cstring>
+#include <stdexcept>
 
 namespace HX711 {
 
 Mass::Mass(const double amount, const Unit u) noexcept
-    : _g(Mass::convert(amount, u, Unit::G)), _u(u) {
+    :   _g(Mass::convert(amount, u, Unit::G)),
+        _u(u) {
 }
 
 Mass::Mass(const Mass& m2) noexcept 
-    : _g(m2._g), _u(m2._u) {
+    :   _g(m2._g),
+        _u(m2._u) {
 }
 
 Mass& Mass::operator=(const Mass& rhs) noexcept {
@@ -61,32 +64,44 @@ void Mass::setUnit(const Unit u) noexcept {
 
 Mass Mass::convertTo(const Unit to) const noexcept {
     Mass m = *this;
-    m.setUnit(to);
+    m._u = to;
     return m;
 }
 
 Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m = Mass(lhs._g + rhs._g);
+    Mass m;
+    m._g = lhs._g + rhs._g;
     m._u = lhs._u;
     return m;
 }
 
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m = Mass(lhs._g - rhs._g);
+    Mass m;
+    m._g = lhs._g - rhs._g;
     m._u = lhs._u;
     return m;
 }
 
 Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m = Mass(lhs._g * rhs._g);
+    Mass m;
+    m._g = lhs._g * rhs._g;
     m._u = lhs._u;
     return m;
 }
 
 Mass operator/(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m = Mass(lhs._g / rhs._g);
+    
+    if(rhs._g == 0) {
+        throw std::invalid_argument("cannot divide by 0");
+    }
+    
+    Mass m;
+    
+    m._g = lhs._g / rhs._g;
     m._u = lhs._u;
+    
     return m;
+
 }
 
 Mass& Mass::operator+=(const Mass& rhs) noexcept {
@@ -105,8 +120,15 @@ Mass& Mass::operator*=(const Mass& rhs) noexcept {
 }
 
 Mass& Mass::operator/=(const Mass& rhs) noexcept {
+
+    if(rhs._g == 0) {
+        throw std::invalid_argument("cannot divide by 0");
+        
+    }
+
     this->_g /= rhs._g;
     return *this;
+
 }
 
 bool operator!(const Mass& m) noexcept {
@@ -159,6 +181,11 @@ double Mass::convert(
     const double amount,
     const Unit from,
     const Unit to) noexcept {
+
+        //return early if 0
+        if(amount == 0) {
+            return 0;
+        }
 
         if(to == Unit::G) {
             return amount * Mass::_CONVERSIONS[static_cast<std::size_t>(from)];
