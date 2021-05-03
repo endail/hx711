@@ -94,13 +94,14 @@ int main(int argc, char** argv) {
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    const double refUnitFloat = (hx->read(ReadType::Median, samples) - zeroValue) / knownWeight;
-    const HX_VALUE refUnitInt = static_cast<HX_VALUE>(round(refUnitFloat));
+    const double raw = hx->read(ReadType::Median, samples);
+    const double refUnitFloat = (raw - zeroValue) / knownWeight;
+    const HX_VALUE refUnit = static_cast<HX_VALUE>(round(refUnitFloat));
     delete hx;
 
     cout    << endl << endl
             << "Known weight (your object): " << knownWeight << unit << endl 
-            << "Raw value over " << samples << " samples: " << val << endl
+            << "Raw value over " << samples << " samples: " << raw << endl
             << endl
             << "-> REFERENCE UNIT: " << refUnit << endl
             << "-> ZERO VALUE: " << zeroValue << endl
