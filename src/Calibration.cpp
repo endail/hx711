@@ -34,7 +34,7 @@ std::uint32_t samples;
 std::string unit;
 double knownWeight;
 double zeroValue;
-HX711::SimpleHX711* _hx;
+HX711::SimpleHX711* hx;
 
 int main(int argc, char** argv) {
 
