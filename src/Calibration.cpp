@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <hx711/SimpleHX711.h>
+#include "../include/SimpleHX711.h"
 #include <wiringPi.h>
 #include <cmath>
 #include <iostream>
