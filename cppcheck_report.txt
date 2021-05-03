@@ -1,24 +1,15 @@
-src/Mass.cpp:31:7: warning: Member variable 'Mass::_u' is not initialized in the constructor. [uninitMemberVar]
-Mass::Mass(const double amount, const Unit u) noexcept
-      ^
-src/SimpleHX711.cpp:100:10: warning: Class 'SimpleHX711' does not have a copy constructor which is recommended since it has dynamic memory/resource allocation(s). [noCopyConstructor]
-   this->_hx = new HX711(dataPin, clockPin);
-         ^
-src/SimpleHX711.cpp:100:10: warning: Class 'SimpleHX711' does not have a operator= which is recommended since it has dynamic memory/resource allocation(s). [noOperatorEq]
-   this->_hx = new HX711(dataPin, clockPin);
-         ^
-src/SimpleHX711.cpp:124:3: error: Exception thrown in function declared not to throw exceptions. [throwInNoexceptFunction]
-  throw std::invalid_argument("reference unit cannot be 0");
-  ^
-src/SimpleHX711.cpp:119:51: style:inconclusive: Function 'setReferenceUnit' argument 1 names different: declaration 'ref' definition 'refUnit'. [funcArgNamesDifferent]
-void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
-                                                  ^
-include/SimpleHX711.h:66:39: note: Function 'setReferenceUnit' argument 1 names different: declaration 'ref' definition 'refUnit'.
- void setReferenceUnit(const HX_VALUE ref) noexcept;
-                                      ^
-src/SimpleHX711.cpp:119:51: note: Function 'setReferenceUnit' argument 1 names different: declaration 'ref' definition 'refUnit'.
-void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) noexcept {
-                                                  ^
+src/SimpleHX711.cpp:93:14: warning: Member variable 'SimpleHX711::_refUnit' is not initialized in the constructor. [uninitMemberVar]
+SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
+             ^
+src/SimpleHX711.cpp:93:14: warning: Member variable 'SimpleHX711::_offset' is not initialized in the constructor. [uninitMemberVar]
+SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
+             ^
+src/SimpleHX711.cpp:96:27: warning: Member variable 'SimpleHX711::_refUnit' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
+SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
+                          ^
+src/SimpleHX711.cpp:96:27: warning: Member variable 'SimpleHX711::_offset' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
+SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
+                          ^
 src/HX711.cpp:236:0: style: The function 'connect' is never used. [unusedFunction]
 
 ^
@@ -31,7 +22,7 @@ src/HX711.cpp:332:0: style: The function 'getBitFormat' is never used. [unusedFu
 src/HX711.cpp:336:0: style: The function 'getByteFormat' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:136:0: style: The function 'getChannel' is never used. [unusedFunction]
+src/SimpleHX711.cpp:143:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:293:0: style: The function 'getClockPin' is never used. [unusedFunction]
@@ -43,7 +34,7 @@ src/HX711.cpp:289:0: style: The function 'getDataPin' is never used. [unusedFunc
 src/HX711.cpp:328:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:115:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/SimpleHX711.cpp:122:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:43:0: style: The function 'getUnit' is never used. [unusedFunction]
@@ -55,10 +46,10 @@ src/HX711.cpp:348:0: style: The function 'powerDown' is never used. [unusedFunct
 src/HX711.cpp:365:0: style: The function 'powerUp' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:132:0: style: The function 'setChannel' is never used. [unusedFunction]
+src/SimpleHX711.cpp:139:0: style: The function 'setChannel' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:140:0: style: The function 'tare' is never used. [unusedFunction]
+src/SimpleHX711.cpp:147:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
