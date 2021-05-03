@@ -1,5 +1,5 @@
-src/Calibration.cpp:97:31: style: Variable 'refUnitInt' is assigned a value that is never used. [unreadVariable]
-    const HX_VALUE refUnitInt = static_cast<HX_VALUE>(std::round(refUnitFloat));
+src/Calibration.cpp:98:31: style: Variable 'refUnitInt' is assigned a value that is never used. [unreadVariable]
+    const HX_VALUE refUnitInt = static_cast<HX_VALUE>(round(refUnitFloat));
                               ^
 src/SimpleHX711.cpp:176:11: style: Checking if unsigned expression 'times' is less than zero. [unsignedLessThanZero]
  if(times <= 0) {
