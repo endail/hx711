@@ -37,8 +37,8 @@ namespace HX711 {
 typedef std::int32_t HX_VALUE;
 
 enum class Format {
-    MSB = 0,
-    LSB
+    MSB = 0, //most significant bit
+    LSB //least significant bit
 };
 
 enum class Channel {
@@ -55,6 +55,7 @@ enum class Gain {
 
 /**
  * Used as a map to select to correct number of clock pulses
+ * depending on the set gain
  * Datasheet pg. 4
  */
 const std::uint8_t PULSES[3] = {
