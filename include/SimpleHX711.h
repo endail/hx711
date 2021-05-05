@@ -30,6 +30,10 @@
 
 namespace HX711 {
 
+/**
+ * Whether SimpleHX711 will use values based on median 
+ * or average values read from the sensor
+ */
 enum class ReadType {
 	Median = 0,
 	Average,

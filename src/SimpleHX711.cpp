@@ -130,10 +130,7 @@ HX_VALUE SimpleHX711::getReferenceUnit() const noexcept {
 void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) {
 
 	if(refUnit == 0) {
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wterminate"
 		throw std::invalid_argument("reference unit cannot be 0");
-		#pragma GCC diagnostic pop
 	}
 
 	this->_refUnit = refUnit;
