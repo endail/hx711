@@ -41,7 +41,7 @@ Mass::Mass(const Mass& m2) noexcept
 
 Mass& Mass::operator=(const Mass& rhs) noexcept {
     this->_g = rhs._g;
-    //don't copy the unit
+    this->_u = rhs._u;
     return *this;
 }
 
@@ -89,7 +89,7 @@ Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
     return m;
 }
 
-Mass operator/(const Mass& lhs, const Mass& rhs) noexcept {
+Mass operator/(const Mass& lhs, const Mass& rhs) {
     
     if(rhs._g == 0) {
         throw std::invalid_argument("cannot divide by 0");
@@ -119,11 +119,10 @@ Mass& Mass::operator*=(const Mass& rhs) noexcept {
     return *this;
 }
 
-Mass& Mass::operator/=(const Mass& rhs) noexcept {
+Mass& Mass::operator/=(const Mass& rhs) {
 
     if(rhs._g == 0) {
         throw std::invalid_argument("cannot divide by 0");
-        
     }
 
     this->_g /= rhs._g;

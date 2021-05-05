@@ -67,12 +67,12 @@ public:
     friend Mass operator+(const Mass& lhs, const Mass& rhs) noexcept;
     friend Mass operator-(const Mass& lhs, const Mass& rhs) noexcept;
     friend Mass operator*(const Mass& lhs, const Mass& rhs) noexcept;
-    friend Mass operator/(const Mass& lhs, const Mass& rhs) noexcept;
+    friend Mass operator/(const Mass& lhs, const Mass& rhs);
 
     Mass& operator+=(const Mass& rhs) noexcept;
     Mass& operator-=(const Mass& rhs) noexcept;
     Mass& operator*=(const Mass& rhs) noexcept;
-    Mass& operator/=(const Mass& rhs) noexcept;
+    Mass& operator/=(const Mass& rhs);
 
     friend bool operator!(const Mass& m) noexcept;
     
