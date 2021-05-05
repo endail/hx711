@@ -163,13 +163,16 @@ std::string Mass::toString() const noexcept {
 }
 
 std::string Mass::toString(const Unit u) const noexcept {
+    
     std::stringstream ss;
-    ss << std::fixed;
-    ss << std::setprecision(0);
-    ss << std::round(Mass::convert(this->_g, Unit::G, u));
-    ss << " ";
-    ss << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
+    
+    ss  << std::setprecision(0)
+        << std::round(Mass::convert(this->_g, Unit::G, u))
+        << " "
+        << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
+    
     return ss.str();
+
 }
 
 std::ostream& operator<<(std::ostream& os, const Mass& m) noexcept {
