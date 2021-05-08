@@ -1,3 +1,6 @@
+src/Mass.cpp:175:7: style: Variable 'f' is assigned a value that is never used. [unreadVariable]
+    f = std::modf(n, &i);
+      ^
 src/HX711.cpp:236:0: style: The function 'connect' is never used. [unusedFunction]
 
 ^
