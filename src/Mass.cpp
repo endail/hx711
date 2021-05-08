@@ -165,9 +165,22 @@ std::string Mass::toString() const noexcept {
 std::string Mass::toString(const Unit u) const noexcept {
     
     std::stringstream ss;
-    
-    ss  << std::setprecision(0)
-        << std::round(Mass::convert(this->_g, Unit::G, u))
+
+    double n; //mass as a double converted to u
+    double i; //integer
+    double f; //fractional
+    int d; //decimals
+
+    n = Mass::convert(this->_g, Unit::G, u);
+    f = std::modf(n, &i);
+    d = static_cast<int>(1 - std::log10(std::abs(fracPart)));
+
+    //d may be < 0
+    //if so, use as 0
+
+    ss  << std::fixed
+        << std::setprecision(d >= 0 ? d : 0)
+        << n
         << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
     
