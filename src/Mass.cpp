@@ -77,8 +77,8 @@ Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
 
 Mass operator+(const double& lhs, const Mass& rhs) noexcept {
     Mass m;
-    m._g = Mass::convert(lhs, rhs._u, Unit::G) + rhs._g;
-    m._u = lhs._u;
+    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) + rhs._g;
+    m._u = rhs._u;
     return m;
 }
 
@@ -95,8 +95,8 @@ Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
 
 Mass operator-(const double& lhs, const Mass& rhs) noexcept {
     Mass m;
-    m._g = Mass::convert(lhs, rhs._u, Unit::G) - rhs._g;
-    m._u = lhs._u;
+    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) - rhs._g;
+    m._u = rhs._u;
     return m;
 }
 
@@ -113,8 +113,8 @@ Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
 
 Mass operator*(const double& lhs, const Mass& rhs) noexcept {
     Mass m;
-    m._g = Mass::convert(lhs, rhs._u, Unit::G) * rhs._g;
-    m._u = lhs._u;
+    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) * rhs._g;
+    m._u = rhs._u;
     return m;
 }
 
@@ -145,8 +145,8 @@ Mass operator/(const double& lhs, const Mass& rhs) {
     
     Mass m;
     
-    m._g = Mass::convert(lhs, rhs._u, Unit::G) / rhs._g;
-    m._u = lhs._u;
+    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) / rhs._g;
+    m._u = rhs._u;
     
     return m;
 
@@ -217,7 +217,7 @@ bool operator==(const Mass& lhs, const Mass& rhs) noexcept {
 }
 
 bool operator==(const double& lhs, const Mass& rhs) noexcept {
-    return Mass::convert(lhs, rhs._u, Unit::G) == rhs._g;
+    return Mass::convert(lhs, rhs._u, Mass::Unit::G) == rhs._g;
 }
 
 bool operator==(const Mass& lhs, const double& rhs) noexcept {
@@ -241,7 +241,7 @@ bool operator<(const Mass& lhs, const Mass& rhs) noexcept {
 }
 
 bool operator<(const double& lhs, const Mass& rhs) noexcept {
-    return Mass::convert(lhs, rhs._u, Unit::G) < rhs._g;
+    return Mass::convert(lhs, rhs._u, Mass::Unit::G) < rhs._g;
 }
 
 bool operator<(const Mass& lhs, const double& rhs) noexcept {
@@ -253,7 +253,7 @@ bool operator>(const Mass& lhs, const Mass& rhs) noexcept {
 }
 
 bool operator>(const double& lhs, const Mass& rhs) noexcept {
-    return Mass::convert(lhs, rhs._u, Unit::G);
+    return Mass::convert(lhs, rhs._u, Mass::Unit::G);
 }
 
 bool operator>(const Mass& lhs, const double& rhs) noexcept {
