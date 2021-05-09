@@ -52,7 +52,8 @@ int main(int argc, char** argv) {
     hx.setUnit(Mass::Unit::G);
     
 	while(true) {
-		cout << hx.weight() << endl;
+		cout << hx.getBase()->getValue() << endl;
+        //cout << hx.weight() << endl;
         this_thread::sleep_for(chrono::seconds(1));
 	}
 
