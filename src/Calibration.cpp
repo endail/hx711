@@ -41,7 +41,7 @@ bool setupHx(const int dataPin, const int clockPin) {
     wiringPiSetup();
     hx = new SimpleHX711(dataPin, clockPin, 1, 0);
     this_thread::sleep_for(chrono::seconds(1));
-    return hx->ready();
+    return hx;
 }
 
 int main(int argc, char** argv) {
