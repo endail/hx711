@@ -28,7 +28,7 @@ endif
 
 # Add additional libs for building on github actions
 ifeq ($(GITHUB_ACTIONS),true)
-	LIBS := $(LIB) -lrt -lcrypt -pthread
+	LIBS := $(LIBS) -lrt -lcrypt -pthread
 endif
 
 .PHONY: all
