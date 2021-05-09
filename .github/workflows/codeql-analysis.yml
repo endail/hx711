@@ -75,6 +75,7 @@ jobs:
         sudo ldconfig
 
     - run: |
+       cd
        make
 
     - name: Perform CodeQL Analysis
