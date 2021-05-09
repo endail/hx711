@@ -72,7 +72,7 @@ protected:
      * Maximum number of attempts to read bytes from the sensor
      * before failing
      */
-    static const std::uint8_t _MAX_READ_TRIES = 3;
+    static const std::uint8_t _MAX_READ_TRIES = 10;
     static constexpr std::chrono::microseconds _WAIT_INTERVAL = std::chrono::milliseconds(100);
 
     //Datasheet pg. 5
