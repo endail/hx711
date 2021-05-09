@@ -20,9 +20,7 @@ CXXFLAGS := -std=c++11 \
 			-Wl,-z,defs	\
 			-Wl,-z,now \
 			-Wl,-z,relro \
-			-fwrapv \
-			-mfloat-abi=hard \
-			-g
+			-fwrapv
 
 # https://stackoverflow.com/a/39895302/570787
 ifeq ($(PREFIX),)
@@ -58,7 +56,7 @@ $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
 								$(BUILDDIR)/static/Mass.o \
 								$(BUILDDIR)/static/SimpleHX711.o
-	$(AR) rcs 	$(BUILDDIR)/static/libhx711.a \
+	ar rcs 		$(BUILDDIR)/static/libhx711.a \
 				$(BUILDDIR)/static/HX711.o \
 				$(BUILDDIR)/static/Mass.o \
 				$(BUILDDIR)/static/SimpleHX711.o
