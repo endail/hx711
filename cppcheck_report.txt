@@ -1,22 +1,22 @@
 src/Mass.cpp:65:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:332:0: style: The function 'getBitFormat' is never used. [unusedFunction]
+src/HX711.cpp:335:0: style: The function 'getBitFormat' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:336:0: style: The function 'getByteFormat' is never used. [unusedFunction]
+src/HX711.cpp:339:0: style: The function 'getByteFormat' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:157:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:293:0: style: The function 'getClockPin' is never used. [unusedFunction]
+src/HX711.cpp:296:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:289:0: style: The function 'getDataPin' is never used. [unusedFunction]
+src/HX711.cpp:292:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:328:0: style: The function 'getGain' is never used. [unusedFunction]
+src/HX711.cpp:331:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:145:0: style: The function 'getOffset' is never used. [unusedFunction]
@@ -28,10 +28,10 @@ src/SimpleHX711.cpp:131:0: style: The function 'getReferenceUnit' is never used.
 src/Mass.cpp:57:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:348:0: style: The function 'powerDown' is never used. [unusedFunction]
+src/HX711.cpp:351:0: style: The function 'powerDown' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:365:0: style: The function 'powerUp' is never used. [unusedFunction]
+src/HX711.cpp:368:0: style: The function 'powerUp' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:153:0: style: The function 'setChannel' is never used. [unusedFunction]
