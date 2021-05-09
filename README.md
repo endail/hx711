@@ -85,7 +85,7 @@ pi@raspberrypi~/hx711 $ bin/hx711calibration 8 9
 
 ## Test
 
-`make` will create the executable `bin/simplehx711test` in the project's `bin` directory. You can use this to test your load cell and HX711 module. Arguments are as follows:
+`make` will create the executable `bin/simplehx711test` in the project directory. You can use this to test your load cell and HX711 module. Arguments are as follows:
 
 - **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
 
