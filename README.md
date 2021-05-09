@@ -95,7 +95,7 @@ pi@raspberrypi~/hx711 $ bin/hx711calibration 8 9
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
 
-Example using WiringPi pin 8 for data, pin 9 for clock, -377 as the reference unit, and -363712 as the offset
+Example using WiringPi pin 8 for data, pin 9 for clock, -377 as the reference unit, and -363712 as the offset:
 
 ```shell
 pi@raspberrypi~/hx711 $ bin/simplehx711test 8 9 -377 -363712
