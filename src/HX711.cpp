@@ -90,12 +90,6 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  Datasheet pg. 5
      */
 
-
-    while(!this->isReady()) {
-        std::this_thread::sleep_for(_WAIT_INTERVAL);
-    }
-
-/*
     std::uint8_t tries = 0;
 
     do {
@@ -113,7 +107,6 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     }
     while(true);
-*/
 
     /**
      *  When DOUT goes low, there is a minimum of 0.1us until the clock pin
