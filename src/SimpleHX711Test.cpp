@@ -33,9 +33,9 @@ int main(int argc, char** argv) {
     using namespace std;
     using namespace HX711;
 
-    const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
+    const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT] [OFFSET]";
 
-    if(argc != 4) {
+    if(argc != 5) {
         cout << err << endl;
         return EXIT_FAILURE;
     }
@@ -43,10 +43,11 @@ int main(int argc, char** argv) {
     const int dataPin = stoi(argv[1]);
     const int clockPin = stoi(argv[2]);
     const int refUnit = stoi(argv[3]);
+    const int offset = stoi(argv[4]);
 
     wiringPiSetup();
 
-    SimpleHX711 hx(dataPin, clockPin, refUnit);
+    SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
 	
     //set the scale to output weights in grams
     hx.setUnit(Mass::Unit::G);
