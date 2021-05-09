@@ -63,6 +63,17 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
+    - name: clone wiringPi
+      uses: actions/checkout@v2
+      with:
+        repository: 'WiringPi/WiringPi'
+
+    - name: build wiringPi
+      run: |
+        sudo ./build
+        sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
+        sudo ldconfig
+
     - run: |
        make
 
