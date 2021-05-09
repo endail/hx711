@@ -173,7 +173,7 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     n = Mass::convert(this->_g, Unit::G, u);
     f = std::modf(n, &i);
-    d = static_cast<int>(1 - std::log10(std::abs(fracPart)));
+    d = static_cast<int>(1 - std::log10(std::abs(f)));
 
     //d may be < 0
     //if so, use as 0
