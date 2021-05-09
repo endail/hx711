@@ -89,14 +89,14 @@ int main(int argc, char** argv) {
     cin.ignore();
 
     //tare prompt
-    cout    << endl << "4. Remove all objects from the scale then press enter.";
+    cout    << endl << "4. Remove all objects from the scale and then press enter.";
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
     zeroValue = hx->read(ReadType::Median, samples);
 
     //weigh prompt
-    cout    << endl << endl << "5. Place object on the scale then press enter.";
+    cout    << endl << endl << "5. Place object on the scale and then press enter.";
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
