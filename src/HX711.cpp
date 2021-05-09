@@ -308,7 +308,7 @@ void HX711::setGain(const Gain gain) {
 
         //why is this here?
         //remove if not necessary
-        ::digitalWrite(this->_clockPin, LOW);
+        //::digitalWrite(this->_clockPin, LOW);
         
         /**
          * A read must take place to set the gain at the
