@@ -1,3 +1,6 @@
+src/Mass.cpp:175:51: error: Uninitialized variable: f [uninitvar]
+    d = static_cast<char>(1 - std::log10(std::abs(f)));
+                                                  ^
 src/HX711.cpp:236:0: style: The function 'connect' is never used. [unusedFunction]
 
 ^
