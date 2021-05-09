@@ -77,7 +77,7 @@ hx711calibration: $(BUILDDIR)/Calibration.o
 		-o $(BINDIR)/hx711calibration \
 		$(BUILDDIR)/Calibration.o \
 		-L $(BUILDDIR)/static \
-		-lhx711.a $(LIBS)
+		-lhx711 $(LIBS)
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o
@@ -85,7 +85,7 @@ test: $(BUILDDIR)/SimpleHX711Test.o
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
 		-L $(BUILDDIR)/static \
-		-lhx711.a $(LIBS)
+		-lhx711  $(LIBS)
 
 .PHONY: clean
 clean:
