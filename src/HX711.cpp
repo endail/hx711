@@ -30,8 +30,6 @@ namespace HX711 {
 constexpr std::chrono::microseconds HX711::_WAIT_INTERVAL;
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
-    //const std::int32_t maskA = 0x800000;
-    //const std::int32_t maskB = 0x7fffff;
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
@@ -52,11 +50,12 @@ bool HX711::_readBit() const noexcept {
      *  Solution: stick with 1us. It seems to work fine.
      */
     ::digitalWrite(this->_clockPin, HIGH);
-    //::delayMicroseconds(1);
-    std::this_thread::sleep_for(std::chrono::microseconds(50));
+    //std::this_thread::sleep_for(std::chrono::microseconds(1));
+    ::delayMicroseconds(1);
+
     ::digitalWrite(this->_clockPin, LOW);
-    std::this_thread::sleep_for(std::chrono::microseconds(1));
-    //::delayMicroseconds(1);
+    //std::this_thread::sleep_for(std::chrono::microseconds(1));
+    ::delayMicroseconds(1);
 
     return ::digitalRead(this->_dataPin) == HIGH;
 
@@ -116,8 +115,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  Datasheet pg. 5
      *  0.1us == 100ns
      */
-    std::this_thread::sleep_for(std::chrono::microseconds(1));
-    //::delayMicroseconds(1);
+    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+    ::delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
     std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
