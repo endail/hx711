@@ -67,7 +67,7 @@ $(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/HX711.o \
 			$(CXXFLAGS) \
 			$(INC) \
 			$(LIBS) \
-			-o $(BUILDDIR)/libhx711.so
+			-o $(BUILDDIR)/shared/libhx711.so
 
 
 
