@@ -32,7 +32,11 @@ ifeq ($(GITHUB_ACTIONS),true)
 endif
 
 .PHONY: all
-all: dirs $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so hx711calibration test
+all: 	dirs \
+		$(BUILDDIR)/static/libhx711.a \
+		$(BUILDDIR)/shared/libhx711.so \
+		hx711calibration \
+		test
 
 .PHONY: dirs
 dirs:
@@ -48,7 +52,6 @@ $(BUILDDIR)/static/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c -o $@ $<
-
 
 # Build static library
 $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
@@ -69,8 +72,6 @@ $(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/HX711.o \
 			$(LIBS) \
 			-o $(BUILDDIR)/shared/libhx711.so
 
-
-
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
 	$(CXX) $(CXXFLAGS) $(INC) \
@@ -85,7 +86,7 @@ test: $(BUILDDIR)/SimpleHX711Test.o
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
 		-L $(BUILDDIR)/static \
-		-lhx711  $(LIBS)
+		-lhx711 $(LIBS)
 
 .PHONY: clean
 clean:
