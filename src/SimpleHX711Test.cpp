@@ -53,8 +53,22 @@ int main(int argc, char** argv) {
     hx.setUnit(Mass::Unit::G);
     
 	while(true) {
-        cout << hx.weight() << endl;
+
+        Mass m = hx.weight();
+
+        cout    << m.toString(Mass::Unit::UG) << " "
+                << m.toString(Mass::Unit::MG) << " "
+                << m.toString(Mass::Unit::G) << " "
+                << m.toString(Mass::Unit::KG) << " "
+                << m.toString(Mass::Unit::TON) << " "
+                << m.toString(Mass::Unit::IMP_TON) << " "
+                << m.toString(Mass::Unit::US_TON) << " "
+                << m.toString(Mass::Unit::ST) << " "
+                << m.toString(Mass::Unit::LB) << " "
+                << m.toString(Mass::Unit::OZ) << endl;
+
         this_thread::sleep_for(chrono::seconds(1));
+
 	}
 
     return EXIT_FAILURE;
