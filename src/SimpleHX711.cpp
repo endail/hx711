@@ -112,7 +112,7 @@ SimpleHX711::~SimpleHX711() {
 }
 
 bool operator!(const SimpleHX711& hx) noexcept {
-	return !hx.ready();
+	return this->_hx->isReady();
 }
 
 void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
@@ -153,8 +153,8 @@ Channel SimpleHX711::getChannel() const noexcept {
 	return this->_ch;
 }
 
-bool SimpleHX711::ready() const noexcept {
-	return this->_hx->isReady();
+HX711* SimpleHX711::getBase() noexcept {
+	return this->_hx;
 }
 
 void SimpleHX711::tare(const ReadType r, const size_t times) {

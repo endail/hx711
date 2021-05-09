@@ -81,7 +81,7 @@ public:
 	void setChannel(const Channel ch) noexcept;
 	Channel getChannel() const noexcept;
 
-	bool ready() const noexcept;
+	HX711* getBase() noexcept;
 
 	void tare(const ReadType r = ReadType::Median, const size_t times = 3);
 	Mass weight(const ReadType r = ReadType::Median, const size_t times = 3);
