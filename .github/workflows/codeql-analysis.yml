@@ -38,6 +38,18 @@ jobs:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
     steps:
+    
+    - name: clone wiringPi
+      uses: actions/checkout@v2
+      with:
+        repository: 'WiringPi/WiringPi'
+
+    - name: build wiringPi
+      run: |
+        sudo ./build
+        sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
+        sudo ldconfig
+
     - name: Checkout repository
       uses: actions/checkout@v2
 
@@ -63,20 +75,8 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    - name: clone wiringPi
-      uses: actions/checkout@v2
-      with:
-        repository: 'WiringPi/WiringPi'
-
-    - name: build wiringPi
-      run: |
-        sudo ./build
-        sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
-        sudo ldconfig
-
     - run: |
-       cd
-       make
+       make && sudo make install
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
