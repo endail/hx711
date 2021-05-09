@@ -32,7 +32,7 @@ ifeq ($(GITHUB_ACTIONS),true)
 endif
 
 .PHONY: all
-all: dirs buildstatic buildshared hx711calibration test
+all: dirs $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so hx711calibration test
 
 .PHONY: dirs
 dirs:
@@ -51,7 +51,6 @@ $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 
 # Build static library
-.PHONY: buildstatic
 $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
 								$(BUILDDIR)/static/Mass.o \
 								$(BUILDDIR)/static/SimpleHX711.o
@@ -61,7 +60,6 @@ $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
 				$(BUILDDIR)/static/SimpleHX711.o
 
 # Build shared library
-.PHONY: buildshared
 $(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/HX711.o \
 								$(BUILDDIR)/shared/Mass.o \
 								$(BUILDDIR)/shared/SimpleHX711.o
