@@ -19,7 +19,14 @@ int main() {
 
   wiringPiSetup();
 
-  SimpleHX711 hx(8, 9, -7050);
+  const int dataPin = 8;
+  const int clockPin = 9;
+  const int referenceUnit = -7050;
+  const int offset = 229;
+
+  SimpleHX711 hx(dataPin, clockPin, referenceUnit, offset);
+
+  //make the hx output weights in kilograms
   hx.setUnit(Mass::Unit::KG);
 
   while(true) {
