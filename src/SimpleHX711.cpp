@@ -112,7 +112,7 @@ SimpleHX711::~SimpleHX711() {
 }
 
 SimpleHX711::operator bool() const noexcept {
-	return hx._hx->isReady();
+	return this->_hx->isReady();
 }
 
 bool operator!(const SimpleHX711& hx) noexcept {
