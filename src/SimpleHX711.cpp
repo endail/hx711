@@ -105,6 +105,7 @@ SimpleHX711::SimpleHX711(
 		_refUnit(refUnit),
 		_offset(offset)  {
 			this->_hx = new HX711(dataPin, clockPin);
+			this->_hx->connect();
 }
 
 SimpleHX711::~SimpleHX711() {
