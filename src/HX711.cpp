@@ -30,9 +30,9 @@ namespace HX711 {
 constexpr std::chrono::microseconds HX711::_WAIT_INTERVAL;
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
-    const std::int32_t maskA = 0x800000;
-    const std::int32_t maskB = 0x7fffff;
-    return -(val & maskA) + (val & maskB);
+    //const std::int32_t maskA = 0x800000;
+    //const std::int32_t maskB = 0x7fffff;
+    return -(val & 0x800000) + (val & 0x7fffff);
 }
 
 bool HX711::_readBit() const noexcept {
@@ -308,7 +308,7 @@ void HX711::setGain(const Gain gain) {
 
         //why is this here?
         //remove if not necessary
-        //::digitalWrite(this->_clockPin, LOW);
+        ::digitalWrite(this->_clockPin, LOW);
         
         /**
          * A read must take place to set the gain at the
