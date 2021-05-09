@@ -112,7 +112,7 @@ SimpleHX711::~SimpleHX711() {
 }
 
 bool operator!(const SimpleHX711& hx) noexcept {
-	return this->_hx->isReady();
+	return hx._hx->isReady();
 }
 
 void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
