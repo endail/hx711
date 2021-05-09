@@ -20,40 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include <iomanip>
-#include <wiringPi.h>
-#include "../include/HX711.h"
+#ifndef HX711_TIMEOUTEXCEPTION_H_75EF3389_6288_47DC_94F1_444516247301
+#define HX711_TIMEOUTEXCEPTION_H_75EF3389_6288_47DC_94F1_444516247301
 
-int main(int argc, char** argv) {
+#include <stdexcept>
 
-    using namespace std;
-
-    const char* err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT]";
-
-    if(argc != 4) {
-        cout << err << endl;
-        return 1;
-    }
-
-    const uint8_t dataPin = stoi(argv[1]);
-    const uint8_t clockPin = stoi(argv[2]);
-    const int32_t refUnit = stoi(argv[3]);
-
-    wiringPiSetup();
-
-    HX711::HX711 hx(dataPin, clockPin);
-
-    hx.set_reference_unit(refUnit);
-    hx.tare();
-
-    while(true) {
-        cout << fixed << hx.get_weight(1) << endl;
-        this_thread::sleep_for(chrono::seconds(1));
-    }
-
-    return 0;
-
-}
+namespace HX711 {
+class TimeoutException : public std::runtime_error {
+public:
+    explicit TimeoutException(const char* what_arg)
+		: std::runtime_error(what_arg) {}
+};
+};
+#endif

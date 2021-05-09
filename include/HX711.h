@@ -23,21 +23,30 @@
 #ifndef HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 #define HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 
+#include <chrono>
 #include <cstdint>
 #include <mutex>
-#include <vector>
 
 namespace HX711 {
 
+/**
+ * Datasheet
+ * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
+ */
+
+typedef std::int32_t HX_VALUE;
+
 enum class Format {
-    MSB,
-    LSB
+    MSB = 0, //most significant bit
+    LSB //least significant bit
 };
 
-/**
- *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
- *  pg. 4
- */
+enum class Channel {
+    A = 0,
+    B
+};
+
+//Datasheet pg. 4
 enum class Gain {
     GAIN_128 = 0,
     GAIN_32,
@@ -45,8 +54,9 @@ enum class Gain {
 };
 
 /**
- *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
- *  pg. 4
+ * Used as a map to select to correct number of clock pulses
+ * depending on the set gain
+ * Datasheet pg. 4
  */
 const std::uint8_t PULSES[3] = {
     25,
@@ -58,75 +68,68 @@ class HX711 {
 
 protected:
 
-    static const std::uint8_t _BITS_PER_BYTE = 8;
-
     /**
-     *  "Conversion period"
-     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
-     *  pg. 5
+     * Maximum number of attempts to read bytes from the sensor
+     * before failing
      */
+    static const std::uint8_t _MAX_READ_TRIES = 10;
+    static constexpr std::chrono::microseconds _WAIT_INTERVAL = std::chrono::milliseconds(100);
+
+    //Datasheet pg. 5
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
-    std::uint8_t _dataPin;
-    std::uint8_t _clockPin;
+    /**
+     * ints (not int32_t) are used for pins to be as compatible as possible
+     * with wiringPi calls (and to not make presumptions about pin 
+     * numbering schemes).
+     */
+    const int _dataPin = -1;
+    const int _clockPin = -1;
     std::mutex _readLock;
-    Gain _gain;
-    std::int32_t _referenceUnit;
-    std::int32_t _referenceUnitB;
-    std::int32_t _offset;
-    std::int32_t _offsetB;
-    Format _byteFormat;
-    Format _bitFormat;
+    Gain _gain = Gain::GAIN_128;
+    Format _bitFormat = Format::MSB;
+    Format _byteFormat = Format::MSB;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const noexcept;
     std::uint8_t _readByte() const noexcept;
-    void _readRawBytes(std::uint8_t* bytes = nullptr) noexcept;
-    std::int32_t _readInt() noexcept;
+    void _readRawBytes(std::uint8_t* bytes = nullptr);
+    HX_VALUE _readInt();
+
+    HX_VALUE _getChannelAValue();
+    HX_VALUE _getChannelBValue();
 
 public:
-    HX711(
-        const std::uint8_t dataPin,
-        const std::uint8_t clockPin,
-        const Gain gain = Gain::GAIN_128);
-
+    
+    HX711(const int dataPin, const int clockPin) noexcept;
     virtual ~HX711() = default;
-    std::uint8_t getDataPin() const noexcept;
-    std::uint8_t getClockPin() const noexcept;
-    bool is_ready() const noexcept;
-    void set_gain(const Gain gain) noexcept;
-    Gain get_gain() const noexcept;
-    double get_value(const std::uint16_t times = 3) noexcept;
-    double get_value_A(const std::uint16_t times = 3) noexcept;
-    double get_value_B(const std::uint16_t times = 3) noexcept;
-    double get_weight(const std::uint16_t times = 3) noexcept;
-    std::vector<double> get_weights(const std::uint16_t times = 3);
-    double get_weight_A(const std::uint16_t times = 3) noexcept;
-    double get_weight_B(const std::uint16_t times = 3) noexcept;
-    double tare(const std::uint16_t times = 15) noexcept;
-    double tare_A(const std::uint16_t times = 15) noexcept;
-    double tare_B(const std::uint16_t times = 15) noexcept;
-    void set_reading_format(
+
+    int getDataPin() const noexcept;
+    int getClockPin() const noexcept;
+
+    void setGain(const Gain gain);
+    Gain getGain() const noexcept;
+
+    void connect(
+        const Gain gain = Gain::GAIN_128,
         const Format bitFormat = Format::MSB,
-        const Format byteFormat = Format::MSB) noexcept;
-    void set_reference_unit(const std::int32_t refUnit);
-    void set_reference_unit_A(const std::int32_t refUnit);
-    void set_reference_unit_B(const std::int32_t refUnit);
-    std::int32_t get_reference_unit() const noexcept;
-    std::int32_t get_reference_unit_A() const noexcept;
-    std::int32_t get_reference_unit_B() const noexcept;
-    void setOffset(const std::int32_t offset) noexcept;
-    void setOffsetA(const std::int32_t offset) noexcept;
-    void setOffsetB(const std::int32_t offset) noexcept;
-    std::int32_t getOffset() const noexcept;
-    std::int32_t getOffsetA() const noexcept;
-    std::int32_t getOffsetB() const noexcept;
-    std::vector<std::int32_t> readValues(const std::uint16_t times = 3);
-    double readAverageValue(const std::uint16_t times = 3);
-    double readMedianValue(const std::uint16_t times = 3);
-    void power_down() noexcept;
-    void power_up() noexcept;
-    void reset() noexcept;
+        const Format byteFormat = Format::MSB);
+    
+    bool isReady() const noexcept;
+
+    /**
+     * If Channel B value is requested but an exception is thrown
+     * setGain MUST be called again.
+     */
+    HX_VALUE getValue(const Channel c = Channel::A);
+
+    Format getBitFormat() const noexcept;
+    Format getByteFormat() const noexcept;
+    void setBitFormat(const Format f) noexcept;
+    void setByteFormat(const Format f) noexcept;
+
+    void powerDown() noexcept;
+    void powerUp();
 
 };
 };
