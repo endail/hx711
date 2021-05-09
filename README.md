@@ -1,6 +1,11 @@
 # HX711 C++ Library
 
-[![Build Status](https://travis-ci.com/endail/hx711.svg?branch=master)](https://travis-ci.com/endail/hx711)
+![Build](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg?branch=simple-hx711
+)
+![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg?branch=simple-hx711
+)
+![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg?branch=simple-hx711
+)
 
 - Use with Raspberry Pi
 
