@@ -16,7 +16,6 @@ CXXFLAGS := -std=c++11 \
 			-fstack-clash-protection \
 			-pipe \
 			-Werror=format-security \
-			-Werror=implicit-function-declaration \
 			-Wl,-z,defs	\
 			-Wl,-z,now \
 			-Wl,-z,relro \
@@ -76,11 +75,19 @@ $(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/HX711.o \
 
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
-	$(CXX) $(CXXFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/static -lhx711 $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INC) \
+		-o $(BINDIR)/hx711calibration \
+		$(BUILDDIR)/Calibration.o \
+		-L $(BUILDDIR)/static \
+		-lhx711.a $(LIBS)
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o
-	$(CXX) $(CXXFLAGS) $(INC) -o $(BINDIR)/simplehx711test $(BUILDDIR)/SimpleHX711Test.o -L $(BUILDDIR)/static -lhx711 $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INC) \
+		-o $(BINDIR)/simplehx711test \
+		$(BUILDDIR)/SimpleHX711Test.o \
+		-L $(BUILDDIR)/static \
+		-lhx711.a $(LIBS)
 
 .PHONY: clean
 clean:
