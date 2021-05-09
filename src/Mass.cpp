@@ -304,9 +304,12 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     //d may be < 0
     //if so, use as 0
+    if(d < 0) {
+        d = 0;
+    }
 
     ss  << std::fixed
-        << std::setprecision(d >= 0 ? d : 0)
+        << std::setprecision(d)
         << n
         << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
