@@ -1,12 +1,28 @@
-CC := g++
+CXX := g++
 INCDIR := include
 SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
-CFLAGS := -g -Wall -Wno-psabi
-LIB := -lwiringPi
+LIBS := -lwiringPi
 INC := -I $(INCDIR)
+CXXFLAGS := -std=c++11 \
+			-Wall \
+			-Wno-psabi \
+			-O2 \
+			-D_FORTIFY_SOURCE=2 \
+			-D_GLIBCXX_ASSERTIONS \
+			-fexceptions \
+			-fstack-clash-protection \
+			-pipe \
+			-Werror=format-security \
+			-Werror=implicit-function-declaration \
+			-Wl,-z,defs	\
+			-Wl,-z,now \
+			-Wl,-z,relro \
+			-fwrapv \
+			-mfloat-abi=hard \
+			-g
 
 # https://stackoverflow.com/a/39895302/570787
 ifeq ($(PREFIX),)
@@ -19,26 +35,54 @@ ifeq ($(GITHUB_ACTIONS),true)
 endif
 
 .PHONY: all
-all: dirs $(BUILDDIR)/libhx711.a test hx711calibration
+all: dirs build-static build-shared hx711calibration test
 
 .PHONY: dirs
 dirs:
 	mkdir -p $(BINDIR)
-	mkdir -p $(BUILDDIR)
-
-$(BUILDDIR)/libhx711.a: $(BUILDDIR)/HX711.o $(BUILDDIR)/Mass.o $(BUILDDIR)/SimpleHX711.o
-	ar rcs $(BUILDDIR)/libhx711.a $(BUILDDIR)/HX711.o $(BUILDDIR)/Mass.o $(BUILDDIR)/SimpleHX711.o
+	mkdir -p $(BUILDDIR)/static
+	mkdir -p $(BUILDDIR)/shared
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/static/%.o: $(SRCDIR)/%.$(SRCEXT)
+	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
+	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c -o $@ $<
+
+
+# Build static library
+.PHONY: build-static
+$(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
+								$(BUILDDIR)/static/Mass.o \
+								$(BUILDDIR)/static/SimpleHX711.o
+	$(AR) rcs 	$(BUILDDIR)/static/libhx711.a \
+				$(BUILDDIR)/static/HX711.o \
+				$(BUILDDIR)/static/Mass.o \
+				$(BUILDDIR)/static/SimpleHX711.o
+
+# Build shared library
+.PHONY: build-shared
+$(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/HX711.o \
+								$(BUILDDIR)/shared/Mass.o \
+								$(BUILDDIR)/shared/SimpleHX711.o
+	$(CXX)	-shared \
+			$(CXXFLAGS) \
+			$(INC) \
+			$(LIBS) \
+			-o $(BUILDDIR)/libhx711.so
+
+
 
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
-	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/ -lhx711 $(LIB)
+	$(CXX) $(CXXFLAGS) $(INC) -o $(BINDIR)/hx711calibration $(BUILDDIR)/Calibration.o -L $(BUILDDIR)/static -lhx711 $(LIBS)
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o
-	$(CC) $(CFLAGS) $(INC) -o $(BINDIR)/simplehx711test $(BUILDDIR)/SimpleHX711Test.o -L $(BUILDDIR)/ -lhx711 $(LIB)
+	$(CXX) $(CXXFLAGS) $(INC) -o $(BINDIR)/simplehx711test $(BUILDDIR)/SimpleHX711Test.o -L $(BUILDDIR)/static -lhx711 $(LIBS)
 
 .PHONY: clean
 clean:
@@ -46,8 +90,9 @@ clean:
 	$(RM) -r $(BINDIR)/*
 
 .PHONY: install
-install: $(BUILDDIR)/libhx711.a $(BINDIR)/hx711calibration
+install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -m 644 $(BUILDDIR)/libhx711.a $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 $(BUILDDIR)/static/libhx711.a $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/hx711
 	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
