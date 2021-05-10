@@ -86,6 +86,7 @@ protected:
     static const std::uint16_t _WAIT_INTERVAL_US = 5000;
 
     //Datasheet pg. 5
+    //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
     /**
