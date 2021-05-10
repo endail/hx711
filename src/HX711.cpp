@@ -86,9 +86,15 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     std::unique_lock<std::mutex> lock(this->_readLock);
 
     /**
-     *  Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
-     *  wait until this occurs.
-     *  Datasheet pg. 5
+     * Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
+     * wait until this occurs.
+     * Datasheet pg. 5
+     * 
+     * The - potential- issue is that DOUT going low does not appear to be
+     * defined. It appears to occur whenever it is ready, whenever that is.
+     * 
+     * The code below should limit that to a reasonable time-frame of checking
+     * after a predefined interval for a predefined number of attempts.
      */
 
     std::uint8_t tries = 0;
@@ -119,6 +125,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     ::delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
+    //uninitialised is fine; they'll be overwritten
     std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
 
     //then populate it with values from the hx711
@@ -145,6 +152,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
         this->_readBit();
     }
 
+    //not reading from the sensor any more so no need to keep
+    //the lock in place
     lock.unlock();
 
     //if no byte pointer is given, don't try to write to it
