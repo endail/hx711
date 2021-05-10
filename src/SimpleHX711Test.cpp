@@ -48,11 +48,11 @@ int main(int argc, char** argv) {
     wiringPiSetup();
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
-	
+
     //set the scale to output weights in grams
     hx.setUnit(Mass::Unit::G);
     
-	while(true) {
+    while(true) {
 
         Mass m = hx.weight();
 
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
         this_thread::sleep_for(chrono::seconds(1));
 
-	}
+    }
 
     return EXIT_FAILURE;
 
