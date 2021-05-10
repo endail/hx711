@@ -4,22 +4,22 @@ src/Mass.cpp:65:0: style: The function 'convertTo' is never used. [unusedFunctio
 src/SimpleHX711.cpp:161:0: style: The function 'getBase' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:334:0: style: The function 'getBitFormat' is never used. [unusedFunction]
+src/HX711.cpp:355:0: style: The function 'getBitFormat' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:338:0: style: The function 'getByteFormat' is never used. [unusedFunction]
+src/HX711.cpp:359:0: style: The function 'getByteFormat' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:157:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:295:0: style: The function 'getClockPin' is never used. [unusedFunction]
+src/HX711.cpp:320:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:291:0: style: The function 'getDataPin' is never used. [unusedFunction]
+src/HX711.cpp:316:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:330:0: style: The function 'getGain' is never used. [unusedFunction]
+src/HX711.cpp:351:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:145:0: style: The function 'getOffset' is never used. [unusedFunction]
@@ -31,10 +31,16 @@ src/SimpleHX711.cpp:131:0: style: The function 'getReferenceUnit' is never used.
 src/Mass.cpp:57:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:350:0: style: The function 'powerDown' is never used. [unusedFunction]
+src/HX711.cpp:371:0: style: The function 'powerDown' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:367:0: style: The function 'powerUp' is never used. [unusedFunction]
+src/HX711.cpp:388:0: style: The function 'powerUp' is never used. [unusedFunction]
+
+^
+src/HX711.cpp:363:0: style: The function 'setBitFormat' is never used. [unusedFunction]
+
+^
+src/HX711.cpp:367:0: style: The function 'setByteFormat' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:153:0: style: The function 'setChannel' is never used. [unusedFunction]
