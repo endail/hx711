@@ -27,8 +27,6 @@
 
 namespace HX711 {
 
-constexpr std::chrono::microseconds HX711::_WAIT_INTERVAL;
-
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
