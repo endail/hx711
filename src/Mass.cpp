@@ -63,23 +63,21 @@ void Mass::setUnit(const Unit u) noexcept {
 }
 
 Mass Mass::convertTo(const Unit to) const noexcept {
-    Mass m = *this;
-    m._u = to;
-    return m;
+    return Mass(this->_g, to);
 }
 
 Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m;
-    m._g = lhs._g + rhs._g;
-    m._u = lhs._u;
-    return m;
+    return Mass(
+        lhs._g + rhs._g,
+        lhs._u
+    );
 }
 
 Mass operator+(const double& lhs, const Mass& rhs) noexcept {
-    Mass m;
-    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) + rhs._g;
-    m._u = rhs._u;
-    return m;
+    return Mass(
+        Mass::convert(lhs, rhs._u, Mass::Unit::G) + rhs._g,
+        rhs._u
+    );
 }
 
 Mass operator+(const Mass& lhs, const double& rhs) noexcept {
@@ -87,17 +85,17 @@ Mass operator+(const Mass& lhs, const double& rhs) noexcept {
 }
 
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m;
-    m._g = lhs._g - rhs._g;
-    m._u = lhs._u;
-    return m;
+    return Mass(
+        lhs._g - rhs._g,
+        lhs._u
+    );
 }
 
 Mass operator-(const double& lhs, const Mass& rhs) noexcept {
-    Mass m;
-    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) - rhs._g;
-    m._u = rhs._u;
-    return m;
+    return Mass(
+        Mass::convert(lhs, rhs._u, Mass::Unit::G) - rhs._g,
+        rhs._u
+    );
 }
 
 Mass operator-(const Mass& lhs, const double& rhs) noexcept {
@@ -105,17 +103,17 @@ Mass operator-(const Mass& lhs, const double& rhs) noexcept {
 }
 
 Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
-    Mass m;
-    m._g = lhs._g * rhs._g;
-    m._u = lhs._u;
-    return m;
+    return Mass(
+        lhs._g * rhs._g,
+        lhs._u
+    );
 }
 
 Mass operator*(const double& lhs, const Mass& rhs) noexcept {
-    Mass m;
-    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) * rhs._g;
-    m._u = rhs._u;
-    return m;
+    return Mass(
+        Mass::convert(lhs, rhs._u, Mass::Unit::G) * rhs._g,
+        rhs._u
+    );
 }
 
 Mass operator*(const Mass& lhs, const double& rhs) noexcept {
@@ -128,12 +126,10 @@ Mass operator/(const Mass& lhs, const Mass& rhs) {
         throw std::invalid_argument("cannot divide by 0");
     }
     
-    Mass m;
-    
-    m._g = lhs._g / rhs._g;
-    m._u = lhs._u;
-    
-    return m;
+    return Mass(
+        lhs._g / rhs._g,
+        lhs._u
+    );
 
 }
 
@@ -143,12 +139,10 @@ Mass operator/(const double& lhs, const Mass& rhs) {
         throw std::invalid_argument("cannot divide by 0");
     }
     
-    Mass m;
-    
-    m._g = Mass::convert(lhs, rhs._u, Mass::Unit::G) / rhs._g;
-    m._u = rhs._u;
-    
-    return m;
+    return Mass(
+        Mass::convert(lhs, rhs._u, Mass::Unit::G) / rhs._g,
+        rhs._u
+    );
 
 }
 
