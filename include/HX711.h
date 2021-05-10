@@ -109,11 +109,6 @@ public:
 
     void setGain(const Gain gain);
     Gain getGain() const noexcept;
-
-    void connect(
-        const Gain gain = Gain::GAIN_128,
-        const Format bitFormat = Format::MSB,
-        const Format byteFormat = Format::MSB);
     
     bool isReady() const noexcept;
 
