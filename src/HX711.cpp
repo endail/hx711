@@ -47,21 +47,21 @@ bool HX711::_readBit() const noexcept {
      * 
      * For the data pin to be ready, 0.1us needs to have elapsed.
      */
-    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    //::delayMicroseconds(1);
+    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+    ::delayMicroseconds(1);
 
     //at this stage, DOUT is ready to be read from
     const bool bit = ::digitalRead(this->_dataPin) == HIGH;
 
     //clock pin needs to be remain high for at least another 0.1us
-    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    //::delayMicroseconds(1);
+    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+    ::delayMicroseconds(1);
     ::digitalWrite(this->_clockPin, LOW);
 
     //once low, clock pin needs to remain low for at least 0.2us
     //before the next bit can be read
-    std::this_thread::sleep_for(std::chrono::nanoseconds(200));
-    //::delayMicroseconds(1);
+    //std::this_thread::sleep_for(std::chrono::nanoseconds(200));
+    ::delayMicroseconds(1);
 
     return bit;
 
@@ -127,8 +127,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      *  Datasheet pg. 5
      *  0.1us == 100ns
      */
-    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    //::delayMicroseconds(1);
+    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+    ::delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
