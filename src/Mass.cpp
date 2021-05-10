@@ -299,14 +299,10 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     n = Mass::convert(this->_g, Unit::G, u);
     f = std::modf(n, &i);
-    //credit: https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
-    d = static_cast<int>(1 - std::log10(std::abs(f)));
-
-    //d may be < 0
-    //if so, use as 0
-    if(d < 0) {
-        d = 0;
-    }
+    
+    //https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
+    //this expression may return < 0, but min usable val should be 0
+    d = std::max(0, static_cast<int>(1 - std::log10(std::abs(f))));
 
     ss  << std::fixed
         << std::setprecision(d)
