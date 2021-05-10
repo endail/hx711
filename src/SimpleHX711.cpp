@@ -50,7 +50,7 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
         throw std::invalid_argument("vals is null or empty");
     }
 
-    if(vals->length() == 1) {
+    if(vals->size() == 1) {
         return static_cast<double>((*vals)[0]);
     }
 
