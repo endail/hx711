@@ -19,7 +19,8 @@ CXXFLAGS := -std=c++11 \
 			-Wl,-z,defs	\
 			-Wl,-z,now \
 			-Wl,-z,relro \
-			-fwrapv
+			-fwrapv \
+			-g
 
 # https://stackoverflow.com/a/39895302/570787
 ifeq ($(PREFIX),)
