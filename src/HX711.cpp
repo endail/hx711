@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020 Daniel Robertson
+// Copyright (c) 2021 Daniel Robertson
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,40 +35,54 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
 
 bool HX711::_readBit() const noexcept {
 
-    //first, clock pin is set high to make DOUT ready to be read from
-    //::digitalWrite(this->_clockPin, HIGH);
-
     /**
-     * !!!IMPORTANT NOTE!!!
+     * The following code does not appear to work when using
+     * std::this_thread::sleep_for. Code using delayMicroseconds
+     * does work and is implemented below. I have left it here
+     * for reference and how it should operate.
      * 
-     * There is an overlap in timing between the clock pin changing from
-     * high to low and the data pin being ready to output the respective
-     * bit. This overlap is T2 in Fig.2 on pg. 5 of the datasheet.
+     * //first, clock pin is set high to make DOUT ready to be read from
+     * ::digitalWrite(this->_clockPin, HIGH);
      * 
-     * For the data pin to be ready, 0.1us needs to have elapsed.
+     * //!!!IMPORTANT NOTE!!!
+     * //
+     * //There is an overlap in timing between the clock pin changing from
+     * //high to low and the data pin being ready to output the respective
+     * //bit. This overlap is T2 in Fig.2 on pg. 5 of the datasheet.
+     * //
+     * //For the data pin to be ready, 0.1us needs to have elapsed.
+     * std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+     * 
+     * //at this stage, DOUT is ready to be read from
+     * const bool bit = ::digitalRead(this->_dataPin) == HIGH;
+     * 
+     * //clock pin needs to be remain high for at least another 0.1us
+     * std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+     * ::digitalWrite(this->_clockPin, LOW);
+
+     * //once low, clock pin needs to remain low for at least 0.2us
+     * //before the next bit can be read
+     * //technically this doesn't need to exist here, but it is
+     * //convenient
+     * std::this_thread::sleep_for(std::chrono::nanoseconds(200));
+     * 
+     * return bit;
      */
-    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    //::delayMicroseconds(1);
 
-    //at this stage, DOUT is ready to be read from
-    //const bool bit = ::digitalRead(this->_dataPin) == HIGH;
-
-    //clock pin needs to be remain high for at least another 0.1us
-    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    //::delayMicroseconds(1);
-    //::digitalWrite(this->_clockPin, LOW);
-
-    //once low, clock pin needs to remain low for at least 0.2us
-    //before the next bit can be read
-    //std::this_thread::sleep_for(std::chrono::nanoseconds(200));
-    //::delayMicroseconds(1);
-
+    //first, clock pin is set high to make DOUT ready to be read from
     ::digitalWrite(this->_clockPin, HIGH);
+
+    //then delay for sufficient time to allow DOUT to be ready (0.1us)
+    //this will also permit a sufficient amount of time for the clock
+    //oin to remain high
     ::delayMicroseconds(1);
+    
     //at this stage, DOUT is ready and the clock pin has been held
-    //high for sufficient amount of time
+    //high for sufficient amount of time, so read the bit value
     const bool bit = ::digitalRead(this->_dataPin) == HIGH;
-    //at this stage, clock pin needs to be low for at least 0.2us
+
+    //the clock pin then needs to be held for at least 0.2us before
+    //the next bit can be read
     ::digitalWrite(this->_clockPin, LOW);
     ::delayMicroseconds(1);
 
@@ -128,15 +142,19 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     }
     while(true);
 
+    //this must occur AFTER the isReady call otherwise it
+    //will deadlock
     std::unique_lock<std::mutex> lock(this->_readLock);
 
     /**
-     *  When DOUT goes low, there is a minimum of 0.1us until the clock pin
-     *  can go high. T1 in Fig.2.
-     *  Datasheet pg. 5
-     *  0.1us == 100ns
+     * When DOUT goes low, there is a minimum of 0.1us until the clock pin
+     * can go high. T1 in Fig.2.
+     * Datasheet pg. 5
+     * 0.1us == 100ns
+     * 
+     * //this does not appear to work
+     * //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
      */
-    //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
     ::delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
@@ -149,15 +167,15 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     }
 
     /**
-     *  The HX711 requires a certain number of "positive clock
-     *  pulses" depending on the set gain value.
-     *  Datasheet pg. 4
+     * The HX711 requires a certain number of "positive clock
+     * pulses" depending on the set gain value.
+     * Datasheet pg. 4
      * 
-     *  The expression below calculates the number of pulses
-     *  after having read the three bytes above. For example,
-     *  a gain of 128 requires 25 pulses: 24 pulses were made
-     *  when reading the three bytes (3 * 8), so only one
-     *  additional pulse is needed.
+     * The expression below calculates the number of pulses
+     * after having read the three bytes above. For example,
+     * a gain of 128 requires 25 pulses: 24 pulses were made
+     * when reading the three bytes (3 * 8), so only one
+     * additional pulse is needed.
      */
     const std::uint8_t pulsesNeeded = 
         PULSES[static_cast<std::size_t>(this->_gain)] -
@@ -177,15 +195,15 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     }
 
     /**
-     *  The HX711 will supply bits in big-endian format;
-     *  the 0th read bit is the MSB.
-     *  Datasheet pg. 4
+     * The HX711 will supply bits in big-endian format;
+     * the 0th read bit is the MSB.
+     * Datasheet pg. 4
      * 
-     *  If this->_byteFormat indicates the HX711 is outputting
-     *  bytes in LSB format, swap the first and last bytes
+     * If this->_byteFormat indicates the HX711 is outputting
+     * bytes in LSB format, swap the first and last bytes
      * 
-     *  Remember, the bytes param expects an array of bytes
-     *  which will be converted to an int.
+     * Remember, the bytes param expects an array of bytes
+     * which will be converted to an int.
      */
     if(this->_byteFormat == Format::LSB) {
         const std::uint8_t swap = raw[0];
@@ -207,8 +225,8 @@ HX_VALUE HX711::_readInt() {
     this->_readRawBytes(bytes);
 
     /**
-     *  An int (int32_t) is 32 bits (4 bytes), but
-     *  the HX711 only uses 24 bits (3 bytes).
+     * An int (int32_t) is 32 bits (4 bytes), but
+     * the HX711 only uses 24 bits (3 bytes).
      */
     const std::int32_t twosComp = ((       0 << 24) |
                                    (bytes[0] << 16) |
@@ -260,22 +278,22 @@ HX711::HX711(
             ::pinMode(this->_clockPin, OUTPUT);
 
             /**
-             *  Cannot simply set this->_gain. this->setGain()
-             *  must be called to set the HX711 module at the
-             *  hardware-level.
+             * Cannot simply set this->_gain. this->setGain()
+             * must be called to set the HX711 module at the
+             * hardware-level.
              * 
-             *  If, for whatever reason, the sensor cannot be
-             *  reached, setGain will fail and throw a
-             *  TimeoutException. Calling code can catch this
-             *  and handle as though the sensor connection has
-             *  "failed".
+             * If, for whatever reason, the sensor cannot be
+             * reached, setGain will fail and throw a
+             * TimeoutException. Calling code can catch this
+             * and handle as though the sensor connection has
+             * "failed".
              * 
-             *  try {
-             *      sensor.connect();
-             *  }
-             *  catch(TimeoutException& e) {
-             *      //sensor failed to connect
-             *  }
+             * try {
+             *     sensor.connect();
+             * }
+             * catch(TimeoutException& e) {
+             *     //sensor failed to connect
+             * }
              */
             this->setGain(this->_gain);
 
@@ -388,12 +406,15 @@ void HX711::powerDown() noexcept {
     ::digitalWrite(this->_clockPin, HIGH);
 
     /**
-     *  "When PD_SCK pin changes from low to high
-     *  and stays at high for longer than 60µs, HX711
-     *  enters power down mode (Fig.3)."
-     *  Datasheet pg. 5
+     * "When PD_SCK pin changes from low to high
+     * and stays at high for longer than 60µs, HX711
+     * enters power down mode (Fig.3)."
+     * Datasheet pg. 5
+     * 
+     * //this may not work
+     * //std::this_thread::sleep_for(std::chrono::microseconds(60));
      */
-    std::this_thread::sleep_for(std::chrono::microseconds(60));
+    ::delayMicroseconds(60);
 
 }
 
@@ -404,21 +425,21 @@ void HX711::powerUp() {
     ::digitalWrite(this->_clockPin, LOW);
 
     /**
-     *  "When PD_SCK returns to low,
-     *  chip will reset and enter normal operation mode"
-     *  Datasheet pg. 5
+     * "When PD_SCK returns to low,
+     * chip will reset and enter normal operation mode"
+     * Datasheet pg. 5
      */
 
     lock.unlock();
 
     /**
-     *  "After a reset or power-down event, input
-     *  selection is default to Channel A with a gain of
-     *  128."
-     *  Datasheet pg. 5
+     * "After a reset or power-down event, input
+     * selection is default to Channel A with a gain of
+     * 128."
+     * Datasheet pg. 5
      * 
-     *  This means the following statement to set the gain
-     *  is needed ONLY IF the current gain isn't 128
+     * This means the following statement to set the gain
+     * is needed ONLY IF the current gain isn't 128
      */
     if(this->_gain != Gain::GAIN_128) {
         this->setGain(this->_gain);
