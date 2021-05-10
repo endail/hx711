@@ -70,7 +70,14 @@ protected:
 
     /**
      * Maximum number of attempts to read bytes from the sensor
-     * before failing
+     * before failing. Can be interpreted as:
+     * 
+     * "Will check every _WAIT_INTERVAL_US microseconds to a 
+     * maximum of _MAX_READ_TRIES times"
+     * 
+     * ie. a TimeoutException will occur after at least:
+     * _WAIT_INTERVAL_US * _MAX_READ_TRIES microseconds has
+     * elapsed
      */
     static const std::uint8_t _MAX_READ_TRIES = 100;
     static const std::uint16_t _WAIT_INTERVAL_US = 5000;
