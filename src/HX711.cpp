@@ -269,7 +269,7 @@ HX711::HX711(
 
 }
 
-bool HX711::isReady() const noexcept {
+bool HX711::isReady() noexcept {
 
     /**
      * The datasheet states DOUT is used to shift-out data,

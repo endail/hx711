@@ -110,7 +110,7 @@ public:
     void setGain(const Gain gain);
     Gain getGain() const noexcept;
     
-    bool isReady() const noexcept;
+    bool isReady() noexcept;
 
     /**
      * If Channel B value is requested but an exception is thrown
