@@ -36,7 +36,7 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
 bool HX711::_readBit() const noexcept {
 
     //first, clock pin is set high to make DOUT ready to be read from
-    ::digitalWrite(this->_clockPin, HIGH);
+    //::digitalWrite(this->_clockPin, HIGH);
 
     /**
      * !!!IMPORTANT NOTE!!!
@@ -48,19 +48,28 @@ bool HX711::_readBit() const noexcept {
      * For the data pin to be ready, 0.1us needs to have elapsed.
      */
     //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    ::delayMicroseconds(1);
+    //::delayMicroseconds(1);
 
     //at this stage, DOUT is ready to be read from
-    const bool bit = ::digitalRead(this->_dataPin) == HIGH;
+    //const bool bit = ::digitalRead(this->_dataPin) == HIGH;
 
     //clock pin needs to be remain high for at least another 0.1us
     //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    ::delayMicroseconds(1);
-    ::digitalWrite(this->_clockPin, LOW);
+    //::delayMicroseconds(1);
+    //::digitalWrite(this->_clockPin, LOW);
 
     //once low, clock pin needs to remain low for at least 0.2us
     //before the next bit can be read
     //std::this_thread::sleep_for(std::chrono::nanoseconds(200));
+    //::delayMicroseconds(1);
+
+    ::digitalWrite(this->_clockPin, HIGH);
+    ::delayMicroseconds(1);
+    //at this stage, DOUT is ready and the clock pin has been held
+    //high for sufficient amount of time
+    const bool bit = ::digitalRead(this->_dataPin) == HIGH;
+    //at this stage, clock pin needs to be low for at least 0.2us
+    ::digitalWrite(this->_clockPin, LOW);
     ::delayMicroseconds(1);
 
     return bit;
