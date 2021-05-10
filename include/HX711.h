@@ -73,7 +73,7 @@ protected:
      * before failing
      */
     static const std::uint8_t _MAX_READ_TRIES = 10;
-    static const std::uint16_t _WAIT_INTERVAL_US = 1000;
+    static const std::uint16_t _WAIT_INTERVAL_US = 5000;
 
     //Datasheet pg. 5
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
