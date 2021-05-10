@@ -72,7 +72,7 @@ protected:
      * Maximum number of attempts to read bytes from the sensor
      * before failing
      */
-    static const std::uint8_t _MAX_READ_TRIES = 10;
+    static const std::uint8_t _MAX_READ_TRIES = 100;
     static const std::uint16_t _WAIT_INTERVAL_US = 5000;
 
     //Datasheet pg. 5
