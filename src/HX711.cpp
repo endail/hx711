@@ -22,7 +22,6 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
-#include <thread>
 #include <wiringPi.h>
 
 namespace HX711 {
@@ -287,7 +286,7 @@ HX711::HX711(
              * "failed".
              * 
              * try {
-             *     sensor.connect();
+             *     new HX711(dataPin, clockPin);
              * }
              * catch(TimeoutException& e) {
              *     //sensor failed to connect
