@@ -205,8 +205,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      */
     if(this->_byteFormat == Format::LSB) {
         const std::uint8_t swap = raw[0];
-        raw[0] = raw[2];
-        raw[2] = swap;
+        raw[0] = raw[_BYTES_PER_CONVERSION_PERIOD - 1];
+        raw[_BYTES_PER_CONVERSION_PERIOD - 1] = swap;
     }
 
     //finally, copy the local raw bytes to the byte array
