@@ -47,8 +47,11 @@ protected:
     static const double _CONVERSIONS[10];
     static const char* const _UNIT_NAMES[];
 
-    double _g; //deal with mass internally as grams
-    Unit _u; //unit the calling code has chosen
+    //deal with mass internally as grams
+    double _g;
+
+    //unit the calling code has chosen to represent this Mass
+    Unit _u;
 
 public:
     Mass(const double amount = 0.0, const Unit u = Unit::G) noexcept;

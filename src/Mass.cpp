@@ -295,12 +295,12 @@ std::string Mass::toString(const Unit u) const noexcept {
     double n; //mass as a double converted to u
     double i; //integer (discard; don't use)
     double f; //fractional
-    char d; //decimals
+    int d; //decimals
 
     n = Mass::convert(this->_g, Unit::G, u);
     f = std::modf(n, &i);
     //credit: https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
-    d = static_cast<char>(1 - std::log10(std::abs(f)));
+    d = static_cast<int>(1 - std::log10(std::abs(f)));
 
     //d may be < 0
     //if so, use as 0
