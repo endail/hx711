@@ -133,7 +133,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
         }
 
         if(++tries < _MAX_READ_TRIES) {
-            std::this_thread::sleep_for(_WAIT_INTERVAL);
+            ::delayMicroseconds(_WAIT_INTERVAL_US);
         }
         else {
             throw TimeoutException("timed out while trying to read bytes from HX711");
