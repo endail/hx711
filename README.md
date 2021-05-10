@@ -1,11 +1,10 @@
 # HX711 C++ Library
 
-![Build](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg?branch=simple-hx711
-)
-![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg?branch=simple-hx711
-)
-![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg?branch=simple-hx711
-)
+[![Build Status](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/buildcheck.yml)
+
+[![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/cppcheck.yml)
+
+[![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml)
 
 - Use with Raspberry Pi
 
@@ -46,7 +45,7 @@ int main() {
 
 ## Sample Output from Test Code
 
-See: `src/SimpleHX711Test.cpp`
+See: [`src/SimpleHX711Test.cpp`](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp)
 
 ```text
 393543766.6 μg 393543.8 mg 393.5 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
@@ -109,4 +108,4 @@ After writing your own code (eg. main.cpp), compile with the HX711 library as fo
 g++ -Wall -o prog main.cpp -lwiringPi -lhx711
 ```
 
-Make sure to setup wiringPi with `wiringPiSetup()` ([or equivalent](http://wiringpi.com/reference/setup/)) prior to creating the SimpleHX711 object. See the [test code](https://github.com/endail/hx711/blob/master/src/test.cpp#L45) as an example.
+Make sure to setup wiringPi with `wiringPiSetup()` ([or equivalent](http://wiringpi.com/reference/setup/)) prior to creating the SimpleHX711 object. See the [test code](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp#L48) as an example.
