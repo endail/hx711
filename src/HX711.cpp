@@ -89,8 +89,6 @@ std::uint8_t HX711::_readByte() const noexcept {
 
 void HX711::_readRawBytes(std::uint8_t* bytes) {
 
-    std::unique_lock<std::mutex> lock(this->_readLock);
-
     /**
      * Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
      * wait until this occurs.
@@ -120,6 +118,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     }
     while(true);
+
+    std::unique_lock<std::mutex> lock(this->_readLock);
 
     /**
      *  When DOUT goes low, there is a minimum of 0.1us until the clock pin
