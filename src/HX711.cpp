@@ -266,15 +266,36 @@ void HX711::connect(
 }
 
 bool HX711::isReady() const noexcept {
+
     /**
-     *  HX711 will be "ready" when DOUT is low.
-     *  Datasheet pg. 5
+     * The datasheet states DOUT is used to shift-out data,
+     * and in the process DOUT will either be HIGH or LOW
+     * to represent bits of the resulting integer. The issue
+     * is that during the "conversion period" of shifting
+     * bits out, DOUT could be LOW, but not necessarily
+     * mean there is "new" data for retrieval. Page 4 states
+     * that the "25th pulse at PD_SCK input will pull DOUT
+     * pin back to high".
      * 
-     *  This should be a one-shot test. Any follow-ups
-     *  or looping for checking if the sensor is ready
-     *  over time can/should be done by other calling code
+     * This is justification enough to guard against
+     * potentially erroneous "ready" states while a
+     * conversion is in progress. The lock is already in
+     * place to prevent extra reads from the sensor, so
+     * it should suffice to stop this issue as well.
+     */
+    std::lock_guard<std::mutex> lock(this->_readLock);
+
+    /**
+     * HX711 will be "ready" when DOUT is low.
+     * "Ready" means "data is ready for retrieval".
+     * Datasheet pg. 4
+     * 
+     * This should be a one-shot test. Any follow-ups
+     * or looping for checking if the sensor is ready
+     * over time can/should be done by other calling code
      */
     return ::digitalRead(this->_dataPin) == LOW;
+
 }
 
 HX_VALUE HX711::getValue(const Channel c) {
