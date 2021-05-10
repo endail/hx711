@@ -33,6 +33,10 @@ namespace HX711 {
  * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
  */
 
+/**
+ * The HX711 is a 24-bit ADC. Values it outputs will always be
+ * treated as 32-bit integers and not floating point numbers.
+ */
 typedef std::int32_t HX_VALUE;
 
 enum class Format {
