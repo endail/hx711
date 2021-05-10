@@ -23,7 +23,6 @@
 #ifndef HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 #define HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 
-#include <chrono>
 #include <cstdint>
 #include <mutex>
 
