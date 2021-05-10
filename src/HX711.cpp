@@ -35,29 +35,32 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
 
 bool HX711::_readBit() const noexcept {
 
-    /**
-     *  A new bit will be "ready" when the clock pin
-     *  is held high for 1us (T3), then low for 1us (T4).
-     *  There is no subsequent delay for reading the bit.
-     * 
-     *  https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
-     *  pg. 5
-     * 
-     *  Problem 1: the max high time for holding clock pin
-     *  high is 50us. Typically (according to docs) 1us is
-     *  sufficient.
-     * 
-     *  Solution: stick with 1us. It seems to work fine.
-     */
+    //first, clock pin is set high to make DOUT ready to be read from
     ::digitalWrite(this->_clockPin, HIGH);
-    //std::this_thread::sleep_for(std::chrono::microseconds(1));
-    ::delayMicroseconds(1);
 
+    /**
+     * !!!IMPORTANT NOTE!!!
+     * 
+     * There is an overlap in timing between the clock pin changing from
+     * high to low and the data pin being ready to output the respective
+     * bit. This overlap is T2 in Fig.2 on pg. 5 of the datasheet.
+     * 
+     * For the data pin to be ready, 0.1us needs to have elapsed.
+     */
+    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+
+    //at this stage, DOUT is ready to be read from
+    const bool bit = ::digitalRead(this->_dataPin) == HIGH;
+
+    //clock pin needs to be remain high for at least another 0.1us
+    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
     ::digitalWrite(this->_clockPin, LOW);
-    //std::this_thread::sleep_for(std::chrono::microseconds(1));
-    ::delayMicroseconds(1);
 
-    return ::digitalRead(this->_dataPin) == HIGH;
+    //once low, clock pin needs to remain low for at least 0.2us
+    //before the next bit can be read
+    std::this_thread::sleep_for(std::chrono::nanoseconds(200));
+
+    return bit;
 
 }
 
