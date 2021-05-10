@@ -296,10 +296,10 @@ std::string Mass::toString(const Unit u) const noexcept {
     
     //https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
     //this expression may return < 0, but min usable val should be 0
-    d = std::max(0, static_cast<int>(1 - std::log10(std::abs(f))));
+    d = static_cast<int>(1 - std::log10(std::abs(f)));
 
     ss  << std::fixed
-        << std::setprecision(d)
+        << std::setprecision(d >= 0 ? d : 0)
         << n
         << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
