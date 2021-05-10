@@ -45,7 +45,7 @@ Mass& Mass::operator=(const Mass& rhs) noexcept {
     return *this;
 }
 
-Mass& Mass::operator=(const double& rhs) noexcept {
+Mass& Mass::operator=(const double rhs) noexcept {
     this->_g = rhs;
     return *this;
 }
@@ -73,14 +73,14 @@ Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
     );
 }
 
-Mass operator+(const double& lhs, const Mass& rhs) noexcept {
+Mass operator+(const double lhs, const Mass& rhs) noexcept {
     return Mass(
         Mass::convert(lhs, rhs._u, Mass::Unit::G) + rhs._g,
         rhs._u
     );
 }
 
-Mass operator+(const Mass& lhs, const double& rhs) noexcept {
+Mass operator+(const Mass& lhs, const double rhs) noexcept {
     return operator+(rhs, lhs);
 }
 
@@ -91,14 +91,14 @@ Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
     );
 }
 
-Mass operator-(const double& lhs, const Mass& rhs) noexcept {
+Mass operator-(const double lhs, const Mass& rhs) noexcept {
     return Mass(
         Mass::convert(lhs, rhs._u, Mass::Unit::G) - rhs._g,
         rhs._u
     );
 }
 
-Mass operator-(const Mass& lhs, const double& rhs) noexcept {
+Mass operator-(const Mass& lhs, const double rhs) noexcept {
     return operator-(rhs, lhs);
 }
 
@@ -109,14 +109,14 @@ Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
     );
 }
 
-Mass operator*(const double& lhs, const Mass& rhs) noexcept {
+Mass operator*(const double lhs, const Mass& rhs) noexcept {
     return Mass(
         Mass::convert(lhs, rhs._u, Mass::Unit::G) * rhs._g,
         rhs._u
     );
 }
 
-Mass operator*(const Mass& lhs, const double& rhs) noexcept {
+Mass operator*(const Mass& lhs, const double rhs) noexcept {
     return operator*(rhs, lhs);
 }
 
@@ -133,7 +133,7 @@ Mass operator/(const Mass& lhs, const Mass& rhs) {
 
 }
 
-Mass operator/(const double& lhs, const Mass& rhs) {
+Mass operator/(const double lhs, const Mass& rhs) {
     
     if(lhs == 0) {
         throw std::invalid_argument("cannot divide by 0");
@@ -146,7 +146,7 @@ Mass operator/(const double& lhs, const Mass& rhs) {
 
 }
 
-Mass operator/(const Mass& lhs, const double& rhs) {
+Mass operator/(const Mass& lhs, const double rhs) {
     return operator/(rhs, lhs);
 }
 
@@ -155,7 +155,7 @@ Mass& Mass::operator+=(const Mass& rhs) noexcept {
     return *this;
 }
 
-Mass& Mass::operator+=(const double& rhs) noexcept {
+Mass& Mass::operator+=(const double rhs) noexcept {
     this->_g += Mass::convert(rhs, this->_u, Unit::G);
     return *this;
 }
@@ -165,7 +165,7 @@ Mass& Mass::operator-=(const Mass& rhs) noexcept {
     return *this;
 }
 
-Mass& Mass::operator-=(const double& rhs) noexcept {
+Mass& Mass::operator-=(const double rhs) noexcept {
     this->_g -= Mass::convert(rhs, this->_u, Unit::G);
     return *this;
 }
@@ -175,7 +175,7 @@ Mass& Mass::operator*=(const Mass& rhs) noexcept {
     return *this;
 }
 
-Mass& Mass::operator*=(const double& rhs) noexcept {
+Mass& Mass::operator*=(const double rhs) noexcept {
     this->_g *= Mass::convert(rhs, this->_u, Unit::G);
     return *this;
 }
@@ -191,7 +191,7 @@ Mass& Mass::operator/=(const Mass& rhs) {
 
 }
 
-Mass& Mass::operator/=(const double& rhs) {
+Mass& Mass::operator/=(const double rhs) {
 
     if(rhs == 0) {
         throw std::invalid_argument("cannot divide by 0");
@@ -210,11 +210,11 @@ bool operator==(const Mass& lhs, const Mass& rhs) noexcept {
     return lhs._g == rhs._g;
 }
 
-bool operator==(const double& lhs, const Mass& rhs) noexcept {
+bool operator==(const double lhs, const Mass& rhs) noexcept {
     return Mass::convert(lhs, rhs._u, Mass::Unit::G) == rhs._g;
 }
 
-bool operator==(const Mass& lhs, const double& rhs) noexcept {
+bool operator==(const Mass& lhs, const double rhs) noexcept {
     return operator==(rhs, lhs);
 }
 
@@ -222,11 +222,11 @@ bool operator!=(const Mass& lhs, const Mass& rhs) noexcept {
     return !operator==(lhs, rhs);
 }
 
-bool operator!=(const double& lhs, const Mass& rhs) noexcept {
+bool operator!=(const double lhs, const Mass& rhs) noexcept {
     return !operator==(lhs, rhs);
 }
 
-bool operator!=(const Mass& lhs, const double& rhs) noexcept {
+bool operator!=(const Mass& lhs, const double rhs) noexcept {
     return !operator==(lhs, rhs);
 }
 
@@ -234,11 +234,11 @@ bool operator<(const Mass& lhs, const Mass& rhs) noexcept {
     return lhs._g < rhs._g;
 }
 
-bool operator<(const double& lhs, const Mass& rhs) noexcept {
+bool operator<(const double lhs, const Mass& rhs) noexcept {
     return Mass::convert(lhs, rhs._u, Mass::Unit::G) < rhs._g;
 }
 
-bool operator<(const Mass& lhs, const double& rhs) noexcept {
+bool operator<(const Mass& lhs, const double rhs) noexcept {
     return operator<(rhs, lhs);
 }
 
@@ -246,11 +246,11 @@ bool operator>(const Mass& lhs, const Mass& rhs) noexcept {
     return operator<(rhs, lhs);
 }
 
-bool operator>(const double& lhs, const Mass& rhs) noexcept {
+bool operator>(const double lhs, const Mass& rhs) noexcept {
     return Mass::convert(lhs, rhs._u, Mass::Unit::G);
 }
 
-bool operator>(const Mass& lhs, const double& rhs) noexcept {
+bool operator>(const Mass& lhs, const double rhs) noexcept {
     return operator>(rhs, lhs);
 }
 
@@ -258,11 +258,11 @@ bool operator<=(const Mass& lhs, const Mass& rhs) noexcept {
     return !operator>(lhs, rhs);
 }
 
-bool operator<=(const double& lhs, const Mass& rhs) noexcept {
+bool operator<=(const double lhs, const Mass& rhs) noexcept {
     return !operator>(lhs, rhs);
 }
 
-bool operator<=(const Mass& lhs, const double& rhs) noexcept {
+bool operator<=(const Mass& lhs, const double rhs) noexcept {
     return !operator>(lhs, rhs);
 }
 
@@ -270,11 +270,11 @@ bool operator>=(const Mass& lhs, const Mass& rhs) noexcept {
     return !operator<(lhs, rhs);
 }
 
-bool operator>=(const double& lhs, const Mass& rhs) noexcept {
+bool operator>=(const double lhs, const Mass& rhs) noexcept {
     return !operator<(lhs, rhs);
 }
 
-bool operator>=(const Mass& lhs, const double& rhs) noexcept {
+bool operator>=(const Mass& lhs, const double rhs) noexcept {
     return !operator<(lhs, rhs);
 }
 
