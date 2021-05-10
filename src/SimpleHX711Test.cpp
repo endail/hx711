@@ -54,6 +54,9 @@ int main(int argc, char** argv) {
     
     while(true) {
 
+        cout << hx.read() << endl;
+
+        /*
         Mass m = hx.weight();
 
         cout    << m.toString(Mass::Unit::UG) << " "
@@ -66,6 +69,7 @@ int main(int argc, char** argv) {
                 << m.toString(Mass::Unit::ST) << " "
                 << m.toString(Mass::Unit::LB) << " "
                 << m.toString(Mass::Unit::OZ) << endl;
+        */
 
         this_thread::sleep_for(chrono::seconds(1));
 
