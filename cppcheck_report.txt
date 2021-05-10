@@ -52,8 +52,5 @@ src/SimpleHX711.cpp:152:0: style: The function 'setOffset' is never used. [unuse
 src/SimpleHX711.cpp:168:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:175:0: style: The function 'weight' is never used. [unusedFunction]
-
-^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
 
