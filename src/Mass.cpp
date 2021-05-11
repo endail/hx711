@@ -22,6 +22,7 @@
 
 #include "../include/Mass.h"
 #include <cmath>
+#include <climits>
 #include <sstream>
 #include <iomanip>
 #include <cstring>
@@ -289,17 +290,16 @@ std::string Mass::toString(const Unit u) const noexcept {
     double n; //mass as a double converted to u
     double i; //integer (discard; don't use)
     double f; //fractional
-    int d; //decimals
+    int d = 0; //decimals
 
     n = Mass::convert(this->_g, Unit::G, u);
     f = std::modf(n, &i);
     
     //https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
-    //this expression may return < 0, but min usable val should be 0
-    d = static_cast<int>(1 - std::log10(std::abs(f)));
-
-    if(d < 0) {
-        d = 0;
+    //min usable value is 0
+    //protect against log10(0)
+    if(f != 0) {
+        d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
     ss  << std::fixed
