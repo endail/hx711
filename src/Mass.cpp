@@ -312,7 +312,7 @@ std::string Mass::toString(const Unit u) const noexcept {
     if(std::floor(n) == n) {
         ss  << std::fixed
             << std::setprecision(0)
-            << std::noshowpoint
+            << std::noshowpoint;
     }
     else {
 
