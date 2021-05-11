@@ -22,7 +22,6 @@
 
 #include "../include/Mass.h"
 #include <cmath>
-#include <climits>
 #include <sstream>
 #include <iomanip>
 #include <cstring>
@@ -294,12 +293,19 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     n = Mass::convert(this->_g, Unit::G, u);
     f = std::modf(n, &i);
-    
-    //https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
-    //min usable value is 0
-    //protect against log10(0)
+
+    /**
+     * Credit: https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
+     * Minimum usable value (passed to setprecision) is 0.
+     *  
+     * This had a nasty bug where the expression was setting d
+     * to be approx. INT_MAX and causing a seg fault in the <<
+     * ostream operator below. It is necessary to guard against
+     * log10(0).
+     * See: https://www.cplusplus.com/reference/cmath/log10/
+     */
     if(f != 0) {
-        d = static_cast<int>(1 - std::log10(std::abs(f)));
+        d = std::max(0, static_cast<int>(1 - std::log10(std::abs(f))));
     }
 
     ss  << std::fixed

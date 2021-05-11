@@ -9,6 +9,7 @@ INC := -I $(INCDIR)
 CXXFLAGS := -std=c++11 \
 			-Wall \
 			-Wno-psabi \
+			-O2 \
 			-D_FORTIFY_SOURCE=2 \
 			-D_GLIBCXX_ASSERTIONS \
 			-fexceptions \
@@ -18,8 +19,7 @@ CXXFLAGS := -std=c++11 \
 			-Wl,-z,defs	\
 			-Wl,-z,now \
 			-Wl,-z,relro \
-			-fwrapv \
-			-g
+			-fwrapv
 
 # https://stackoverflow.com/a/39895302/570787
 ifeq ($(PREFIX),)
