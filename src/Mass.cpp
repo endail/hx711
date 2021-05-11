@@ -305,7 +305,7 @@ std::string Mass::toString(const Unit u) const noexcept {
      * See: https://www.cplusplus.com/reference/cmath/log10/
      */
     if(f != 0) {
-        d = static_cast<int>(std::floor(1 - std::log10(std::abs(f))));
+        d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
     ss  << std::fixed

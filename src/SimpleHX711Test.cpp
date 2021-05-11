@@ -56,7 +56,8 @@ int main(int argc, char** argv) {
 
         Mass m = hx.weight();
 
-        cout    << m.toString(Mass::Unit::UG) << " "
+        cout    << m.getValue() << " "
+                << m.toString(Mass::Unit::UG) << " "
                 << m.toString(Mass::Unit::MG) << " "
                 << m.toString(Mass::Unit::G) << " "
                 << m.toString(Mass::Unit::KG) << " "
