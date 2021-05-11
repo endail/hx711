@@ -48,16 +48,13 @@ int main(int argc, char** argv) {
     wiringPiSetup();
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
-
-    //set the scale to output weights in grams
-    hx.setUnit(Mass::Unit::G);
     
     while(true) {
 
         Mass m = hx.weight();
 
         cout    << "\x1B[2J\x1B[H"
-                << "Base value: \t" << m.getValue() << endl
+                << "\t" << m.getValue() << endl
                 << "\t" << m.toString(Mass::Unit::UG) << endl
                 << "\t" << m.toString(Mass::Unit::MG) << endl
                 << "\t" << m.toString(Mass::Unit::G) << endl
