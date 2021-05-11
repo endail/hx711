@@ -56,17 +56,17 @@ int main(int argc, char** argv) {
 
         Mass m = hx.weight();
 
-        cout    << m.getValue() << " "
-                << m.toString(Mass::Unit::UG) << " "
-                << m.toString(Mass::Unit::MG) << " "
-                << m.toString(Mass::Unit::G) << " "
-                << m.toString(Mass::Unit::KG) << " "
-                << m.toString(Mass::Unit::TON) << " "
-                << m.toString(Mass::Unit::IMP_TON) << " "
-                << m.toString(Mass::Unit::US_TON) << " "
-                << m.toString(Mass::Unit::ST) << " "
-                << m.toString(Mass::Unit::LB) << " "
-                << m.toString(Mass::Unit::OZ) << endl;
+        cout    << m.getValue() << ", "
+                << m.toString(Mass::Unit::UG) << ", "
+                << m.toString(Mass::Unit::MG) << ", "
+                << m.toString(Mass::Unit::G) << ", "
+                << m.toString(Mass::Unit::KG) << ", "
+                << m.toString(Mass::Unit::TON) << ", "
+                << m.toString(Mass::Unit::IMP_TON) << ", "
+                << m.toString(Mass::Unit::US_TON) << ", "
+                << m.toString(Mass::Unit::ST) << ", "
+                << m.toString(Mass::Unit::LB) << ", "
+                << m.toString(Mass::Unit::OZ) << endl << endl;
 
         this_thread::sleep_for(chrono::seconds(1));
 
