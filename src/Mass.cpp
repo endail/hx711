@@ -308,21 +308,10 @@ std::string Mass::toString(const Unit u) const noexcept {
         d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
-    //check if whole number
-    if(std::floor(n) == n) {
-        ss  << std::fixed
-            << std::setprecision(0)
-            << std::noshowpoint
-            << static_cast<long>(n);
-    }
-    else {
-        ss  << std::fixed
-            << std::setprecision(d)
-            << std::noshowpoint
-            << n;
-    }
-
-    ss  << " "
+    ss  << std::fixed
+        //<< std::setprecision(d)
+        << n
+        << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
     
     return ss.str();
