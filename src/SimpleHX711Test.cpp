@@ -56,19 +56,18 @@ int main(int argc, char** argv) {
 
         Mass m = hx.weight();
 
-        cout    << m.getValue() << ", "
-                << m.toString(Mass::Unit::UG) << ", "
-                << m.toString(Mass::Unit::MG) << ", "
-                << m.toString(Mass::Unit::G) << ", "
-                << m.toString(Mass::Unit::KG) << ", "
-                << m.toString(Mass::Unit::TON) << ", "
-                << m.toString(Mass::Unit::IMP_TON) << ", "
-                << m.toString(Mass::Unit::US_TON) << ", "
-                << m.toString(Mass::Unit::ST) << ", "
-                << m.toString(Mass::Unit::LB) << ", "
-                << m.toString(Mass::Unit::OZ) << endl << endl;
-
-        //this_thread::sleep_for(chrono::seconds(1));
+        cout    << "\x1B[2J\x1B[H"
+                << "Base value: \t" << m.getValue() << endl
+                << "\t" << m.toString(Mass::Unit::UG) << endl
+                << "\t" << m.toString(Mass::Unit::MG) << endl
+                << "\t" << m.toString(Mass::Unit::G) << endl
+                << "\t" << m.toString(Mass::Unit::KG) << endl
+                << "\t" << m.toString(Mass::Unit::TON) << endl
+                << "\t" << m.toString(Mass::Unit::IMP_TON) << endl
+                << "\t" << m.toString(Mass::Unit::US_TON) << endl
+                << "\t" << m.toString(Mass::Unit::ST) << endl
+                << "\t" << m.toString(Mass::Unit::LB) << endl
+                << "\t" << m.toString(Mass::Unit::OZ) << endl;
 
     }
 
