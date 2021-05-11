@@ -9,7 +9,7 @@ INC := -I $(INCDIR)
 CXXFLAGS := -std=c++11 \
 			-Wall \
 			-Wno-psabi \
-			-O2 \
+			#-O2 \
 			-D_FORTIFY_SOURCE=2 \
 			-D_GLIBCXX_ASSERTIONS \
 			-fexceptions \

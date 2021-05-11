@@ -298,8 +298,12 @@ std::string Mass::toString(const Unit u) const noexcept {
     //this expression may return < 0, but min usable val should be 0
     d = static_cast<int>(1 - std::log10(std::abs(f)));
 
+    if(d < 0) {
+        d = 0;
+    }
+
     ss  << std::fixed
-        << std::setprecision(d >= 0 ? d : 0)
+        << std::setprecision(d)
         << n
         << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
@@ -309,7 +313,8 @@ std::string Mass::toString(const Unit u) const noexcept {
 }
 
 std::ostream& operator<<(std::ostream& os, const Mass& m) noexcept {
-    return os << m.toString();
+    os << m.toString();
+    return os;
 }
 
 double Mass::convert(
