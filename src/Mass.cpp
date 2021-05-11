@@ -308,8 +308,7 @@ std::string Mass::toString(const Unit u) const noexcept {
         d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
-    ss  << std::fixed
-        << std::setprecision(d)
+    ss  << std::setprecision(d)
         << std::noshowpoint
         << n
         << " "
