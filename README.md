@@ -45,18 +45,7 @@ int main() {
 
 See: [`src/SimpleHX711Test.cpp`](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp)
 
-```text
-393543766.6 μg 393543.8 mg 393.5 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393283819.6 μg 393283.8 mg 393.3 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393413793.1 μg 393413.8 mg 393.4 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393501326.3 μg 393501.3 mg 393.5 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393432360.7 μg 393432.4 mg 393.4 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393458885.9 μg 393458.9 mg 393.5 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393432360.7 μg 393432.4 mg 393.4 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393151193.6 μg 393151.2 mg 393.2 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393302387.3 μg 393302.4 mg 393.3 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-393344827.6 μg 393344.8 mg 393.3 g 0.4 kg 0.0004 ton 0.0004 ton (imp) 0.0004 ton (US) 0.06 st 0.7 lb 13.9 oz
-```
+![hx711.gif](hx711.gif)
 
 ## Build and Install
 
