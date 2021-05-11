@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
                 << m.toString(Mass::Unit::LB) << ", "
                 << m.toString(Mass::Unit::OZ) << endl << endl;
 
-        this_thread::sleep_for(chrono::seconds(1));
+        //this_thread::sleep_for(chrono::seconds(1));
 
     }
 
