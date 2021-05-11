@@ -312,18 +312,18 @@ std::string Mass::toString(const Unit u) const noexcept {
     if(std::floor(n) == n) {
         ss  << std::fixed
             << std::setprecision(0)
-            << std::noshowpoint;
+            << std::noshowpoint
+            << static_cast<long>(n);
     }
     else {
-
         ss  << std::fixed
             << std::setprecision(d)
             << std::noshowpoint
-            << n
-            << " "
-            << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
-    
+            << n;
     }
+
+    ss  << " "
+        << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
     
     return ss.str();
 
