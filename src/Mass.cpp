@@ -310,6 +310,7 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     ss  << std::fixed
         << std::setprecision(d)
+        << std::noshowpoint
         << n
         << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
