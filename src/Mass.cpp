@@ -308,8 +308,15 @@ std::string Mass::toString(const Unit u) const noexcept {
         d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
+    /**
+     * At this point d may be 1 even if the only decimal is 0. I
+     * do not know why this is, but I will leave it instead of 
+     * "fixing" it with string manipulation.
+     */
+
     ss  << std::fixed
-        //<< std::setprecision(d)
+        << std::setprecision(d)
+        << std::noshowpoint
         << n
         << " "
         << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
