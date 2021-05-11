@@ -84,6 +84,22 @@ Mass operator+(const Mass& lhs, const double rhs) noexcept {
     return operator+(rhs, lhs);
 }
 
+std::string operator+(const std::string& lhs, const Mass& rhs) noexcept {
+    return lhs + rhs.toString();
+}
+
+std::string operator+(const Mass& lhs, const std::string& rhs) noexcept {
+    return operator+(rhs, lhs);
+}
+
+std::string operator+(const char* const lhs, const Mass& rhs) noexcept {
+    return lhs + rhs.toString();
+}
+
+std::string operator+(const Mass& lhs, const char* const rhs) noexcept {
+    return operator+(rhs, lhs);
+}
+
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
         lhs._g - rhs._g,

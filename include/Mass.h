@@ -70,6 +70,10 @@ public:
     friend Mass operator+(const Mass& lhs, const Mass& rhs) noexcept;
     friend Mass operator+(const double lhs, const Mass& rhs) noexcept;
     friend Mass operator+(const Mass& lhs, const double rhs) noexcept;
+    friend std::string operator+(const std::string& lhs, const Mass& rhs) noexcept;
+    friend std::string operator+(const Mass& lhs, const std::string& rhs) noexcept;
+    friend std::string operator+(const char* const lhs, const Mass& rhs) noexcept;
+    friend std::string operator+(const Mass& lhs, const char* const rhs) noexcept;
 
     friend Mass operator-(const Mass& lhs, const Mass& rhs) noexcept;
     friend Mass operator-(const double lhs, const Mass& rhs) noexcept;
