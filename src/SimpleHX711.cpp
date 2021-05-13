@@ -31,12 +31,12 @@
 
 namespace HX711 {
 
-std::vector<HX_VALUE> SimpleHX711::_readValues(const std::size_t times) {
+std::vector<HX_VALUE> SimpleHX711::_readValues(const std::size_t samples) {
 
     std::vector<HX_VALUE> vals;
-    vals.reserve(times);
+    vals.reserve(samples);
 
-    for(std::size_t i = 0; i < times; ++i) {
+    for(std::size_t i = 0; i < samples; ++i) {
         vals.push_back(this->_hx->getValue(this->_ch));
     }
 
@@ -165,26 +165,26 @@ HX711* SimpleHX711::getBase() noexcept {
     return this->_hx;
 }
 
-void SimpleHX711::tare(const ReadType r, const size_t times) {
+void SimpleHX711::tare(const ReadType r, const size_t samples) {
     const HX_VALUE backup = this->_refUnit;
     this->setReferenceUnit(1);
-    this->_offset = static_cast<HX_VALUE>(std::round(this->read(r, times)));
+    this->_offset = static_cast<HX_VALUE>(std::round(this->read(r, samples)));
     this->setReferenceUnit(backup);
 }
 
-Mass SimpleHX711::weight(const ReadType r, const size_t times) {
-    return Mass(this->read(r, times), this->_scaleUnit);
+Mass SimpleHX711::weight(const ReadType r, const size_t samples) {
+    return Mass(this->read(r, samples), this->_scaleUnit);
 }
 
-double SimpleHX711::read(const ReadType r, const std::size_t times) {
+double SimpleHX711::read(const ReadType r, const std::size_t samples) {
 
-    if(times == 0) {
-        throw std::range_error("times must be at least 1");
+    if(samples == 0) {
+        throw std::range_error("samples must be at least 1");
     }
 
     double val;
 
-    std::vector<HX_VALUE> vals = this->_readValues(times);
+    std::vector<HX_VALUE> vals = this->_readValues(samples);
 
     switch(r) {
         case ReadType::Median:
