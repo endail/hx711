@@ -48,7 +48,7 @@ protected:
 	HX_VALUE _refUnit = 1;
 	HX_VALUE _offset = 0;
 
-	std::vector<HX_VALUE> _readValues(const std::size_t times = 3);
+	std::vector<HX_VALUE> _readValues(const std::size_t samples = 3);
 	static double _median(const std::vector<HX_VALUE>* vals);
 	static double _average(const std::vector<HX_VALUE>* vals);
 
@@ -84,9 +84,9 @@ public:
 
 	HX711* getBase() noexcept;
 
-	void tare(const ReadType r = ReadType::Median, const size_t times = 3);
-	Mass weight(const ReadType r = ReadType::Median, const size_t times = 3);
-	double read(const ReadType r = ReadType::Median, const size_t times = 3);
+	void tare(const ReadType r = ReadType::Median, const size_t samples = 3);
+	Mass weight(const ReadType r = ReadType::Median, const size_t samples = 3);
+	double read(const ReadType r = ReadType::Median, const size_t samples = 3);
 
 };
 };
