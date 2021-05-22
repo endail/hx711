@@ -71,7 +71,7 @@ bool HX711::_readBit() const noexcept {
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
-    //oin to remain high
+    //pin to remain high
     ::delayMicroseconds(1);
     
     //at this stage, DOUT is ready and the clock pin has been held
