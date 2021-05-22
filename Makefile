@@ -6,7 +6,7 @@ BINDIR := bin
 SRCEXT := cpp
 LIBS := -lwiringPi
 INC := -I $(INCDIR)
-CFLAGS := 	-O2 \
+CFLAGS :=	-O2 \
 			-pipe \
 			-fomit-frame-pointer \
 			-Wall \
@@ -38,13 +38,14 @@ else
 # only include these flags on rpi, not gha
 	CFLAGS := 	-march=native \
 				-mfpu=vfp \
-				-mfloat-abi=hard
+				-mfloat-abi=hard \
+				$(CFLAGS)
 endif
 
 
 CXXFLAGS := -std=c++11 \
 			-fexceptions \
-			${CFLAGS}
+			$(CFLAGS)
 
 ########################################################################
 
