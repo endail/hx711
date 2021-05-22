@@ -6,20 +6,28 @@ BINDIR := bin
 SRCEXT := cpp
 LIBS := -lwiringPi
 INC := -I $(INCDIR)
-CXXFLAGS := -std=c++11 \
-			-Wall \
-			-Wno-psabi \
+CFLAGS := 	-march=native \
+			-mfloat-abi=hard \
 			-O2 \
-			-D_FORTIFY_SOURCE=2 \
-			-D_GLIBCXX_ASSERTIONS \
-			-fexceptions \
-			-fstack-clash-protection \
 			-pipe \
+			-fomit-frame-pointer \
+			-Wall \
+			-Wfatal-errors \
 			-Werror=format-security \
-			-Wl,-z,defs	\
-			-Wl,-z,now \
 			-Wl,-z,relro \
-			-fwrapv
+			-Wl,-z,now \
+			-Wl,-z,defs	\
+			-Wl,--hash-style=gnu \
+			-Wl,--as-needed \
+			-D_FORTIFY_SOURCE=2 \
+			-fstack-clash-protection \
+
+CXXFLAGS := -std=c++11 \
+			-fexceptions \
+			"${CFLAGS}"
+
+#CHOST="armv6j-hardfloat-linux-gnueabi"
+#COMMON_FLAGS="-O2 -pipe -march=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard"
 
 # https://stackoverflow.com/a/39895302/570787
 ifeq ($(PREFIX),)
