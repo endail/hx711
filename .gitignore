@@ -467,3 +467,4 @@ FodyWeavers.xsd
 *.tlog
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,visualstudiocode,visualstudio,windows,linux,c++
+.vscode/settings.json
