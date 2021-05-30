@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "../include/SimpleHX711.h"
+#include "../include/TimeoutException.h"
 #include <wiringPi.h>
 #include <cmath>
 #include <cstdlib>
