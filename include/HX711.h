@@ -115,7 +115,7 @@ public:
     HX711(const int dataPin, const int clockPin) noexcept;
     virtual ~HX711() = default;
 
-    void begin() const;
+    void begin();
 
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
