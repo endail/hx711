@@ -71,7 +71,7 @@ bool HX711::_readBit() const noexcept {
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
-    //oin to remain high
+    //pin to remain high
     ::delayMicroseconds(1);
     
     //at this stage, DOUT is ready and the clock pin has been held
@@ -147,10 +147,6 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * When DOUT goes low, there is a minimum of 0.1us until the clock pin
      * can go high. T1 in Fig.2.
      * Datasheet pg. 5
-     * 0.1us == 100ns
-     * 
-     * //this does not appear to work
-     * //std::this_thread::sleep_for(std::chrono::nanoseconds(100));
      */
     ::delayMicroseconds(1);
 
@@ -407,9 +403,6 @@ void HX711::powerDown() noexcept {
      * and stays at high for longer than 60µs, HX711
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
-     * 
-     * //this may not work
-     * //std::this_thread::sleep_for(std::chrono::microseconds(60));
      */
     ::delayMicroseconds(60);
 

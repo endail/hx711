@@ -6,30 +6,49 @@ BINDIR := bin
 SRCEXT := cpp
 LIBS := -lwiringPi
 INC := -I $(INCDIR)
-CXXFLAGS := -std=c++11 \
-			-Wall \
-			-Wno-psabi \
-			-O2 \
-			-D_FORTIFY_SOURCE=2 \
-			-D_GLIBCXX_ASSERTIONS \
-			-fexceptions \
-			-fstack-clash-protection \
+CFLAGS :=	-O2 \
 			-pipe \
+			-fomit-frame-pointer \
+			-Wall \
+			-Wfatal-errors \
 			-Werror=format-security \
-			-Wl,-z,defs	\
-			-Wl,-z,now \
 			-Wl,-z,relro \
-			-fwrapv
+			-Wl,-z,now \
+			-Wl,-z,defs	\
+			-Wl,--hash-style=gnu \
+			-Wl,--as-needed \
+			-D_FORTIFY_SOURCE=2 \
+			-fstack-clash-protection \
+			-v
+
+
+########################################################################
 
 # https://stackoverflow.com/a/39895302/570787
 ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
-# Add additional libs for building on github actions
+
 ifeq ($(GITHUB_ACTIONS),true)
+# gha needs these additional libs
 	LIBS := $(LIBS) -lrt -lcrypt -pthread
+else
+# only include these flags on rpi, not gha
+	CFLAGS := 	-march=native \
+				-mfpu=vfp \
+				-mfloat-abi=hard \
+				$(CFLAGS)
 endif
+
+
+CXXFLAGS := -std=c++11 \
+			-fexceptions \
+			$(CFLAGS)
+
+########################################################################
+
+
 
 .PHONY: all
 all: 	dirs \
