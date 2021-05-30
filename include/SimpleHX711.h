@@ -35,55 +35,65 @@ namespace HX711 {
  * or average values read from the sensor
  */
 enum class ReadType {
-	Median = 0,
-	Average,
+    Median = 0,
+    Average,
 };
 
 class SimpleHX711 {
-	
+    
 protected:
-	HX711* _hx = nullptr;
-	Mass::Unit _scaleUnit = Mass::Unit::G;
-	Channel _ch = Channel::A;
-	HX_VALUE _refUnit = 1;
-	HX_VALUE _offset = 0;
+    HX711* _hx = nullptr;
+    Mass::Unit _scaleUnit = Mass::Unit::G;
+    Channel _ch = Channel::A;
+    HX_VALUE _refUnit = 1;
+    HX_VALUE _offset = 0;
 
-	static double _median(const std::vector<HX_VALUE>* vals);
-	static double _average(const std::vector<HX_VALUE>* vals);
+    static double _median(const std::vector<HX_VALUE>* vals);
+    static double _average(const std::vector<HX_VALUE>* vals);
 
-	//prohibit copying and assignment
-	SimpleHX711(const SimpleHX711& s2) noexcept;
-	SimpleHX711& operator=(const SimpleHX711& rhs) noexcept;
+    //prohibit copying and assignment
+    SimpleHX711(const SimpleHX711& s2) noexcept;
+    SimpleHX711& operator=(const SimpleHX711& rhs) noexcept;
 
 
 public:
 
-	SimpleHX711(
-		const int dataPin,
-		const int clockPin,
-		const HX_VALUE refUnit = 1,
-		const HX_VALUE offset = 0);
+    SimpleHX711(
+        const int dataPin,
+        const int clockPin,
+        const HX_VALUE refUnit = 1,
+        const HX_VALUE offset = 0);
 
-	~SimpleHX711();
+    ~SimpleHX711();
 
-	void setUnit(const Mass::Unit unit) noexcept;
-	Mass::Unit getUnit() const noexcept;
+    void setUnit(const Mass::Unit unit) noexcept;
+    Mass::Unit getUnit() const noexcept;
 
-	HX_VALUE getReferenceUnit() const noexcept;
-	void setReferenceUnit(const HX_VALUE refUnit);
+    HX_VALUE getReferenceUnit() const noexcept;
+    void setReferenceUnit(const HX_VALUE refUnit);
 
-	HX_VALUE getOffset() const noexcept;
-	void setOffset(const HX_VALUE offset) noexcept;
+    HX_VALUE getOffset() const noexcept;
+    void setOffset(const HX_VALUE offset) noexcept;
 
-	void setChannel(const Channel ch) noexcept;
-	Channel getChannel() const noexcept;
+    void setChannel(const Channel ch) noexcept;
+    Channel getChannel() const noexcept;
 
-	HX711* getBase() noexcept;
+    HX711* getBase() noexcept;
 
-	std::vector<HX_VALUE> readValues(const std::size_t samples = 3);
-	void tare(const ReadType r = ReadType::Median, const size_t samples = 3);
-	Mass weight(const ReadType r = ReadType::Median, const size_t samples = 3);
-	double read(const ReadType r = ReadType::Median, const size_t samples = 3);
+    
+    /**
+     * Returns a vector of values from the sensor. This method is useful
+     * if you do not want to use the predefined average or median methods.
+     * Note that the values in the vector are not adjusted as per the
+     * reference unit or offset.
+     * @param  {std::size_t} samples    : 
+     * @return {std::vector<HX_VALUE>}  : 
+     */
+    std::vector<HX_VALUE> readValues(const std::size_t samples = 3);
+
+    void tare(const ReadType r = ReadType::Median, const size_t samples = 3);
+    Mass weight(const ReadType r = ReadType::Median, const size_t samples = 3);
+    double read(const ReadType r = ReadType::Median, const size_t samples = 3);
 
 };
 };
