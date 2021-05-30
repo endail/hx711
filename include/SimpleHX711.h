@@ -66,9 +66,6 @@ public:
 
 	~SimpleHX711();
 
-	explicit operator bool() const noexcept;
-	friend bool operator!(const SimpleHX711& hx) noexcept;
-
 	void setUnit(const Mass::Unit unit) noexcept;
 	Mass::Unit getUnit() const noexcept;
 

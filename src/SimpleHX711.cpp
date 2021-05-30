@@ -96,18 +96,11 @@ SimpleHX711::SimpleHX711(
         _refUnit(refUnit),
         _offset(offset)  {
             this->_hx = new HX711(dataPin, clockPin);
+            this->_hx->begin();
 }
 
 SimpleHX711::~SimpleHX711() {
     delete this->_hx;
-}
-
-SimpleHX711::operator bool() const noexcept {
-    return this->_hx->isReady();
-}
-
-bool operator!(const SimpleHX711& hx) noexcept {
-    return !hx._hx->isReady();
 }
 
 void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
