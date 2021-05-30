@@ -23,6 +23,7 @@
 #include "../include/SimpleHX711.h"
 #include <wiringPi.h>
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -47,14 +48,15 @@ int main(int argc, char** argv) {
 
     if(argc != 3) {
         cout << "Usage: hx711calibration [data pin] [clock pin]" << endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
-    setupHx(stoi(argv[1]), stoi(argv[2]));
-
-    if(!(*hx)) {
+    try {
+        setupHx(stoi(argv[1]), stoi(argv[2]));
+    }
+    catch(HX711::TimeoutException& e) {
         cout << "Failed to connect to HX711 module" << endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     //clear screen
@@ -120,6 +122,6 @@ int main(int argc, char** argv) {
             << "this."
             << endl << endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 
 }
