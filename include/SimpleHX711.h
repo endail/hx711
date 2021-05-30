@@ -80,7 +80,6 @@ public:
 
     HX711* getBase() noexcept;
 
-    
     /**
      * Returns a vector of values from the sensor. This method is useful
      * if you do not want to use the predefined average or median methods.
