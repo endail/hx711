@@ -31,16 +31,16 @@ struct Mass {
 public:
 
 enum class Unit {
-	UG,
-	MG,
-	G,
-	KG,
-	TON,
-	IMP_TON,
-	US_TON,
-	ST,
-	LB,
-	OZ
+    UG,
+    MG,
+    G,
+    KG,
+    TON,
+    IMP_TON,
+    US_TON,
+    ST,
+    LB,
+    OZ
 };
 
 protected:

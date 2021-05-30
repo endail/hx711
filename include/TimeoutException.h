@@ -29,7 +29,7 @@ namespace HX711 {
 class TimeoutException : public std::runtime_error {
 public:
     explicit TimeoutException(const char* what_arg)
-		: std::runtime_error(what_arg) {}
+        : std::runtime_error(what_arg) {}
 };
 };
 #endif
