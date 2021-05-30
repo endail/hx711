@@ -266,29 +266,32 @@ HX711::HX711(
     const int clockPin) noexcept :
         _dataPin(dataPin),
         _clockPin(clockPin) {
+}
 
-            ::pinMode(this->_dataPin, INPUT);
-            ::pinMode(this->_clockPin, OUTPUT);
+void HX711::begin() {
 
-            /**
-             * Cannot simply set this->_gain. this->setGain()
-             * must be called to set the HX711 module at the
-             * hardware-level.
-             * 
-             * If, for whatever reason, the sensor cannot be
-             * reached, setGain will fail and throw a
-             * TimeoutException. Calling code can catch this
-             * and handle as though the sensor connection has
-             * "failed".
-             * 
-             * try {
-             *     new HX711(dataPin, clockPin);
-             * }
-             * catch(TimeoutException& e) {
-             *     //sensor failed to connect
-             * }
-             */
-            this->setGain(this->_gain);
+    ::pinMode(this->_dataPin, INPUT);
+    ::pinMode(this->_clockPin, OUTPUT);
+
+    /**
+     * Cannot simply set this->_gain. this->setGain()
+     * must be called to set the HX711 module at the
+     * hardware-level.
+     * 
+     * If, for whatever reason, the sensor cannot be
+     * reached, setGain will fail and throw a
+     * TimeoutException. Calling code can catch this
+     * and handle as though the sensor connection has
+     * "failed".
+     * 
+     * try {
+     *     hx.begin();
+     * }
+     * catch(TimeoutException& e) {
+     *     //sensor failed to connect
+     * }
+     */
+    this->setGain(this->_gain);
 
 }
 
