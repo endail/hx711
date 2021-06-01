@@ -26,7 +26,7 @@
 #include <chrono>
 #include <iomanip>
 #include <wiringPi.h>
-#include "../include/SimpleHX711.h"
+#include "../include/HX711.h"
 
 int main(int argc, char** argv) {
 

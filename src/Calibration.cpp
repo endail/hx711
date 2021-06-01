@@ -20,8 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../include/SimpleHX711.h"
-#include "../include/TimeoutException.h"
+#include "../include/HX711.h"
 #include <wiringPi.h>
 #include <cmath>
 #include <cstdlib>
