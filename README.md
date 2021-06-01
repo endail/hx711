@@ -12,7 +12,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <hx711/SimpleHX711.h>
+#include <hx711/HX711.h>
 
 int main() {
 
