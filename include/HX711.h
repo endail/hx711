@@ -26,6 +26,11 @@
 #include <cstdint>
 #include <mutex>
 
+//include other headers here so only this header needs to be included
+#include "Mass.h"
+#include "SimpleHX711.h"
+#include "TimeoutException.h"
+
 namespace HX711 {
 
 /**
