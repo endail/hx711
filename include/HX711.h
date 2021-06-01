@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020 Daniel Robertson
+// Copyright (c) 2021 Daniel Robertson
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,6 @@
 
 #include <cstdint>
 #include <mutex>
-
-//include other headers here so only this header needs to be included
-#include "Mass.h"
-#include "SimpleHX711.h"
-#include "TimeoutException.h"
 
 namespace HX711 {
 
@@ -146,4 +141,9 @@ public:
 
 };
 };
+
+#include "Mass.h"
+#include "TimeoutException.h"
+#include "SimpleHX711.h"
+
 #endif
