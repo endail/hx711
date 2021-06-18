@@ -1,4 +1,4 @@
-src/Mass.cpp:65:0: style: The function 'convertTo' is never used. [unusedFunction]
+src/Mass.cpp:60:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:144:0: style: The function 'getBase' is never used. [unusedFunction]
@@ -28,7 +28,7 @@ src/SimpleHX711.cpp:128:0: style: The function 'getOffset' is never used. [unuse
 src/SimpleHX711.cpp:114:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
-src/Mass.cpp:57:0: style: The function 'getUnit' is never used. [unusedFunction]
+src/Mass.cpp:52:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:397:0: style: The function 'powerDown' is never used. [unusedFunction]
@@ -49,7 +49,7 @@ src/SimpleHX711.cpp:136:0: style: The function 'setChannel' is never used. [unus
 src/SimpleHX711.cpp:132:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
-src/Mass.cpp:61:0: style: The function 'setUnit' is never used. [unusedFunction]
+src/Mass.cpp:56:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
 src/SimpleHX711.cpp:161:0: style: The function 'tare' is never used. [unusedFunction]
