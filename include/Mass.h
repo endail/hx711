@@ -58,8 +58,7 @@ public:
     Mass(const Mass& m2) noexcept;
 
     Mass& operator=(const Mass& rhs) noexcept;
-    Mass& operator=(const double rhs) noexcept;
-
+    
     double getValue(const Unit u = Unit::G) const noexcept;
 
     Unit getUnit() const noexcept;
@@ -68,62 +67,21 @@ public:
     Mass convertTo(const Unit to) const noexcept;
 
     friend Mass operator+(const Mass& lhs, const Mass& rhs) noexcept;
-    friend Mass operator+(const double lhs, const Mass& rhs) noexcept;
-    friend Mass operator+(const Mass& lhs, const double rhs) noexcept;
-    friend std::string operator+(const std::string& lhs, const Mass& rhs) noexcept;
-    friend std::string operator+(const Mass& lhs, const std::string& rhs) noexcept;
-    friend std::string operator+(const char* const lhs, const Mass& rhs) noexcept;
-    friend std::string operator+(const Mass& lhs, const char* const rhs) noexcept;
-
     friend Mass operator-(const Mass& lhs, const Mass& rhs) noexcept;
-    friend Mass operator-(const double lhs, const Mass& rhs) noexcept;
-    friend Mass operator-(const Mass& lhs, const double rhs) noexcept;
-
     friend Mass operator*(const Mass& lhs, const Mass& rhs) noexcept;
-    friend Mass operator*(const double lhs, const Mass& rhs) noexcept;
-    friend Mass operator*(const Mass& lhs, const double rhs) noexcept;
-
     friend Mass operator/(const Mass& lhs, const Mass& rhs);
-    friend Mass operator/(const double lhs, const Mass& rhs);
-    friend Mass operator/(const Mass& lhs, const double rhs);
-
-    Mass& operator+=(const Mass& rhs) noexcept;
-    Mass& operator+=(const double rhs) noexcept;
-
-    Mass& operator-=(const Mass& rhs) noexcept;
-    Mass& operator-=(const double rhs) noexcept;
-
-    Mass& operator*=(const Mass& rhs) noexcept;
-    Mass& operator*=(const double rhs) noexcept;
-
-    Mass& operator/=(const Mass& rhs);
-    Mass& operator/=(const double rhs);
-
-    friend bool operator!(const Mass& m) noexcept;
     
+    Mass& operator+=(const Mass& rhs) noexcept;
+    Mass& operator-=(const Mass& rhs) noexcept;
+    Mass& operator*=(const Mass& rhs) noexcept;
+    Mass& operator/=(const Mass& rhs);
+
     friend bool operator==(const Mass& lhs, const Mass& rhs) noexcept;
-    friend bool operator==(const double lhs, const Mass& rhs) noexcept;
-    friend bool operator==(const Mass& lhs, const double rhs) noexcept;
-
     friend bool operator!=(const Mass& lhs, const Mass& rhs) noexcept;
-    friend bool operator!=(const double lhs, const Mass& rhs) noexcept;
-    friend bool operator!=(const Mass& lhs, const double rhs) noexcept;
-
     friend bool operator<(const Mass& lhs, const Mass& rhs) noexcept;
-    friend bool operator<(const double lhs, const Mass& rhs) noexcept;
-    friend bool operator<(const Mass& lhs, const double rhs) noexcept;
-
     friend bool operator>(const Mass& lhs, const Mass& rhs) noexcept;
-    friend bool operator>(const double lhs, const Mass& rhs) noexcept;
-    friend bool operator>(const Mass& lhs, const double rhs) noexcept;
-
     friend bool operator<=(const Mass& lhs, const Mass& rhs) noexcept;
-    friend bool operator<=(const double lhs, const Mass& rhs) noexcept;
-    friend bool operator<=(const Mass& lhs, const double rhs) noexcept;
-
     friend bool operator>=(const Mass& lhs, const Mass& rhs) noexcept;
-    friend bool operator>=(const double lhs, const Mass& rhs) noexcept;
-    friend bool operator>=(const Mass& lhs, const double rhs) noexcept;
 
     std::string toString() const noexcept;
     std::string toString(const Unit u) const noexcept;
