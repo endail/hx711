@@ -281,7 +281,7 @@ void HX711::begin() {
     if(!(   (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
             ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) >= 0 &&
             ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) >= 0
-    ) {
+    )) {
         throw std::runtime_error("unable to access GPIO");
     }
 
