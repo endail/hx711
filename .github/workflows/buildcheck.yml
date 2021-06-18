@@ -7,8 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - run: cd ~
-
       - name: Clone lgpio
         uses: actions/checkout@v2
         with:
@@ -20,10 +18,9 @@ jobs:
           sudo make install
           sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
           sudo ldconfig
-          cd ~
 
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Test make and install
-        run: make all && sudo make install
+        run: sudo make all && sudo make install
