@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #include "../include/HX711.h"
-#include <wiringPi.h>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -39,7 +38,6 @@ double zeroValue;
 SimpleHX711* hx;
 
 void setupHx(const int dataPin, const int clockPin) {
-    wiringPiSetup();
     hx = new SimpleHX711(dataPin, clockPin, 1, 0);
     this_thread::sleep_for(chrono::seconds(1));
 }

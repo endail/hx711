@@ -25,7 +25,6 @@
 #include <thread>
 #include <chrono>
 #include <iomanip>
-#include <wiringPi.h>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
@@ -44,8 +43,6 @@ int main(int argc, char** argv) {
     const int clockPin = stoi(argv[2]);
     const int refUnit = stoi(argv[3]);
     const int offset = stoi(argv[4]);
-
-    wiringPiSetup();
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
     

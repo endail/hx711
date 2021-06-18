@@ -94,6 +94,7 @@ protected:
      * with wiringPi calls (and to not make presumptions about pin 
      * numbering schemes).
      */
+    int _gpioHandle = -1;
     const int _dataPin = -1;
     const int _clockPin = -1;
     std::mutex _readLock;
@@ -113,7 +114,7 @@ protected:
 public:
     
     HX711(const int dataPin, const int clockPin) noexcept;
-    virtual ~HX711() = default;
+    virtual ~HX711();
 
     void begin();
 

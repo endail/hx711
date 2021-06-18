@@ -7,14 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Clone wiringPi
+      - name: Clone lgpio
         uses: actions/checkout@v2
         with:
-          repository: 'WiringPi/WiringPi'
+          repository: 'joan2937/lg'
 
-      - name: Build and Install wiringPi
+      - name: Build and Install lgpio
         run: |
-          sudo ./build
+          make
+          sudo make install
           sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
           sudo ldconfig
 

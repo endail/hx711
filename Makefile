@@ -4,7 +4,7 @@ SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
-LIBS := -lwiringPi
+LIBS := -llgpio
 INC := -I $(INCDIR)
 CFLAGS :=	-O2 \
 			-pipe \
