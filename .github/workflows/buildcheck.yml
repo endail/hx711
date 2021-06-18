@@ -20,6 +20,7 @@ jobs:
           sudo make install
           sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
           sudo ldconfig
+          sudo chown -R $USER:$USER /home/runner/work
 
       - name: Checkout repository
         uses: actions/checkout@v2
