@@ -5,6 +5,7 @@
 [![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml)
 
 - Use with Raspberry Pi
+- Requires [lgpio](http://abyz.me.uk/lg/index.html)
 
 ## Example
 
@@ -90,5 +91,5 @@ pi@raspberrypi~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 After writing your own code (eg. main.cpp), compile with the HX711 library as follows:
 
 ```shell
-g++ -Wall -o prog main.cpp -lwiringPi -llgpio
+g++ -Wall -o prog main.cpp -llgpio
 ```
