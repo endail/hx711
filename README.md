@@ -19,10 +19,8 @@ int main() {
   using namespace std;
   using namespace HX711;
 
-  wiringPiSetup();
-
-  const int dataPin = 8;
-  const int clockPin = 9;
+  const int dataPin = 2;
+  const int clockPin = 3;
   const int referenceUnit = -377;
   const int offset = -363712;
 
@@ -59,32 +57,32 @@ pi@raspberrypi~/hx711 $ make && sudo make install
 
 `make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 module. Run it as follows and follow the prompts:
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
+- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering.
 
-Example using WiringPi pin 8 for data and pin 9 for clock.
+Example using GPIO pin 2 for data and pin 3 for clock.
 
 ```shell
-pi@raspberrypi~/hx711 $ bin/hx711calibration 8 9
+pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
 ```
 
 ## Test
 
 `make` will create the executable `bin/simplehx711test` in the project directory. You can use this to test your load cell and HX711 module. Arguments are as follows:
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
+- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [WiringPi](https://pinout.xyz/pinout/wiringpi) pin numbering.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [GPIO](https://pinout.xyz/) pin numbering.
 
 - **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
 
-Example using WiringPi pin 8 for data, pin 9 for clock, -377 as the reference unit, and -363712 as the offset:
+Example using GPIO pin 2 for data, pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
 
 ```shell
-pi@raspberrypi~/hx711 $ bin/simplehx711test 8 9 -377 -363712
+pi@raspberrypi~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 ```
 
 ## Use
@@ -92,7 +90,5 @@ pi@raspberrypi~/hx711 $ bin/simplehx711test 8 9 -377 -363712
 After writing your own code (eg. main.cpp), compile with the HX711 library as follows:
 
 ```shell
-g++ -Wall -o prog main.cpp -lwiringPi -lhx711
+g++ -Wall -o prog main.cpp -lwiringPi -llgpio
 ```
-
-Make sure to setup wiringPi with `wiringPiSetup()` ([or equivalent](http://wiringpi.com/reference/setup/)) prior to creating the SimpleHX711 object. See the [test code](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp#L48) as an example.
