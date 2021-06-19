@@ -95,7 +95,7 @@ SimpleHX711::SimpleHX711(
     const HX_VALUE offset) :
         _hx(nullptr),
         _scaleUnit(Mass::Unit::G),
-        _ch(Channel::A)
+        _ch(Channel::A),
         _refUnit(refUnit),
         _offset(offset)  {
             this->_hx = new HX711(dataPin, clockPin);
