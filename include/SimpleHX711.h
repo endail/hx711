@@ -24,9 +24,9 @@
 #define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
 
 #include <cstdint>
+#include <vector>
 #include "HX711.h"
 #include "Mass.h"
-#include <vector>
 
 namespace HX711 {
 
@@ -42,11 +42,11 @@ enum class ReadType {
 class SimpleHX711 {
     
 protected:
-    HX711* _hx = nullptr;
-    Mass::Unit _scaleUnit = Mass::Unit::G;
-    Channel _ch = Channel::A;
-    HX_VALUE _refUnit = 1;
-    HX_VALUE _offset = 0;
+    HX711* _hx;
+    Mass::Unit _scaleUnit;
+    Channel _ch;
+    HX_VALUE _refUnit;
+    HX_VALUE _offset;
 
     static double _median(const std::vector<HX_VALUE>* vals);
     static double _average(const std::vector<HX_VALUE>* vals);

@@ -83,7 +83,7 @@ protected:
      * elapsed
      */
     static const std::uint8_t _MAX_READ_TRIES = 100;
-    static const std::uint16_t _WAIT_INTERVAL_US = 1000;
+    static const std::uint16_t _WAIT_INTERVAL_US = 100;
 
     //Datasheet pg. 5
     //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
@@ -94,13 +94,13 @@ protected:
      * with wiringPi calls (and to not make presumptions about pin 
      * numbering schemes).
      */
-    int _gpioHandle = -1;
-    const int _dataPin = -1;
-    const int _clockPin = -1;
+    int _gpioHandle;
+    const int _dataPin;
+    const int _clockPin;
     std::mutex _readLock;
-    Gain _gain = Gain::GAIN_128;
-    Format _bitFormat = Format::MSB;
-    Format _byteFormat = Format::MSB;
+    Gain _gain;
+    Format _bitFormat;
+    Format _byteFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const noexcept;

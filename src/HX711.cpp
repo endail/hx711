@@ -132,7 +132,6 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
         }
 
         if(++tries < _MAX_READ_TRIES) {
-            //::lguSleep(_WAIT_INTERVAL_US / static_cast<double>(std::chrono::microseconds::period::den));
             _delayMicroseconds(_WAIT_INTERVAL_US);
         }
         else {
@@ -152,7 +151,6 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * Datasheet pg. 5
      */
     _delayMicroseconds(1);
-    
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
@@ -285,11 +283,13 @@ HX_VALUE HX711::_getChannelBValue() {
 
 }
 
-HX711::HX711(
-    const int dataPin,
-    const int clockPin) noexcept :
-        _dataPin(dataPin),
-        _clockPin(clockPin) {
+HX711::HX711(const int dataPin, const int clockPin) noexcept :
+    _gpioHandle(-1),
+    _dataPin(dataPin),
+    _clockPin(clockPin),
+    _gain(Gain::GAIN_128),
+    _bitFormat(Format::MSB),
+    _byteFormat(Format::MSB) {
 }
 
 HX711::~HX711() {
