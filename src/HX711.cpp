@@ -24,6 +24,7 @@
 #include "../include/TimeoutException.h"
 #include <chrono>
 #include <lgpio.h>
+#include <sys/time.h>
 
 namespace HX711 {
 
