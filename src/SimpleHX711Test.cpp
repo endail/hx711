@@ -22,10 +22,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <thread>
-#include <chrono>
-#include <iomanip>
-#include <wiringPi.h>
+#include <string>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
@@ -45,13 +42,12 @@ int main(int argc, char** argv) {
     const int refUnit = stoi(argv[3]);
     const int offset = stoi(argv[4]);
 
-    wiringPiSetup();
-
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
     
     while(true) {
 
-        Mass m = hx.weight();
+        //use the median from 5 samples
+        Mass m = hx.weight(ReadType::Median, 5);
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << endl

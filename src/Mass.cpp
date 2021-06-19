@@ -22,9 +22,8 @@
 
 #include "../include/Mass.h"
 #include <cmath>
-#include <sstream>
 #include <iomanip>
-#include <cstring>
+#include <sstream>
 #include <stdexcept>
 
 namespace HX711 {
@@ -201,11 +200,6 @@ double Mass::convert(
     const double amount,
     const Unit from,
     const Unit to) noexcept {
-
-        //return early if 0
-        if(amount == 0) {
-            return 0;
-        }
 
         if(to == Unit::G) {
             return amount * Mass::_CONVERSIONS[static_cast<std::size_t>(from)];

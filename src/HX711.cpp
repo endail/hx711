@@ -22,7 +22,9 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
-#include <wiringPi.h>
+#include <chrono>
+#include <lgpio.h>
+#include <sys/time.h>
 
 namespace HX711 {
 
@@ -67,21 +69,21 @@ bool HX711::_readBit() const noexcept {
      */
 
     //first, clock pin is set high to make DOUT ready to be read from
-    ::digitalWrite(this->_clockPin, HIGH);
+    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
-    ::delayMicroseconds(1);
+    _delayMicroseconds(1);
     
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
-    const bool bit = ::digitalRead(this->_dataPin) == HIGH;
+    const bool bit = ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 1;
 
     //the clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
-    ::digitalWrite(this->_clockPin, LOW);
-    ::delayMicroseconds(1);
+    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
+    _delayMicroseconds(1);
 
     return bit;
 
@@ -130,7 +132,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
         }
 
         if(++tries < _MAX_READ_TRIES) {
-            ::delayMicroseconds(_WAIT_INTERVAL_US);
+            _delayMicroseconds(_WAIT_INTERVAL_US);
         }
         else {
             throw TimeoutException("timed out while trying to read bytes from HX711");
@@ -148,7 +150,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * can go high. T1 in Fig.2.
      * Datasheet pg. 5
      */
-    ::delayMicroseconds(1);
+    _delayMicroseconds(1);
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
@@ -230,6 +232,26 @@ HX_VALUE HX711::_readInt() {
 
 }
 
+void HX711::_delayMicroseconds(const unsigned int us) noexcept {
+
+    //https://github.com/WiringPi/WiringPi/blob/master/wiringPi/wiringPi.c#L2144
+
+    struct timeval tNow;
+    struct timeval tLong;
+    struct timeval tEnd;
+
+    tLong.tv_sec = us / 1000000;
+    tLong.tv_usec = us % 1000000;
+
+    ::gettimeofday(&tNow, nullptr);
+    timeradd(&tNow, &tLong, &tEnd);
+
+    while(timercmp(&tNow, &tEnd, <)) {
+        ::gettimeofday(&tNow, nullptr);
+    }
+
+}
+
 HX_VALUE HX711::_getChannelAValue() {
 
     /**
@@ -261,17 +283,29 @@ HX_VALUE HX711::_getChannelBValue() {
 
 }
 
-HX711::HX711(
-    const int dataPin,
-    const int clockPin) noexcept :
-        _dataPin(dataPin),
-        _clockPin(clockPin) {
+HX711::HX711(const int dataPin, const int clockPin) noexcept :
+    _gpioHandle(-1),
+    _dataPin(dataPin),
+    _clockPin(clockPin),
+    _gain(Gain::GAIN_128),
+    _bitFormat(Format::MSB),
+    _byteFormat(Format::MSB) {
+}
+
+HX711::~HX711() {
+    ::lgGpioFree(this->_gpioHandle, this->_clockPin);
+    ::lgGpioFree(this->_gpioHandle, this->_dataPin);
+    ::lgGpiochipClose(this->_gpioHandle);
 }
 
 void HX711::begin() {
 
-    ::pinMode(this->_dataPin, INPUT);
-    ::pinMode(this->_clockPin, OUTPUT);
+    if(!(   (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
+            ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
+            ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) >= 0
+    )) {
+        throw std::runtime_error("unable to access GPIO");
+    }
 
     /**
      * Cannot simply set this->_gain. this->setGain()
@@ -324,7 +358,7 @@ bool HX711::isReady() noexcept {
      * or looping for checking if the sensor is ready
      * over time can/should be done by other calling code
      */
-    return ::digitalRead(this->_dataPin) == LOW;
+    return ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 0;
 
 }
 
@@ -367,7 +401,7 @@ void HX711::setGain(const Gain gain) {
         this->_readRawBytes();
         
     }
-    catch(TimeoutException& e) {
+    catch(const TimeoutException& e) {
         this->_gain = backup;
         throw;
     }
@@ -398,8 +432,8 @@ void HX711::powerDown() noexcept {
 
     std::lock_guard<std::mutex> lock(this->_readLock);
 
-    ::digitalWrite(this->_clockPin, LOW);
-    ::digitalWrite(this->_clockPin, HIGH);
+    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
+    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
     /**
      * "When PD_SCK pin changes from low to high
@@ -407,7 +441,7 @@ void HX711::powerDown() noexcept {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    ::delayMicroseconds(60);
+    _delayMicroseconds(60);
 
 }
 
@@ -415,7 +449,7 @@ void HX711::powerUp() {
 
     std::unique_lock<std::mutex> lock(this->_readLock);
 
-    ::digitalWrite(this->_clockPin, LOW);
+    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
 
     /**
      * "When PD_SCK returns to low,

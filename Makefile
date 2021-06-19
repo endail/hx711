@@ -4,7 +4,7 @@ SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
-LIBS := -lwiringPi
+LIBS := -llgpio
 INC := -I $(INCDIR)
 CFLAGS :=	-O2 \
 			-pipe \
@@ -18,8 +18,7 @@ CFLAGS :=	-O2 \
 			-Wl,--hash-style=gnu \
 			-Wl,--as-needed \
 			-D_FORTIFY_SOURCE=2 \
-			-fstack-clash-protection \
-			-v
+			-fstack-clash-protection
 
 
 ########################################################################
@@ -119,3 +118,8 @@ install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/hx711
 	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
+
+.PHONY: uninstall
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/lib/libhx711.*
+	rm -rf $(DESTDIR)$(PREFIX)/include/hx711

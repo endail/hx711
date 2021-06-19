@@ -94,18 +94,20 @@ protected:
      * with wiringPi calls (and to not make presumptions about pin 
      * numbering schemes).
      */
-    const int _dataPin = -1;
-    const int _clockPin = -1;
+    int _gpioHandle;
+    const int _dataPin;
+    const int _clockPin;
     std::mutex _readLock;
-    Gain _gain = Gain::GAIN_128;
-    Format _bitFormat = Format::MSB;
-    Format _byteFormat = Format::MSB;
+    Gain _gain;
+    Format _bitFormat;
+    Format _byteFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const noexcept;
     std::uint8_t _readByte() const noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
+    static void _delayMicroseconds(const unsigned int us) noexcept;
 
     HX_VALUE _getChannelAValue();
     HX_VALUE _getChannelBValue();
@@ -113,7 +115,7 @@ protected:
 public:
     
     HX711(const int dataPin, const int clockPin) noexcept;
-    virtual ~HX711() = default;
+    virtual ~HX711();
 
     void begin();
 
