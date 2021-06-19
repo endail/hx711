@@ -22,9 +22,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <thread>
-#include <chrono>
-#include <iomanip>
+#include <string>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
