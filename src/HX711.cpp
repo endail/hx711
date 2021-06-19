@@ -73,7 +73,7 @@ bool HX711::_readBit() const noexcept {
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
-    ::lguSleep(0.000001);
+    _delayMicroseconds(1);
     
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -82,7 +82,7 @@ bool HX711::_readBit() const noexcept {
     //the clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    ::lguSleep(0.000001);
+    _delayMicroseconds(1);
 
     return bit;
 
@@ -131,7 +131,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
         }
 
         if(++tries < _MAX_READ_TRIES) {
-            ::lguSleep(_WAIT_INTERVAL_US / static_cast<double>(std::chrono::microseconds::period::den));
+            //::lguSleep(_WAIT_INTERVAL_US / static_cast<double>(std::chrono::microseconds::period::den));
+            _delayMicroseconds(_WAIT_INTERVAL_US);
         }
         else {
             throw TimeoutException("timed out while trying to read bytes from HX711");
@@ -149,7 +150,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * can go high. T1 in Fig.2.
      * Datasheet pg. 5
      */
-    ::lguSleep(0.000001);
+    _delayMicroseconds(1);
     
 
     //delcare array of bytes of sufficient size
@@ -229,6 +230,26 @@ HX_VALUE HX711::_readInt() {
                                     bytes[2]         );
 
     return _convertFromTwosComplement(twosComp);
+
+}
+
+void HX711::_delayMicroseconds(const unsigned int us) noexcept {
+
+    //https://github.com/WiringPi/WiringPi/blob/master/wiringPi/wiringPi.c#L2144
+
+    struct timeval tNow;
+    struct timeval tLong;
+    struct timeval tEnd;
+
+    tLong.tv_sec = us / 1000000;
+    tLong.tv_usec = us % 1000000;
+
+    ::gettimeofday(&tNow, nullptr);
+    ::timeradd(&tNow, &tLong, &tEnd);
+
+    while(::timercmp(&tNow, &tEnd, <)) {
+        ::gettimeofday(&tNow, nullptr);
+    }
 
 }
 
@@ -379,7 +400,7 @@ void HX711::setGain(const Gain gain) {
         this->_readRawBytes();
         
     }
-    catch(TimeoutException& e) {
+    catch(const TimeoutException& e) {
         this->_gain = backup;
         throw;
     }
@@ -419,7 +440,7 @@ void HX711::powerDown() noexcept {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    ::lguSleep(0.00006);
+    _delayMicroseconds(60);
 
 }
 

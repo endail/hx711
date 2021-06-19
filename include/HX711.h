@@ -107,6 +107,7 @@ protected:
     std::uint8_t _readByte() const noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
+    void _delayMicroseconds(const unsigned int us) noexcept;
 
     HX_VALUE _getChannelAValue();
     HX_VALUE _getChannelBValue();
