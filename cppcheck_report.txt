@@ -1,4 +1,4 @@
-src/HX711.cpp:250:36: error: syntax error: <) [syntaxError]
+src/HX711.cpp:251:36: error: syntax error: <) [syntaxError]
     while(::timercmp(&tNow, &tEnd, <)) {
                                    ^
 src/Mass.cpp:60:0: style: The function 'convertTo' is never used. [unusedFunction]
