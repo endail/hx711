@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
     
     while(true) {
 
-        Mass m = hx.weight();
+        //use the median from 5 samples
+        Mass m = hx.weight(ReadType::Median, 5);
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << endl
