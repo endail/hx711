@@ -91,5 +91,5 @@ pi@raspberrypi~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 After writing your own code (eg. main.cpp), compile with the HX711 library as follows:
 
 ```shell
-g++ -Wall -o prog main.cpp -llgpio
+g++ -Wall -o prog main.cpp -hx711 -llgpio
 ```
