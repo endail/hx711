@@ -83,7 +83,7 @@ protected:
      * elapsed
      */
     static const std::uint8_t _MAX_READ_TRIES = 100;
-    static const std::uint16_t _WAIT_INTERVAL_US = 100;
+    static const std::uint16_t _WAIT_INTERVAL_US = 200;
 
     //Datasheet pg. 5
     //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
