@@ -31,15 +31,6 @@ SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
 src/SimpleHX711.cpp:87:27: warning: Member variable 'SimpleHX711::_offset' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
 SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
                           ^
-src/SimpleHX711.cpp:91:14: warning: Member variable 'SimpleHX711::_ch' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(
-             ^
-src/SimpleHX711.cpp:91:14: warning: Member variable 'SimpleHX711::_refUnit' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(
-             ^
-src/SimpleHX711.cpp:91:14: warning: Member variable 'SimpleHX711::_offset' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(
-             ^
 src/Mass.cpp:59:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
