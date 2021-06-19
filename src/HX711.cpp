@@ -246,9 +246,9 @@ void HX711::_delayMicroseconds(const unsigned int us) noexcept {
     tLong.tv_usec = us % 1000000;
 
     ::gettimeofday(&tNow, nullptr);
-    ::timeradd(&tNow, &tLong, &tEnd);
+    timeradd(&tNow, &tLong, &tEnd);
 
-    while(::timercmp(&tNow, &tEnd, <)) {
+    while(timercmp(&tNow, &tEnd, <)) {
         ::gettimeofday(&tNow, nullptr);
     }
 
