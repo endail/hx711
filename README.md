@@ -46,6 +46,8 @@ See: [`src/SimpleHX711Test.cpp`](https://github.com/endail/hx711/blob/master/src
 
 ![hx711.gif](hx711.gif)
 
+The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 module was operating at 80Hz. However, note from the code that the value being used is [the median of five samples](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp#L50) from the sensor.
+
 ## Build and Install
 
 ```shell
