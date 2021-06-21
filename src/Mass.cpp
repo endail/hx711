@@ -232,7 +232,7 @@ const char* const Mass::_UNIT_NAMES[] = {
     "g",
     "kg",
     "ton",
-    "ton (imp)",
+    "ton (IMP)",
     "ton (US)",
     "st",
     "lb",
