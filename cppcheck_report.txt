@@ -1,4 +1,4 @@
-src/HX711.cpp:249:34: error: syntax error: <) [syntaxError]
+src/HX711.cpp:274:34: error: syntax error: <) [syntaxError]
     while(timercmp(&tNow, &tEnd, <)) {
                                  ^
 src/SimpleHX711.cpp:84:14: warning: Member variable 'SimpleHX711::_hx' is not initialized in the constructor. [uninitMemberVar]
