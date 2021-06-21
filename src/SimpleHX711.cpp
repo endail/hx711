@@ -74,7 +74,7 @@ double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
         throw std::invalid_argument("vals is null or empty");
     }
     
-    const std::int64_t sum = std::accumulate(
+    const long long int sum = std::accumulate(
         vals->begin(), vals->end(), 0);
 
     return static_cast<double>(sum) / vals->size();
