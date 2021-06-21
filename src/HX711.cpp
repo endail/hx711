@@ -22,7 +22,6 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
-#include <chrono>
 #include <lgpio.h>
 #include <sys/time.h>
 
