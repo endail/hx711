@@ -233,7 +233,33 @@ HX_VALUE HX711::_readInt() {
 
 void HX711::_delayMicroseconds(const unsigned int us) noexcept {
 
-    //https://github.com/WiringPi/WiringPi/blob/master/wiringPi/wiringPi.c#L2144
+    /**
+     * This requires some explanation.
+     * 
+     * Delays on a pi are inconsistent due to the OS not being a real-time OS.
+     * A previous version of this code used wiringPi which used its
+     * delayMicroseconds function to delay in the microsecond range. The way this
+     * was implemented was with a busy-wait loop for times under 100 nanoseconds.
+     * 
+     * https://github.com/WiringPi/WiringPi/blob/f15240092312a54259a9f629f9cc241551f9faae/wiringPi/wiringPi.c#L2165-L2166
+     * https://github.com/WiringPi/WiringPi/blob/f15240092312a54259a9f629f9cc241551f9faae/wiringPi/wiringPi.c#L2153-L2154
+     * 
+     * This (the busy-wait) would, presumably, help to prevent context switching
+     * therefore keep the timing required by the HX711 module relatively
+     * consistent.
+     * 
+     * When this code changed to using the lgpio library, its lguSleep function
+     * appeared to be an equivalent replacement. But it did not work.
+     * 
+     * http://abyz.me.uk/lg/lgpio.html#lguSleep
+     * https://github.com/joan2937/lg/blob/8f385c9b8487e608aeb4541266cc81d1d03514d3/lgUtil.c#L56-L67
+     * 
+     * The problem appears to be that lguSleep is not busy-waiting. And, when
+     * a sleep occurs, it is taking far too long to return. Contrast this
+     * behaviour with wiringPi, which constantly calls gettimeofday until return.
+     * 
+     * In short, use this function for delays under 100us.
+     */
 
     struct timeval tNow;
     struct timeval tLong;
