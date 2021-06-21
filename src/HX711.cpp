@@ -313,9 +313,7 @@ void HX711::begin() {
      * 
      * If, for whatever reason, the sensor cannot be
      * reached, setGain will fail and throw a
-     * TimeoutException. Calling code can catch this
-     * and handle as though the sensor connection has
-     * "failed".
+     * TimeoutException.
      * 
      * try {
      *     hx.begin();
