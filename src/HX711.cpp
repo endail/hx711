@@ -306,6 +306,8 @@ void HX711::begin() {
         throw std::runtime_error("unable to access GPIO");
     }
 
+    this->powerUp();
+
     /**
      * Cannot simply set this->_gain. this->setGain()
      * must be called to set the HX711 module at the
@@ -444,6 +446,7 @@ void HX711::powerDown() noexcept {
 
 void HX711::powerUp() {
 
+    //TODO: is this actually needed?
     std::unique_lock<std::mutex> lock(this->_readLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
