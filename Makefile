@@ -132,8 +132,13 @@ test: $(BUILDDIR)/SimpleHX711Test.o
 
 .PHONY: clean
 clean:
-	$(RM) -r $(BUILDDIR)/*
-	$(RM) -r $(BINDIR)/*
+ifeq ($(IS_WIN),1)
+	del /S /Q $(BUILDDIR)\*
+	del /S /Q $(BINDIR)\*
+else
+	rm -r $(BUILDDIR)/*
+	rm -r $(BINDIR)/*
+endif
 
 .PHONY: install
 install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
