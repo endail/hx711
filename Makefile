@@ -1,4 +1,5 @@
 CXX := g++
+AR := ar
 INCDIR := include
 SRCDIR := src
 BUILDDIR := build
@@ -18,8 +19,8 @@ CFLAGS :=	-O2 \
 			-Wl,--hash-style=gnu \
 			-Wl,--as-needed \
 			-D_FORTIFY_SOURCE=2 \
-			-fstack-clash-protection
-
+			-fstack-clash-protection \
+			-v
 
 ########################################################################
 
@@ -28,25 +29,41 @@ ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
+ifeq ($(OS),Windows_NT)
+	IS_WIN := 1
+	CXX = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-g++.exe
+	AR = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-ar.exe
+endif
 
 ifeq ($(GITHUB_ACTIONS),true)
-# gha needs these additional libs
-	LIBS := $(LIBS) -lrt -lcrypt -pthread
-else
-# only include these flags on rpi, not gha
+	IS_GHA := 1
+endif
+
+ifneq ($(IS_WIN),1)
+	IS_PI := $(shell test -f /proc/device-tree/model && grep -qi "raspberry pi" /proc/device-tree/model)
+endif
+
+########################################################################
+
+
+ifeq ($(IS_PI),1)
+# only include these flags on rpi
 	CFLAGS := 	-march=native \
 				-mfpu=vfp \
 				-mfloat-abi=hard \
 				$(CFLAGS)
 endif
 
+ifeq ($(IS_GHA),1)
+# gha needs these additional libs
+	LIBS := $(LIBS) -lrt -lcrypt -pthread
+endif
 
 CXXFLAGS := -std=c++11 \
 			-fexceptions \
 			$(CFLAGS)
 
 ########################################################################
-
 
 
 .PHONY: all
@@ -58,9 +75,16 @@ all: 	dirs \
 
 .PHONY: dirs
 dirs:
+ifeq ($(IS_WIN),1)
+	if not exist $(BINDIR) mkdir $(BINDIR)
+	if not exist $(BUILDDIR) mkdir $(BUILDDIR)
+	if not exist $(BUILDDIR)\static mkdir $(BUILDDIR)\static
+	if not exist $(BUILDDIR)\shared mkdir $(BUILDDIR)\shared
+else
 	mkdir -p $(BINDIR)
 	mkdir -p $(BUILDDIR)/static
 	mkdir -p $(BUILDDIR)/shared
+endif
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
@@ -75,7 +99,7 @@ $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
 								$(BUILDDIR)/static/Mass.o \
 								$(BUILDDIR)/static/SimpleHX711.o
-	ar rcs 		$(BUILDDIR)/static/libhx711.a \
+	$(AR) rcs 	$(BUILDDIR)/static/libhx711.a \
 				$(BUILDDIR)/static/HX711.o \
 				$(BUILDDIR)/static/Mass.o \
 				$(BUILDDIR)/static/SimpleHX711.o
