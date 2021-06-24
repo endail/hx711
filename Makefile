@@ -31,8 +31,6 @@ endif
 
 ifeq ($(OS),Windows_NT)
 	IS_WIN := 1
-	CXX = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-g++.exe
-	AR = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-ar.exe
 endif
 
 ifeq ($(GITHUB_ACTIONS),true)
@@ -45,6 +43,11 @@ endif
 
 ########################################################################
 
+ifeq ($(IS_WIN),1)
+# overwrite binaries for dev
+	CXX = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-g++.exe
+	AR = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-ar.exe
+endif
 
 ifeq ($(IS_PI),1)
 # only include these flags on rpi
