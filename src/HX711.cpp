@@ -31,41 +31,7 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
-bool HX711::_readBit() const noexcept {
-
-    /**
-     * The following code does not appear to work when using
-     * std::this_thread::sleep_for. Code using delayMicroseconds
-     * does work and is implemented below. I have left it here
-     * for reference and how it should operate.
-     * 
-     * //first, clock pin is set high to make DOUT ready to be read from
-     * ::digitalWrite(this->_clockPin, HIGH);
-     * 
-     * //!!!IMPORTANT NOTE!!!
-     * //
-     * //There is an overlap in timing between the clock pin changing from
-     * //high to low and the data pin being ready to output the respective
-     * //bit. This overlap is T2 in Fig.2 on pg. 5 of the datasheet.
-     * //
-     * //For the data pin to be ready, 0.1us needs to have elapsed.
-     * std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-     * 
-     * //at this stage, DOUT is ready to be read from
-     * const bool bit = ::digitalRead(this->_dataPin) == HIGH;
-     * 
-     * //clock pin needs to be remain high for at least another 0.1us
-     * std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-     * ::digitalWrite(this->_clockPin, LOW);
-
-     * //once low, clock pin needs to remain low for at least 0.2us
-     * //before the next bit can be read
-     * //technically this doesn't need to exist here, but it is
-     * //convenient
-     * std::this_thread::sleep_for(std::chrono::nanoseconds(200));
-     * 
-     * return bit;
-     */
+bool HX711::_readBit() noexcept {
 
     //first, clock pin is set high to make DOUT ready to be read from
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
@@ -74,7 +40,7 @@ bool HX711::_readBit() const noexcept {
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
     _delayMicroseconds(1);
-    
+
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
     const bool bit = ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 1;
@@ -88,7 +54,7 @@ bool HX711::_readBit() const noexcept {
 
 }
 
-std::uint8_t HX711::_readByte() const noexcept {
+std::uint8_t HX711::_readByte() noexcept {
 
     std::uint8_t val = 0;
 
@@ -122,27 +88,12 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * after a predefined interval for a predefined number of attempts.
      */
 
-    std::uint8_t tries = 0;
+    std::unique_lock<std::mutex> communication(this->_commLock);
+    std::unique_lock<std::mutex> ready(this->_readyLock);
 
-    do {
-
-        if(this->isReady()) {
-            break;
-        }
-
-        if(++tries < _MAX_READ_TRIES) {
-            _delayMicroseconds(_WAIT_INTERVAL_US);
-        }
-        else {
-            throw TimeoutException("timed out while trying to read bytes from HX711");
-        }
-
+    if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
+        throw TimeoutException("timed out while trying to read from HX711");
     }
-    while(true);
-
-    //this must occur AFTER the isReady call otherwise it
-    //will deadlock
-    std::unique_lock<std::mutex> lock(this->_readLock);
 
     /**
      * When DOUT goes low, there is a minimum of 0.1us until the clock pin
@@ -181,7 +132,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     //not reading from the sensor any more so no need to keep
     //the lock in place
-    lock.unlock();
+    ready.unlock();
+    communication.unlock();
 
     //if no byte pointer is given, don't try to write to it
     if(bytes == nullptr) {
@@ -308,10 +260,15 @@ HX_VALUE HX711::_getChannelBValue() {
 
 }
 
+void HX711::_watchReady(int num_alerts, lgGpioAlert_p alerts, void* userdata) noexcept {
+    static_cast<HX711*>(userdata)->_dataReady.notify_one();
+}
+
 HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
+    _maxWait(_DEFAULT_MAX_WAIT),
     _gain(Gain::GAIN_128),
     _bitFormat(Format::MSB),
     _byteFormat(Format::MSB) {
@@ -335,6 +292,15 @@ void HX711::begin() {
 
     this->powerUp();
 
+    if(!(
+        ::lgGpioSetAlertsFunc(this->_gpioHandle, this->_dataPin, 
+            &HX711::_watchReady, this) == 0 &&
+        ::lgGpioClaimAlert(this->_gpioHandle, 0, LG_FALLING_EDGE,
+            this->_dataPin, -1) == 0
+    )) {
+        throw std::runtime_error("unable to setup HX711 interrupts");
+    }
+
     /**
      * Cannot simply set this->_gain. this->setGain()
      * must be called to set the HX711 module at the
@@ -355,6 +321,10 @@ void HX711::begin() {
 
 }
 
+void HX711::setMaxWaitTime(const std::chrono::nanoseconds maxWait) noexcept {
+    this->_maxWait = maxWait;
+}
+
 bool HX711::isReady() noexcept {
 
     /**
@@ -373,7 +343,7 @@ bool HX711::isReady() noexcept {
      * place to prevent extra reads from the sensor, so
      * it should suffice to stop this issue as well.
      */
-    std::lock_guard<std::mutex> lock(this->_readLock);
+    std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
      * HX711 will be "ready" when DOUT is low.
@@ -456,9 +426,10 @@ void HX711::setByteFormat(const Format f) noexcept {
 
 void HX711::powerDown() noexcept {
 
-    std::lock_guard<std::mutex> lock(this->_readLock);
+    std::lock_guard<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
+    _delayMicroseconds(1);
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
     /**
@@ -474,7 +445,7 @@ void HX711::powerDown() noexcept {
 void HX711::powerUp() {
 
     //TODO: is this actually needed?
-    std::unique_lock<std::mutex> lock(this->_readLock);
+    std::unique_lock<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
 

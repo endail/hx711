@@ -23,8 +23,12 @@
 #ifndef HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 #define HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 
+#include <chrono>
+#include <condition_variable>
 #include <cstdint>
 #include <mutex>
+#include <thread>
+#include <lgpio.h>
 
 namespace HX711 {
 
@@ -71,43 +75,36 @@ class HX711 {
 
 protected:
 
-    /**
-     * Maximum number of attempts to read bytes from the sensor
-     * before failing. Can be interpreted as:
-     * 
-     * "Will check every _WAIT_INTERVAL_US microseconds to a 
-     * maximum of _MAX_READ_TRIES times"
-     * 
-     * ie. a TimeoutException will occur after at least:
-     * _WAIT_INTERVAL_US * _MAX_READ_TRIES microseconds has
-     * elapsed
-     */
-    static const std::uint8_t _MAX_READ_TRIES = 100;
-    static const std::uint16_t _WAIT_INTERVAL_US = 1000;
+    static constexpr std::chrono::nanoseconds _DEFAULT_MAX_WAIT =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::seconds(1));
 
     //Datasheet pg. 5
     //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
-    /**
-     * ints (not int32_t) are used for pins to be as compatible as possible
-     * with wiringPi calls (and to not make presumptions about pin 
-     * numbering schemes).
-     */
     int _gpioHandle;
     const int _dataPin;
     const int _clockPin;
-    std::mutex _readLock;
+    std::mutex _commLock;
+    std::mutex _readyLock;
+    std::condition_variable _dataReady;
+    std::chrono::nanoseconds _maxWait;
+    bool _isReading = false;
     Gain _gain;
     Format _bitFormat;
     Format _byteFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
-    bool _readBit() const noexcept;
-    std::uint8_t _readByte() const noexcept;
+    bool _readBit() noexcept;
+    std::uint8_t _readByte() noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
     static void _delayMicroseconds(const unsigned int us) noexcept;
+    static void _watchReady(
+        int num_alerts,
+        lgGpioAlert_p alerts,
+        void* userdata) noexcept;
 
     HX_VALUE _getChannelAValue();
     HX_VALUE _getChannelBValue();
@@ -118,6 +115,9 @@ public:
     virtual ~HX711();
 
     void begin();
+
+    void setMaxWaitTime(
+        const std::chrono::nanoseconds maxWait = _DEFAULT_MAX_WAIT) noexcept;
 
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;

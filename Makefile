@@ -5,7 +5,7 @@ SRCDIR := src
 BUILDDIR := build
 BINDIR := bin
 SRCEXT := cpp
-LIBS := -llgpio
+LIBS := -llgpio -pthread
 INC := -I $(INCDIR)
 CFLAGS :=	-O2 \
 			-pipe \

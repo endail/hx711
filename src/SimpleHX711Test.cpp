@@ -44,10 +44,16 @@ int main(int argc, char** argv) {
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
     
+int count = 0;
+
     while(true) {
 
         //use the median from 5 samples
-        Mass m = hx.weight(ReadType::Median, 5);
+        Mass m = hx.weight(ReadType::Median, 1);
+        //count++;
+
+        //cout << "\x1B[2J\x1B[H" << double(count % 80) << endl;
+        //continue;
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << endl
