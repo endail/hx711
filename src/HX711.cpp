@@ -425,6 +425,14 @@ void HX711::setGain(const Gain gain) {
          * Interface".
          */
         this->_readRawBytes();
+
+        /**
+         * "Settling time refers to the time from power up,
+         * reset, input channel change and gain change to 
+         * valid stable output data."
+         * Datasheet pg. 3
+         */
+        ::lguSleep(0.4);
         
     }
     catch(const TimeoutException& e) {
@@ -476,13 +484,20 @@ void HX711::powerUp() {
     //TODO: is this actually needed?
     std::unique_lock<std::mutex> lock(this->_readLock);
 
-    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-
     /**
      * "When PD_SCK returns to low,
      * chip will reset and enter normal operation mode"
      * Datasheet pg. 5
      */
+    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
+
+    /**
+     * "Settling time refers to the time from power up,
+     * reset, input channel change and gain change to 
+     * valid stable output data."
+     * Datasheet pg. 3
+     */
+    ::lguSleep(0.4);
 
     lock.unlock();
 
