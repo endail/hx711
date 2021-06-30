@@ -28,10 +28,13 @@
 
 namespace HX711 {
 
-volatile HX_VALUE HX711::_lastVal;
-
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
+}
+
+bool HX711::_isSaturated(const HX_VALUE v) {
+    //Datasheet pg. 4
+    return v == HX_MIN_VALUE || v == HX_MAX_VALUE;
 }
 
 bool HX711::_readBit() noexcept {
@@ -91,12 +94,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * after a predefined interval for a predefined number of attempts.
      */
 
-    //std::unique_lock<std::mutex> communication(this->_commLock);
-    //std::unique_lock<std::mutex> ready(this->_readyLock);
-
-    //if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
-    //    throw TimeoutException("timed out while trying to read from HX711");
-    //}
+    std::unique_lock<std::mutex> communication(this->_commLock);
 
     /**
      * When DOUT goes low, there is a minimum of 0.1us until the clock pin
@@ -135,8 +133,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     //not reading from the sensor any more so no need to keep
     //the lock in place
-    //ready.unlock();
-    //communication.unlock();
+    communication.unlock();
 
     //if no byte pointer is given, don't try to write to it
     if(bytes == nullptr) {
@@ -232,50 +229,32 @@ void HX711::_delayMicroseconds(const unsigned int us) noexcept {
 
 }
 
-HX_VALUE HX711::_getChannelAValue() {
+void HX711::_watchPin() noexcept {
 
-    /**
-     * "Channel A can be programmed with a gain 
-     * of 128 or 64..."
-     * Datasheet pg. 1
-     * 
-     * Opt to default to 128
-     */
-    if(this->_gain == Gain::GAIN_32) {
-        this->setGain(Gain::GAIN_128);
-    }
-
-    return this->_readInt();
-
-}
-
-HX_VALUE HX711::_getChannelBValue() {
+    while(this->_pollPin) {
     
-    /**
-     * "Channel B has a fixed gain of 32"
-     * Datasheet pg. 1
-     */
-    if(this->_gain != Gain::GAIN_32) {
-        this->setGain(Gain::GAIN_32);
-    }
+        std::unique_lock<std::mutex> ready(this->_readyLock);
 
-    return this->_readInt();
-
-}
-
-void HX711::_watchReady(HX711* self) noexcept {
-    while(true) {
-        if(self->isReady()) {
-            const HX_VALUE v = self->_getChannelAValue();
-            if(v != -1) {
-                _lastVal = v;
-                self->_dataReady.notify_all();
-                std::this_thread::yield();
-            }
+        if(!this->isReady()) {
+            ready.unlock();
+            ::lguSleep(0.001);
+            continue;
         }
-        else {
-            lguSleep(0.001);
+
+        const HX_VALUE v = this->_readInt();
+
+        if(_isSaturated(v)) {
+            ready.unlock();
+        //    ::lguSleep(0.001);
+            continue;
         }
+
+        this->_lastVal = v;
+        this->_dataReady.notify_all();
+        ready.unlock();
+        
+        ::lguSleep(0.001);
+
     }
 }
 
@@ -284,12 +263,16 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _dataPin(dataPin),
     _clockPin(clockPin),
     _maxWait(_DEFAULT_MAX_WAIT),
+    _lastVal(HX_MAX_VALUE),
+    _pollPin(true),
+    _channel(Channel::A),
     _gain(Gain::GAIN_128),
     _bitFormat(Format::MSB),
     _byteFormat(Format::MSB) {
 }
 
 HX711::~HX711() {
+    this->_pollPin = false;
     ::lgGpioFree(this->_gpioHandle, this->_clockPin);
     ::lgGpioFree(this->_gpioHandle, this->_dataPin);
     ::lgGpiochipClose(this->_gpioHandle);
@@ -305,21 +288,11 @@ void HX711::begin() {
         throw std::runtime_error("unable to access GPIO");
     }
 
+    this->powerDown();
     this->powerUp();
 
-/*
-    if(!(
-        ::lgGpioSetAlertsFunc(this->_gpioHandle, this->_dataPin, 
-            &HX711::_watchReady, this) == 0 &&
-        ::lgGpioClaimAlert(this->_gpioHandle, 0, LG_FALLING_EDGE,
-            this->_dataPin, -1) == 0
-    )) {
-        throw std::runtime_error("unable to setup HX711 interrupts");
-    }
-*/
-
     /**
-     * Cannot simply set this->_gain. this->setGain()
+     * Cannot simply set this->_gain. this->setConfig()
      * must be called to set the HX711 module at the
      * hardware-level.
      * 
@@ -330,13 +303,13 @@ void HX711::begin() {
      * try {
      *     hx.begin();
      * }
-     * catch(TimeoutException& e) {
+     * catch(const TimeoutException& e) {
      *     //sensor failed to connect
      * }
      */
-    this->setGain(this->_gain);
+    this->setConfig(this->_channel, this->_gain);
 
-    std::thread(&HX711::_watchReady, this).detach();
+    std::thread(&HX711::_watchPin, this).detach();
 
 }
 
@@ -377,21 +350,45 @@ bool HX711::isReady() noexcept {
 
 }
 
-HX_VALUE HX711::getValue(const Channel c) {
+std::vector<Timing> HX711::testTiming(const size_t samples) noexcept {
+
+    using namespace std::chrono;
+
+    std::vector<Timing> vec;
+    vec.reserve(samples);
+
+    for(size_t i = 0; i < samples; ++i) {
+
+        Timing t;
+
+        t.begin = high_resolution_clock::now();
+        
+        while(!this->isReady());
+        t.ready = high_resolution_clock::now();
+
+        this->_readInt();
+        t.end = high_resolution_clock::now();
+
+        while(!this->isReady()) ;
+        t.nextbegin = high_resolution_clock::now();
+
+        vec.push_back(t);
+
+    }
+
+    return vec;
+
+}
+
+HX_VALUE HX711::getValue() {
 
     std::unique_lock<std::mutex> ready(this->_readyLock);
+
     if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
         throw TimeoutException("timed out while trying to read from HX711");
     }
 
-    return _lastVal;
-
-    if(c == Channel::A) {
-        return this->_getChannelAValue();
-    }
-    
-    //else channel B
-    return this->_getChannelBValue();
+    return this->_lastVal;
 
 }
 
@@ -403,9 +400,25 @@ int HX711::getClockPin() const noexcept {
     return this->_clockPin;
 }
 
-void HX711::setGain(const Gain gain) {
+Channel HX711::getChannel() const noexcept {
+    return this->_channel;
+}
 
-    const Gain backup = this->_gain;
+Gain HX711::getGain() const noexcept {
+    return this->_gain;
+}
+
+void HX711::setConfig(const Channel c, const Gain g) {
+
+    if(c == Channel::A && g == Gain::GAIN_32) {
+        throw std::invalid_argument("Channel A can only use a gain of 128 or 64");
+    }
+    else if(c == Channel::B && g != Gain::GAIN_32) {
+        throw std::invalid_argument("Channel B can only use a gain of 32");
+    }
+
+    const Channel backupChannel = this->_channel;
+    const Gain backupGain = this->_gain;
 
     /**
      * If the attempt to set the gain fails, it should
@@ -413,7 +426,8 @@ void HX711::setGain(const Gain gain) {
      */
     try {
 
-        this->_gain = gain;
+        this->_channel = c;
+        this->_gain = g;
         
         /**
          * A read must take place to set the gain at the
@@ -424,14 +438,11 @@ void HX711::setGain(const Gain gain) {
         
     }
     catch(const TimeoutException& e) {
-        this->_gain = backup;
+        this->_channel = backupChannel;
+        this->_gain = backupGain;
         throw;
     }
 
-}
-
-Gain HX711::getGain() const noexcept {
-    return this->_gain;
 }
 
 Format HX711::getBitFormat() const noexcept {
@@ -493,7 +504,7 @@ void HX711::powerUp() {
      * is needed ONLY IF the current gain isn't 128
      */
     if(this->_gain != Gain::GAIN_128) {
-        this->setGain(this->_gain);
+        this->setConfig(this->_channel, this->_gain);
     }
 
 }

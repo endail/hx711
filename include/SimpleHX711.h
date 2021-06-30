@@ -44,7 +44,7 @@ class SimpleHX711 {
 protected:
     HX711* _hx;
     Mass::Unit _scaleUnit;
-    Channel _ch;
+    Channel _channel;
     HX_VALUE _refUnit;
     HX_VALUE _offset;
 

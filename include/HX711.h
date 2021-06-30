@@ -30,6 +30,8 @@
 #include <thread>
 #include <lgpio.h>
 
+#include <vector>
+
 namespace HX711 {
 
 /**
@@ -71,6 +73,17 @@ const std::uint8_t PULSES[3] = {
     27
 };
 
+struct Timing {
+    std::chrono::high_resolution_clock::time_point begin;
+    std::chrono::high_resolution_clock::time_point ready;
+    std::chrono::high_resolution_clock::time_point end;
+    std::chrono::high_resolution_clock::time_point nextbegin;
+    std::chrono::microseconds getDiff() {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->nextbegin - this->end);
+    }
+};
+
 class HX711 {
 
 protected:
@@ -79,11 +92,10 @@ protected:
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::seconds(1));
 
-    //Datasheet pg. 5
-    //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
-    static volatile HX_VALUE _lastVal;
+    static const HX_VALUE HX_MIN_VALUE = 0x800000;
+    static const HX_VALUE HX_MAX_VALUE = 0x7FFFFF;
 
     int _gpioHandle;
     const int _dataPin;
@@ -92,21 +104,24 @@ protected:
     std::mutex _readyLock;
     std::condition_variable _dataReady;
     std::chrono::nanoseconds _maxWait;
-    //volatile bool _isReading = false;
+    HX_VALUE _lastVal;
+    bool _pollPin;
+    std::chrono::nanoseconds _notReadySleep;
+    std::chrono::nanoseconds _saturatedSleep;
+    std::chrono::nanoseconds _pollSleep;
+    Channel _channel;
     Gain _gain;
     Format _bitFormat;
     Format _byteFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
+    static bool _isSaturated(const HX_VALUE v);
     bool _readBit() noexcept;
     std::uint8_t _readByte() noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
     static void _delayMicroseconds(const unsigned int us) noexcept;
-    static void _watchReady(HX711* self) noexcept;
-
-    HX_VALUE _getChannelAValue();
-    HX_VALUE _getChannelBValue();
+    void _watchPin() noexcept;
 
 public:
     
@@ -121,16 +136,15 @@ public:
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
 
-    void setGain(const Gain gain);
+    Channel getChannel() const noexcept;
     Gain getGain() const noexcept;
-    
+    void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
+
     bool isReady() noexcept;
 
-    /**
-     * If Channel B value is requested but an exception is thrown
-     * setGain MUST be called again.
-     */
-    HX_VALUE getValue(const Channel c = Channel::A);
+    std::vector<Timing> testTiming(const size_t samples = 1000) noexcept;
+
+    HX_VALUE getValue();
 
     Format getBitFormat() const noexcept;
     Format getByteFormat() const noexcept;

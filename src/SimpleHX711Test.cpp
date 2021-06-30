@@ -22,6 +22,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include "../include/HX711.h"
 
@@ -46,10 +47,27 @@ int main(int argc, char** argv) {
     
 int count = 0;
 
+    auto samples = hx.getBase()->testTiming();
+    long long unsigned int sum = 0;
+
+    for(int i = 0; i < samples.size(); ++i) {
+        sum += samples[i].getDiff().count();
+    }
+
+    double mean = sum / samples.size();
+
+    cout << "mean: " << mean << endl;
+    
+    //for(auto it = samples.begin(); it != samples.end(); ++it) {
+    //    cout << it->count() << endl;
+    //}
+
+    return EXIT_SUCCESS;
+
     while(true) {
 
         //use the median from 5 samples
-        Mass m = hx.weight(ReadType::Median, 1);
+        Mass m = hx.weight(ReadType::Median, 3);
         //count++;
 
         //cout << "\x1B[2J\x1B[H" << double(count % 80) << endl;
@@ -66,7 +84,8 @@ int count = 0;
                 << "\t" << m.toString(Mass::Unit::US_TON) << endl
                 << "\t" << m.toString(Mass::Unit::ST) << endl
                 << "\t" << m.toString(Mass::Unit::LB) << endl
-                << "\t" << m.toString(Mass::Unit::OZ) << endl;
+                << "\t" << m.toString(Mass::Unit::OZ) << endl
+        ;
 
     }
 

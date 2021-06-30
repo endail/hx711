@@ -95,7 +95,7 @@ SimpleHX711::SimpleHX711(
     const HX_VALUE offset) :
         _hx(nullptr),
         _scaleUnit(Mass::Unit::G),
-        _ch(Channel::A),
+        _channel(Channel::A),
         _refUnit(refUnit),
         _offset(offset)  {
             this->_hx = new HX711(dataPin, clockPin);
@@ -137,11 +137,11 @@ void SimpleHX711::setOffset(const HX_VALUE offset) noexcept {
 }
 
 void SimpleHX711::setChannel(const Channel ch) noexcept {
-    this->_ch = ch;
+    this->_channel = ch;
 }
 
 Channel SimpleHX711::getChannel() const noexcept {
-    return this->_ch;
+    return this->_channel;
 }
 
 HX711* SimpleHX711::getBase() noexcept {
@@ -154,7 +154,7 @@ std::vector<HX_VALUE> SimpleHX711::readValues(const std::size_t samples) {
     vals.reserve(samples);
 
     for(std::size_t i = 0; i < samples; ++i) {
-        vals.push_back(this->_hx->getValue(this->_ch));
+        vals.push_back(this->_hx->getValue());
     }
 
     return vals;
