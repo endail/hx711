@@ -261,7 +261,9 @@ HX_VALUE HX711::_getChannelBValue() {
 }
 
 void HX711::_watchReady(int num_alerts, lgGpioAlert_p alerts, void* userdata) noexcept {
-    static_cast<HX711*>(userdata)->_dataReady.notify_one();
+    
+    auto ptr = static_cast<HX711*>(userdata);
+
 }
 
 HX711::HX711(const int dataPin, const int clockPin) noexcept :
