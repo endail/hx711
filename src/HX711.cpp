@@ -24,8 +24,11 @@
 #include "../include/TimeoutException.h"
 #include <lgpio.h>
 #include <sys/time.h>
+#include <thread>
 
 namespace HX711 {
+
+volatile HX_VALUE HX711::_lastVal;
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
@@ -88,12 +91,12 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * after a predefined interval for a predefined number of attempts.
      */
 
-    std::unique_lock<std::mutex> communication(this->_commLock);
-    std::unique_lock<std::mutex> ready(this->_readyLock);
+    //std::unique_lock<std::mutex> communication(this->_commLock);
+    //std::unique_lock<std::mutex> ready(this->_readyLock);
 
-    if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
-        throw TimeoutException("timed out while trying to read from HX711");
-    }
+    //if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
+    //    throw TimeoutException("timed out while trying to read from HX711");
+    //}
 
     /**
      * When DOUT goes low, there is a minimum of 0.1us until the clock pin
@@ -132,8 +135,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     //not reading from the sensor any more so no need to keep
     //the lock in place
-    ready.unlock();
-    communication.unlock();
+    //ready.unlock();
+    //communication.unlock();
 
     //if no byte pointer is given, don't try to write to it
     if(bytes == nullptr) {
@@ -260,8 +263,20 @@ HX_VALUE HX711::_getChannelBValue() {
 
 }
 
-void HX711::_watchReady(int num_alerts, lgGpioAlert_p alerts, void* userdata) noexcept {
-    static_cast<HX711*>(userdata)->_dataReady.notify_one();
+void HX711::_watchReady(HX711* self) noexcept {
+    while(true) {
+        if(self->isReady()) {
+            const HX_VALUE v = self->_getChannelAValue();
+            if(v != -1) {
+                _lastVal = v;
+                self->_dataReady.notify_all();
+                std::this_thread::yield();
+            }
+        }
+        else {
+            lguSleep(0.001);
+        }
+    }
 }
 
 HX711::HX711(const int dataPin, const int clockPin) noexcept :
@@ -292,6 +307,7 @@ void HX711::begin() {
 
     this->powerUp();
 
+/*
     if(!(
         ::lgGpioSetAlertsFunc(this->_gpioHandle, this->_dataPin, 
             &HX711::_watchReady, this) == 0 &&
@@ -300,6 +316,7 @@ void HX711::begin() {
     )) {
         throw std::runtime_error("unable to setup HX711 interrupts");
     }
+*/
 
     /**
      * Cannot simply set this->_gain. this->setGain()
@@ -318,6 +335,8 @@ void HX711::begin() {
      * }
      */
     this->setGain(this->_gain);
+
+    std::thread(&HX711::_watchReady, this).detach();
 
 }
 
@@ -343,7 +362,7 @@ bool HX711::isReady() noexcept {
      * place to prevent extra reads from the sensor, so
      * it should suffice to stop this issue as well.
      */
-    std::lock_guard<std::mutex> lock(this->_commLock);
+    //std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
      * HX711 will be "ready" when DOUT is low.
@@ -359,6 +378,13 @@ bool HX711::isReady() noexcept {
 }
 
 HX_VALUE HX711::getValue(const Channel c) {
+
+    std::unique_lock<std::mutex> ready(this->_readyLock);
+    if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
+        throw TimeoutException("timed out while trying to read from HX711");
+    }
+
+    return _lastVal;
 
     if(c == Channel::A) {
         return this->_getChannelAValue();

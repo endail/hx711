@@ -83,6 +83,8 @@ protected:
     //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
+    static volatile HX_VALUE _lastVal;
+
     int _gpioHandle;
     const int _dataPin;
     const int _clockPin;
@@ -90,7 +92,7 @@ protected:
     std::mutex _readyLock;
     std::condition_variable _dataReady;
     std::chrono::nanoseconds _maxWait;
-    bool _isReading = false;
+    //volatile bool _isReading = false;
     Gain _gain;
     Format _bitFormat;
     Format _byteFormat;
@@ -101,10 +103,7 @@ protected:
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
     static void _delayMicroseconds(const unsigned int us) noexcept;
-    static void _watchReady(
-        int num_alerts,
-        lgGpioAlert_p alerts,
-        void* userdata) noexcept;
+    static void _watchReady(HX711* self) noexcept;
 
     HX_VALUE _getChannelAValue();
     HX_VALUE _getChannelBValue();
