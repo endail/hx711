@@ -20,7 +20,8 @@ CFLAGS :=	-O2 \
 			-Wl,--as-needed \
 			-D_FORTIFY_SOURCE=2 \
 			-fstack-clash-protection \
-			-v
+			-v \
+			-g
 
 ########################################################################
 

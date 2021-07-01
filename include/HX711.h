@@ -27,10 +27,8 @@
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
-#include <thread>
-#include <lgpio.h>
-
 #include <vector>
+#include <lgpio.h>
 
 namespace HX711 {
 
@@ -62,6 +60,13 @@ enum class Gain {
     GAIN_64
 };
 
+enum class PinWatchState {
+    NONE = 0,
+    NORMAL,
+    PAUSE,
+    END
+};
+
 /**
  * Used as a map to select to correct number of clock pulses
  * depending on the set gain
@@ -78,10 +83,27 @@ struct Timing {
     std::chrono::high_resolution_clock::time_point ready;
     std::chrono::high_resolution_clock::time_point end;
     std::chrono::high_resolution_clock::time_point nextbegin;
-    std::chrono::microseconds getDiff() {
+
+    std::chrono::microseconds getTimeToReady() {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->ready - this->begin);
+    }
+
+    std::chrono::microseconds getTimeToConvert() {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->end - this->ready);
+    }
+
+    std::chrono::microseconds getTimeBetweenConversions() {
         return std::chrono::duration_cast<std::chrono::microseconds>(
             this->nextbegin - this->end);
     }
+
+    std::chrono::microseconds getTotalTime() {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->ready - this->begin);
+    }
+
 };
 
 class HX711 {
@@ -99,7 +121,7 @@ protected:
 
     static constexpr std::chrono::nanoseconds _DEFAULT_POLL_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds(1));
+            std::chrono::milliseconds(57));
 
     static constexpr std::chrono::nanoseconds _DEFAULT_SATURATED_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -107,7 +129,7 @@ protected:
 
     static constexpr std::chrono::nanoseconds _DEFAULT_NOT_READY_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds(1));
+            std::chrono::microseconds(7));
 
     int _gpioHandle;
     const int _dataPin;
@@ -117,7 +139,7 @@ protected:
     std::condition_variable _dataReady;
     std::chrono::nanoseconds _maxWait;
     HX_VALUE _lastVal;
-    bool _pollPin;
+    PinWatchState _watchState;
     std::chrono::nanoseconds _notReadySleep;
     std::chrono::nanoseconds _saturatedSleep;
     std::chrono::nanoseconds _pollSleep;

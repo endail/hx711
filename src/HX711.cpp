@@ -22,9 +22,9 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
+#include <thread>
 #include <lgpio.h>
 #include <sys/time.h>
-#include <thread>
 
 namespace HX711 {
 
@@ -230,9 +230,16 @@ void HX711::_delayMicroseconds(const unsigned int us) noexcept {
 }
 
 void HX711::_watchPin() noexcept {
-
-    while(this->_pollPin) {
+    for(;;) {
     
+        if(this->_watchState == PinWatchState::END) {
+            break;
+        }
+        else if(this->_watchState == PinWatchState::PAUSE) {
+            std::this_thread::yield();
+            continue;
+        }
+
         std::unique_lock<std::mutex> ready(this->_readyLock);
 
         if(!this->isReady()) {
@@ -270,7 +277,7 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _clockPin(clockPin),
     _maxWait(_DEFAULT_MAX_WAIT),
     _lastVal(HX_MAX_VALUE),
-    _pollPin(true),
+    _watchState(PinWatchState::NONE),
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
     _saturatedSleep(_DEFAULT_SATURATED_SLEEP),
     _pollSleep(_DEFAULT_POLL_SLEEP),
@@ -281,7 +288,7 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
 }
 
 HX711::~HX711() {
-    this->_pollPin = false;
+    this->_watchState = PinWatchState::END;
     ::lgGpioFree(this->_gpioHandle, this->_clockPin);
     ::lgGpioFree(this->_gpioHandle, this->_dataPin);
     ::lgGpiochipClose(this->_gpioHandle);
@@ -472,6 +479,7 @@ void HX711::setByteFormat(const Format f) noexcept {
 
 void HX711::powerDown() noexcept {
 
+    this->_watchState = PinWatchState::PAUSE;
     std::lock_guard<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
@@ -490,7 +498,7 @@ void HX711::powerDown() noexcept {
 
 void HX711::powerUp() {
 
-    //TODO: is this actually needed?
+    this->_watchState = PinWatchState::NORMAL;
     std::unique_lock<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);

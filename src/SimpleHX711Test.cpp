@@ -25,6 +25,7 @@
 #include <numeric>
 #include <string>
 #include <algorithm>
+#include <thread>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
@@ -48,18 +49,33 @@ int main(int argc, char** argv) {
     
 int count = 0;
 
-    auto samples = hx.getBase()->testTiming(100);
+    auto samples = hx.getBase()->testTiming(50);
     std::vector<std::chrono::microseconds> diffs;
 
     for(auto t : samples) {
-        diffs.push_back(t.getDiff());
+        diffs.push_back(t.getTimeToReady());
     }
 
     std::sort(diffs.begin(), diffs.end());
 
+    cout << "Time to ready: " << endl;
     cout << "min: " << diffs.front().count() << endl;
     cout << "med: " << diffs[ diffs.size() / 2 ] .count() << endl;
     cout << "max: " << diffs.back().count() << endl;
+
+    diffs.clear();
+
+    for(auto t : samples) {
+        diffs.push_back(t.getTimeBetweenConversions());
+    }
+
+    std::sort(diffs.begin(), diffs.end());
+
+    cout << "Time between conversions: " << endl;
+    cout << "min: " << diffs.front().count() << endl;
+    cout << "med: " << diffs[ diffs.size() / 2 ] .count() << endl;
+    cout << "max: " << diffs.back().count() << endl;
+
 
 /*
     long long unsigned int sum = 0;
@@ -76,12 +92,15 @@ int count = 0;
     //    cout << it->count() << endl;
     //}
 
-    return EXIT_SUCCESS;
+    //return EXIT_SUCCESS;
+
+    this_thread::sleep_for(chrono::seconds(5));
+
 
     while(true) {
 
         //use the median from 5 samples
-        Mass m = hx.weight(ReadType::Median, 3);
+        Mass m = hx.weight(ReadType::Median, 1);
         //count++;
 
         //cout << "\x1B[2J\x1B[H" << double(count % 80) << endl;
