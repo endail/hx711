@@ -237,7 +237,9 @@ void HX711::_watchPin() noexcept {
 
         if(!this->isReady()) {
             ready.unlock();
-            ::lguSleep(0.001);
+            ::lguSleep(
+                static_cast<double>(this->_notReadySleep.count()) / 
+                decltype(this->_notReadySleep)::period::den);
             continue;
         }
 
@@ -245,7 +247,9 @@ void HX711::_watchPin() noexcept {
 
         if(_isSaturated(v)) {
             ready.unlock();
-        //    ::lguSleep(0.001);
+            ::lguSleep(
+                static_cast<double>(this->_saturatedSleep.count()) / 
+                decltype(this->_saturatedSleep)::period::den);
             continue;
         }
 
@@ -253,7 +257,9 @@ void HX711::_watchPin() noexcept {
         this->_dataReady.notify_all();
         ready.unlock();
         
-        ::lguSleep(0.001);
+        ::lguSleep(
+            static_cast<double>(this->_pollSleep.count()) / 
+            decltype(this->_pollSleep)::period::den);
 
     }
 }
@@ -265,6 +271,9 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _maxWait(_DEFAULT_MAX_WAIT),
     _lastVal(HX_MAX_VALUE),
     _pollPin(true),
+    _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
+    _saturatedSleep(_DEFAULT_SATURATED_SLEEP),
+    _pollSleep(_DEFAULT_POLL_SLEEP),
     _channel(Channel::A),
     _gain(Gain::GAIN_128),
     _bitFormat(Format::MSB),

@@ -97,6 +97,18 @@ protected:
     static const HX_VALUE HX_MIN_VALUE = 0x800000;
     static const HX_VALUE HX_MAX_VALUE = 0x7FFFFF;
 
+    static constexpr std::chrono::nanoseconds _DEFAULT_POLL_SLEEP =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds(1));
+
+    static constexpr std::chrono::nanoseconds _DEFAULT_SATURATED_SLEEP =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds(1));
+
+    static constexpr std::chrono::nanoseconds _DEFAULT_NOT_READY_SLEEP =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds(1));
+
     int _gpioHandle;
     const int _dataPin;
     const int _clockPin;

@@ -24,6 +24,7 @@
 #include <iostream>
 #include <numeric>
 #include <string>
+#include <algorithm>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
@@ -47,7 +48,20 @@ int main(int argc, char** argv) {
     
 int count = 0;
 
-    auto samples = hx.getBase()->testTiming();
+    auto samples = hx.getBase()->testTiming(100);
+    std::vector<std::chrono::microseconds> diffs;
+
+    for(auto t : samples) {
+        diffs.push_back(t.getDiff());
+    }
+
+    std::sort(diffs.begin(), diffs.end());
+
+    cout << "min: " << diffs.front().count() << endl;
+    cout << "med: " << diffs[ diffs.size() / 2 ] .count() << endl;
+    cout << "max: " << diffs.back().count() << endl;
+
+/*
     long long unsigned int sum = 0;
 
     for(int i = 0; i < samples.size(); ++i) {
@@ -57,7 +71,7 @@ int count = 0;
     double mean = sum / samples.size();
 
     cout << "mean: " << mean << endl;
-    
+*/  
     //for(auto it = samples.begin(); it != samples.end(); ++it) {
     //    cout << it->count() << endl;
     //}
