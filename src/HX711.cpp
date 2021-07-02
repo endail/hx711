@@ -347,6 +347,7 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
     _saturatedSleep(_DEFAULT_SATURATED_SLEEP),
     _pollSleep(_DEFAULT_POLL_SLEEP),
+    _rate(Rate::HZ_10),
     _channel(Channel::A),
     _gain(Gain::GAIN_128),
     _bitFormat(Format::MSB),

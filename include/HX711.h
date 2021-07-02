@@ -67,6 +67,11 @@ enum class PinWatchState {
     END
 };
 
+enum class Rate {
+    HZ_10,
+    HZ_80
+};
+
 /**
  * Used as a map to select to correct number of clock pulses
  * depending on the set gain
@@ -151,6 +156,7 @@ protected:
     std::chrono::nanoseconds _notReadySleep;
     std::chrono::nanoseconds _saturatedSleep;
     std::chrono::nanoseconds _pollSleep;
+    Rate _rate;
     Channel _channel;
     Gain _gain;
     Format _bitFormat;
