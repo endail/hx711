@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
     
 int count = 0;
 
+/*
     auto samples = hx.getBase()->testTiming(50);
     std::vector<std::chrono::microseconds> diffs;
 
@@ -75,7 +76,7 @@ int count = 0;
     cout << "min: " << diffs.front().count() << endl;
     cout << "med: " << diffs[ diffs.size() / 2 ] .count() << endl;
     cout << "max: " << diffs.back().count() << endl;
-
+*/
 
 /*
     long long unsigned int sum = 0;
@@ -94,7 +95,7 @@ int count = 0;
 
     //return EXIT_SUCCESS;
 
-    this_thread::sleep_for(chrono::seconds(5));
+//    this_thread::sleep_for(chrono::seconds(5));
 
 
     while(true) {

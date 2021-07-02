@@ -149,16 +149,10 @@ HX711* SimpleHX711::getBase() noexcept {
 }
 
 std::vector<HX_VALUE> SimpleHX711::readValues(const std::size_t samples) {
-
     std::vector<HX_VALUE> vals;
-    vals.reserve(samples);
-
-    for(std::size_t i = 0; i < samples; ++i) {
-        vals.push_back(this->_hx->getValue());
-    }
-
+    vals.resize(samples);
+    this->_hx->getValues(vals.data(), samples);
     return vals;
-
 }
 
 void SimpleHX711::tare(const ReadType r, const size_t samples) {

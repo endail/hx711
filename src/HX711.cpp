@@ -22,11 +22,14 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
+#include <stdexcept>
 #include <thread>
 #include <lgpio.h>
 #include <sys/time.h>
 
 namespace HX711 {
+
+constexpr std::chrono::nanoseconds HX711::_DEFAULT_MAX_WAIT;
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
@@ -39,13 +42,16 @@ bool HX711::_isSaturated(const HX_VALUE v) {
 
 bool HX711::_readBit() noexcept {
 
+    using namespace std::chrono;
+
     //first, clock pin is set high to make DOUT ready to be read from
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
-    _delayMicroseconds(1);
+    //_delayMicroseconds(1);
+    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -54,7 +60,8 @@ bool HX711::_readBit() noexcept {
     //the clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    _delayMicroseconds(1);
+    //_delayMicroseconds(1);
+    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
 
     return bit;
 
@@ -82,6 +89,8 @@ std::uint8_t HX711::_readByte() noexcept {
 
 void HX711::_readRawBytes(std::uint8_t* bytes) {
 
+    using namespace std::chrono;
+
     /**
      * Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
      * wait until this occurs.
@@ -101,7 +110,8 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * can go high. T1 in Fig.2.
      * Datasheet pg. 5
      */
-    _delayMicroseconds(1);
+    //_delayMicroseconds(1);
+    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
@@ -183,7 +193,12 @@ HX_VALUE HX711::_readInt() {
 
 }
 
-void HX711::_delayMicroseconds(const unsigned int us) noexcept {
+void HX711::_delaySoft(const std::chrono::nanoseconds ns) noexcept {
+    ::lguSleep(static_cast<double>(ns.count()) / decltype(ns)::period::den);
+    //std::this_thread::sleep_for(ns);
+}
+
+void HX711::_delayHard(const std::chrono::nanoseconds ns) noexcept {
 
     /**
      * This requires some explanation.
@@ -213,9 +228,13 @@ void HX711::_delayMicroseconds(const unsigned int us) noexcept {
      * In short, use this function for delays under 100us.
      */
 
+    using namespace std::chrono;
+
     struct timeval tNow;
     struct timeval tLong;
     struct timeval tEnd;
+
+    const uint8_t us = duration_cast<microseconds>(ns).count();
 
     tLong.tv_sec = us / 1000000;
     tLong.tv_usec = us % 1000000;
@@ -229,55 +248,102 @@ void HX711::_delayMicroseconds(const unsigned int us) noexcept {
 
 }
 
-void HX711::_watchPin() noexcept {
-    for(;;) {
+void HX711::_watchPin() {
     
+    /**
+     * This is the thread loop function for watching when data is ready from
+     * the HX711.
+     * 
+     * A state var is used to control what operation(s) this thread is
+     * performing.
+     *      NONE:   undefined state and should not be used
+     *      NORMAL: normal operation of obtaining sensor values and sleeping
+     *      PAUSE:  causes the thread to stop performing any operations without
+     *              causing the thread to end
+     *      END:    lets the thread exit - not recoverable
+     * 
+     * Two relevant locks are used: state and data ready
+     * 
+     * State Lock:
+     * In order for this loop's state to be changed, a state var is used. But
+     * the mechanism for changing state needs to be atomic - it must not be
+     * altered while the current state is executing. Thefore, at the beginning
+     * of each loop, the state is locked. This does not actually "lock" the var
+     * but controls access to it with the _changeWatchState function. The state
+     * lock should be unlocked prior to the next iteration of the loop, but
+     * prior to [any] sleep/yield calls. This will give any other thread(s) the
+     * best opportunity to acquire a lock and change the state while this
+     * thread is asleep and/or yielding.
+     * 
+     * DataReady Lock:
+     * This lock works in conjunction with a condition variable in order to
+     * notify the caller when a new sensor reading is available for be used.
+     * It should not be unlocked until a usable value has been obtained. A
+     * caller can timeout while waiting if needed.
+     */
+
+    std::unique_lock<std::mutex> stateLock(this->_pinWatchLock, std::defer_lock);
+    std::unique_lock<std::mutex> dataReadyLock(this->_readyLock, std::defer_lock);
+    
+    for(;;) {
+
+        stateLock.lock();
+
         if(this->_watchState == PinWatchState::END) {
             break;
         }
-        else if(this->_watchState == PinWatchState::PAUSE) {
+        
+        if(this->_watchState == PinWatchState::PAUSE) {
+            stateLock.unlock();
             std::this_thread::yield();
+            _delaySoft(this->_pauseSleep);
             continue;
         }
 
-        std::unique_lock<std::mutex> ready(this->_readyLock);
+        if(!dataReadyLock.owns_lock()) {
+            dataReadyLock.lock();
+        }
 
         if(!this->isReady()) {
-            ready.unlock();
-            ::lguSleep(
-                static_cast<double>(this->_notReadySleep.count()) / 
-                decltype(this->_notReadySleep)::period::den);
+            stateLock.unlock();
+            _delaySoft(this->_notReadySleep);
             continue;
         }
 
         const HX_VALUE v = this->_readInt();
 
         if(_isSaturated(v)) {
-            ready.unlock();
-            ::lguSleep(
-                static_cast<double>(this->_saturatedSleep.count()) / 
-                decltype(this->_saturatedSleep)::period::den);
+            stateLock.unlock();
+            _delaySoft(this->_saturatedSleep);
             continue;
         }
 
         this->_lastVal = v;
         this->_dataReady.notify_all();
-        ready.unlock();
-        
-        ::lguSleep(
-            static_cast<double>(this->_pollSleep.count()) / 
-            decltype(this->_pollSleep)::period::den);
+        dataReadyLock.unlock();
+        stateLock.unlock();
+        _delaySoft(this->_pollSleep);
 
     }
+
+    /**
+     * Any thread cleanup stuff goes here, under the loop
+     */
+
+}
+
+void HX711::_changeWatchState(const PinWatchState state) {
+    std::lock_guard<std::mutex> lck(this->_pinWatchLock);
+    this->_watchState = state;
 }
 
 HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
-    _maxWait(_DEFAULT_MAX_WAIT),
     _lastVal(HX_MAX_VALUE),
-    _watchState(PinWatchState::NONE),
+    _watchState(PinWatchState::PAUSE),
+    _pauseSleep(_DEFAULT_PAUSE_SLEEP),
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
     _saturatedSleep(_DEFAULT_SATURATED_SLEEP),
     _pollSleep(_DEFAULT_POLL_SLEEP),
@@ -288,13 +354,15 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
 }
 
 HX711::~HX711() {
-    this->_watchState = PinWatchState::END;
+    this->_changeWatchState(PinWatchState::END);
     ::lgGpioFree(this->_gpioHandle, this->_clockPin);
     ::lgGpioFree(this->_gpioHandle, this->_dataPin);
     ::lgGpiochipClose(this->_gpioHandle);
 }
 
 void HX711::begin() {
+
+    //TODO: move this to constructor?
 
     if(!(   
         (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
@@ -304,54 +372,14 @@ void HX711::begin() {
         throw std::runtime_error("unable to access GPIO");
     }
 
+    std::thread(&HX711::_watchPin, this).detach();
+
     this->powerDown();
     this->powerUp();
 
-    /**
-     * Cannot simply set this->_gain. this->setConfig()
-     * must be called to set the HX711 module at the
-     * hardware-level.
-     * 
-     * If, for whatever reason, the sensor cannot be
-     * reached, setGain will fail and throw a
-     * TimeoutException.
-     * 
-     * try {
-     *     hx.begin();
-     * }
-     * catch(const TimeoutException& e) {
-     *     //sensor failed to connect
-     * }
-     */
-    this->setConfig(this->_channel, this->_gain);
-
-    std::thread(&HX711::_watchPin, this).detach();
-
-}
-
-void HX711::setMaxWaitTime(const std::chrono::nanoseconds maxWait) noexcept {
-    this->_maxWait = maxWait;
 }
 
 bool HX711::isReady() noexcept {
-
-    /**
-     * The datasheet states DOUT is used to shift-out data,
-     * and in the process DOUT will either be HIGH or LOW
-     * to represent bits of the resulting integer. The issue
-     * is that during the "conversion period" of shifting
-     * bits out, DOUT could be LOW, but not necessarily
-     * mean there is "new" data for retrieval. Page 4 states
-     * that the "25th pulse at PD_SCK input will pull DOUT
-     * pin back to high".
-     * 
-     * This is justification enough to guard against
-     * potentially erroneous "ready" states while a
-     * conversion is in progress. The lock is already in
-     * place to prevent extra reads from the sensor, so
-     * it should suffice to stop this issue as well.
-     */
-    //std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
      * HX711 will be "ready" when DOUT is low.
@@ -366,7 +394,7 @@ bool HX711::isReady() noexcept {
 
 }
 
-std::vector<Timing> HX711::testTiming(const size_t samples) noexcept {
+std::vector<Timing> HX711::testTiming(const std::size_t samples) noexcept {
 
     using namespace std::chrono;
 
@@ -397,14 +425,34 @@ std::vector<Timing> HX711::testTiming(const size_t samples) noexcept {
 }
 
 HX_VALUE HX711::getValue() {
+    HX_VALUE v;
+    this->getValues(&v, 1);
+    return v;
+}
 
-    std::unique_lock<std::mutex> ready(this->_readyLock);
+void HX711::getValues(
+    HX_VALUE* const arr,
+    const std::size_t len,
+    const std::chrono::nanoseconds maxWait) {
 
-    if(this->_dataReady.wait_for(ready, this->_maxWait) == std::cv_status::timeout) {
-        throw TimeoutException("timed out while trying to read from HX711");
-    }
+        std::unique_lock<std::mutex> ready(this->_readyLock, std::defer_lock);
 
-    return this->_lastVal;
+        this->_changeWatchState(PinWatchState::NORMAL);
+
+        for(size_t i = 0; i < len; ++i) {
+            
+            ready.lock();
+
+            if(this->_dataReady.wait_for(ready, maxWait) == std::cv_status::timeout) {
+                throw TimeoutException("timed out while trying to read from HX711");
+            }
+
+            arr[i] = this->_lastVal;
+            ready.unlock();
+
+        }
+
+        this->_changeWatchState(PinWatchState::PAUSE);
 
 }
 
@@ -436,21 +484,21 @@ void HX711::setConfig(const Channel c, const Gain g) {
     const Channel backupChannel = this->_channel;
     const Gain backupGain = this->_gain;
 
+    this->_channel = c;
+    this->_gain = g;
+
     /**
      * If the attempt to set the gain fails, it should
      * revert back to whatever it was before
      */
     try {
-
-        this->_channel = c;
-        this->_gain = g;
         
         /**
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
          */
-        this->_readRawBytes();
+        this->getValue();
         
     }
     catch(const TimeoutException& e) {
@@ -479,11 +527,13 @@ void HX711::setByteFormat(const Format f) noexcept {
 
 void HX711::powerDown() noexcept {
 
-    this->_watchState = PinWatchState::PAUSE;
+    using namespace std::chrono;
+
     std::lock_guard<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    _delayMicroseconds(1);
+    //_delayMicroseconds(1);
+    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
     /**
@@ -492,13 +542,12 @@ void HX711::powerDown() noexcept {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    _delayMicroseconds(60);
+    _delaySoft(duration_cast<nanoseconds>(microseconds(60)));
 
 }
 
 void HX711::powerUp() {
 
-    this->_watchState = PinWatchState::NORMAL;
     std::unique_lock<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
@@ -508,7 +557,6 @@ void HX711::powerUp() {
      * chip will reset and enter normal operation mode"
      * Datasheet pg. 5
      */
-
     lock.unlock();
 
     /**

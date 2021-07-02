@@ -110,14 +110,21 @@ class HX711 {
 
 protected:
 
+    static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
+
+    /**
+     * Datasheet pg. 3
+     */
+    static const HX_VALUE HX_MIN_VALUE = 0x800000;
+    static const HX_VALUE HX_MAX_VALUE = 0x7FFFFF;
+
     static constexpr std::chrono::nanoseconds _DEFAULT_MAX_WAIT =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::seconds(1));
 
-    static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
-
-    static const HX_VALUE HX_MIN_VALUE = 0x800000;
-    static const HX_VALUE HX_MAX_VALUE = 0x7FFFFF;
+    static constexpr std::chrono::nanoseconds _DEFAULT_PAUSE_SLEEP =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds(100));
 
     static constexpr std::chrono::nanoseconds _DEFAULT_POLL_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -136,10 +143,11 @@ protected:
     const int _clockPin;
     std::mutex _commLock;
     std::mutex _readyLock;
+    std::mutex _pinWatchLock;
     std::condition_variable _dataReady;
-    std::chrono::nanoseconds _maxWait;
     HX_VALUE _lastVal;
     PinWatchState _watchState;
+    std::chrono::nanoseconds _pauseSleep;
     std::chrono::nanoseconds _notReadySleep;
     std::chrono::nanoseconds _saturatedSleep;
     std::chrono::nanoseconds _pollSleep;
@@ -154,8 +162,10 @@ protected:
     std::uint8_t _readByte() noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
-    static void _delayMicroseconds(const unsigned int us) noexcept;
-    void _watchPin() noexcept;
+    static void _delaySoft(const std::chrono::nanoseconds ns) noexcept;
+    static void _delayHard(const std::chrono::nanoseconds ns) noexcept;
+    void _watchPin();
+    void _changeWatchState(const PinWatchState state);
 
 public:
     
@@ -163,9 +173,6 @@ public:
     virtual ~HX711();
 
     void begin();
-
-    void setMaxWaitTime(
-        const std::chrono::nanoseconds maxWait = _DEFAULT_MAX_WAIT) noexcept;
 
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
@@ -176,9 +183,13 @@ public:
 
     bool isReady() noexcept;
 
-    std::vector<Timing> testTiming(const size_t samples = 1000) noexcept;
+    std::vector<Timing> testTiming(const std::size_t samples = 1000) noexcept;
 
     HX_VALUE getValue();
+    void getValues(
+        HX_VALUE* const arr,
+        const std::size_t len,
+        const std::chrono::nanoseconds maxWait = _DEFAULT_MAX_WAIT);
 
     Format getBitFormat() const noexcept;
     Format getByteFormat() const noexcept;
