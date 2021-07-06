@@ -99,8 +99,8 @@ public:
         return this->_v >= MIN->_v && this->_v <= MAX->_v;
     }
 
-    Value() : _v(MIN->_v) { } noexcept
-    Value(const int32_t v) : _v(v) { } noexcept
+    Value() noexcept : _v(MIN->_v) { }
+    Value(const int32_t v) noexcept : _v(v) { }
 
 protected:
     int32_t _v;
