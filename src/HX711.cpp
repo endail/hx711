@@ -491,14 +491,6 @@ void HX711::powerUp() {
      */
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
 
-    /**
-     * "Settling time refers to the time from power up,
-     * reset, input channel change and gain change to 
-     * valid stable output data."
-     * Datasheet pg. 3
-     */
-    ::lguSleep(0.4);
-
     lock.unlock();
 
     /**
@@ -513,6 +505,14 @@ void HX711::powerUp() {
     if(this->_gain != Gain::GAIN_128) {
         this->setGain(this->_gain);
     }
+
+    /**
+     * "Settling time refers to the time from power up,
+     * reset, input channel change and gain change to 
+     * valid stable output data."
+     * Datasheet pg. 3
+     */
+    ::lguSleep(0.4);
 
 }
 
