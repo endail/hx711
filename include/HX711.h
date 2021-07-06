@@ -83,6 +83,30 @@ const std::uint8_t PULSES[3] = {
     27
 };
 
+struct Value {
+public:
+    static const int32_t MIN = -0x800000;
+    static const int32_t MAX = 0x7FFFFF;
+
+    int32_t get() const noexcept {
+        return this->_v;
+    }
+
+    bool isSaturated() const noexcept {
+        return this->_v == MIN || this->_v == MAX;
+    }
+
+    bool isValid() const noexcept {
+        return this->_v >= MIN && this->_v <= MAX;
+    }
+
+    Value(const int32_t v) : _v(v) { }
+
+protected:
+    int32_t _v;
+
+};
+
 struct Timing {
     std::chrono::high_resolution_clock::time_point begin;
     std::chrono::high_resolution_clock::time_point ready;
@@ -135,10 +159,6 @@ protected:
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::milliseconds(57));
 
-    static constexpr std::chrono::nanoseconds _DEFAULT_SATURATED_SLEEP =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds(1));
-
     static constexpr std::chrono::nanoseconds _DEFAULT_NOT_READY_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::microseconds(7));
@@ -154,7 +174,6 @@ protected:
     PinWatchState _watchState;
     std::chrono::nanoseconds _pauseSleep;
     std::chrono::nanoseconds _notReadySleep;
-    std::chrono::nanoseconds _saturatedSleep;
     std::chrono::nanoseconds _pollSleep;
     Rate _rate;
     Channel _channel;
@@ -163,13 +182,15 @@ protected:
     Format _byteFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
+    static std::uint8_t _calculatePulses(const Gain g) noexcept;
     static bool _isSaturated(const HX_VALUE v);
+    bool _isReady() noexcept;
     bool _readBit() noexcept;
     std::uint8_t _readByte() noexcept;
     void _readRawBytes(std::uint8_t* bytes = nullptr);
     HX_VALUE _readInt();
-    static void _delaySoft(const std::chrono::nanoseconds ns) noexcept;
-    static void _delayHard(const std::chrono::nanoseconds ns) noexcept;
+    static void _sleepns(const std::chrono::nanoseconds ns) noexcept;
+    static void _delayns(const std::chrono::nanoseconds ns) noexcept;
     void _watchPin();
     void _changeWatchState(const PinWatchState state);
 
@@ -186,8 +207,6 @@ public:
     Channel getChannel() const noexcept;
     Gain getGain() const noexcept;
     void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
-
-    bool isReady() noexcept;
 
     std::vector<Timing> testTiming(const std::size_t samples = 1000) noexcept;
 

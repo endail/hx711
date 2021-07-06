@@ -22,6 +22,8 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
+#include <algorithm>
+#include <iterator>
 #include <utility>
 #include <stdexcept>
 #include <thread>
@@ -36,9 +38,29 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
+std::uint8_t HX711::_calculatePulses(const Gain g) noexcept {
+    return PULSES[static_cast<std::uint8_t>(g)] -
+        8 * _BYTES_PER_CONVERSION_PERIOD;
+}
+
 bool HX711::_isSaturated(const HX_VALUE v) {
     //Datasheet pg. 4
     return v == HX_MIN_VALUE || v == HX_MAX_VALUE;
+}
+
+bool HX711::_isReady() noexcept {
+
+    /**
+     * HX711 will be "ready" when DOUT is low.
+     * "Ready" means "data is ready for retrieval".
+     * Datasheet pg. 4
+     * 
+     * This should be a one-shot test. Any follow-ups
+     * or looping for checking if the sensor is ready
+     * over time can/should be done by other calling code
+     */
+    return ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 0;
+
 }
 
 bool HX711::_readBit() noexcept {
@@ -51,8 +73,7 @@ bool HX711::_readBit() noexcept {
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
-    //_delayMicroseconds(1);
-    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
+    _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -61,8 +82,7 @@ bool HX711::_readBit() noexcept {
     //the clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    //_delayMicroseconds(1);
-    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
+    _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
     return bit;
 
@@ -111,8 +131,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * can go high. T1 in Fig.2.
      * Datasheet pg. 5
      */
-    //_delayMicroseconds(1);
-    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
+    _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
@@ -134,9 +153,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * when reading the three bytes (3 * 8), so only one
      * additional pulse is needed.
      */
-    const std::uint8_t pulsesNeeded = 
-        PULSES[static_cast<std::size_t>(this->_gain)] -
-            8 * _BYTES_PER_CONVERSION_PERIOD;
+    const std::uint8_t pulsesNeeded = _calculatePulses(this->_gain);
 
     for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
         this->_readBit();
@@ -167,9 +184,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
     }
 
     //finally, copy the local raw bytes to the byte array
-    for(std::uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
-        bytes[i] = raw[i];
-    }
+    std::copy(std::begin(raw), std::end(raw), std::begin(bytes));
 
 }
 
@@ -192,12 +207,12 @@ HX_VALUE HX711::_readInt() {
 
 }
 
-void HX711::_delaySoft(const std::chrono::nanoseconds ns) noexcept {
+void HX711::_sleepns(const std::chrono::nanoseconds ns) noexcept {
     ::lguSleep(static_cast<double>(ns.count()) / decltype(ns)::period::den);
     //std::this_thread::sleep_for(ns);
 }
 
-void HX711::_delayHard(const std::chrono::nanoseconds ns) noexcept {
+void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
 
     /**
      * This requires some explanation.
@@ -295,7 +310,7 @@ void HX711::_watchPin() {
         if(this->_watchState == PinWatchState::PAUSE) {
             stateLock.unlock();
             std::this_thread::yield();
-            _delaySoft(this->_pauseSleep);
+            _sleepns(this->_pauseSleep);
             continue;
         }
 
@@ -303,25 +318,19 @@ void HX711::_watchPin() {
             dataReadyLock.lock();
         }
 
-        if(!this->isReady()) {
+        if(!this->_isReady()) {
             stateLock.unlock();
-            _delaySoft(this->_notReadySleep);
+            _sleepns(this->_notReadySleep);
             continue;
         }
 
         const HX_VALUE v = this->_readInt();
 
-        if(_isSaturated(v)) {
-            stateLock.unlock();
-            _delaySoft(this->_saturatedSleep);
-            continue;
-        }
-
         this->_lastVal = v;
         this->_dataReady.notify_all();
         dataReadyLock.unlock();
         stateLock.unlock();
-        _delaySoft(this->_pollSleep);
+        _sleepns(this->_pollSleep);
 
     }
 
@@ -379,21 +388,6 @@ void HX711::begin() {
 
 }
 
-bool HX711::isReady() noexcept {
-
-    /**
-     * HX711 will be "ready" when DOUT is low.
-     * "Ready" means "data is ready for retrieval".
-     * Datasheet pg. 4
-     * 
-     * This should be a one-shot test. Any follow-ups
-     * or looping for checking if the sensor is ready
-     * over time can/should be done by other calling code
-     */
-    return ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 0;
-
-}
-
 std::vector<Timing> HX711::testTiming(const std::size_t samples) noexcept {
 
     using namespace std::chrono;
@@ -407,13 +401,13 @@ std::vector<Timing> HX711::testTiming(const std::size_t samples) noexcept {
 
         t.begin = high_resolution_clock::now();
         
-        while(!this->isReady());
+        while(!this->_isReady());
         t.ready = high_resolution_clock::now();
 
         this->_readInt();
         t.end = high_resolution_clock::now();
 
-        while(!this->isReady()) ;
+        while(!this->_isReady()) ;
         t.nextbegin = high_resolution_clock::now();
 
         vec.push_back(t);
@@ -533,7 +527,7 @@ void HX711::powerDown() noexcept {
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
     //_delayMicroseconds(1);
-    _delayHard(duration_cast<nanoseconds>(microseconds(1)));
+    _delayns(duration_cast<nanoseconds>(microseconds(1)));
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
     /**
@@ -542,7 +536,7 @@ void HX711::powerDown() noexcept {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    _delaySoft(duration_cast<nanoseconds>(microseconds(60)));
+    _sleepns(duration_cast<nanoseconds>(microseconds(60)));
 
 }
 
