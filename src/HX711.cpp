@@ -22,6 +22,7 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
+#include <utility>
 #include <stdexcept>
 #include <thread>
 #include <lgpio.h>
@@ -162,9 +163,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
      * which will be converted to an int.
      */
     if(this->_byteFormat == Format::LSB) {
-        const std::uint8_t swap = raw[0];
-        raw[0] = raw[_BYTES_PER_CONVERSION_PERIOD - 1];
-        raw[_BYTES_PER_CONVERSION_PERIOD - 1] = swap;
+        std::swap(raw[0], raw[_BYTES_PER_CONVERSION_PERIOD - 1]);
     }
 
     //finally, copy the local raw bytes to the byte array
