@@ -108,7 +108,7 @@ std::uint8_t HX711::_readByte() const noexcept {
 
 }
 
-void HX711::_readRawBytes(std::uint8_t* bytes) {
+void HX711::_readRawBytes(std::uint8_t* const bytes) {
 
     /**
      * Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,

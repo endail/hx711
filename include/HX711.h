@@ -105,7 +105,7 @@ protected:
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     bool _readBit() const noexcept;
     std::uint8_t _readByte() const noexcept;
-    void _readRawBytes(std::uint8_t* bytes = nullptr);
+    void _readRawBytes(std::uint8_t* const bytes = nullptr);
     HX_VALUE _readInt();
     static void _delayMicroseconds(const unsigned int us) noexcept;
 
