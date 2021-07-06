@@ -87,12 +87,6 @@ const std::uint8_t PULSES[3] = {
 struct Value {
 public:
 
-    /**
-     * Datasheet pg. 3
-     */
-    static constexpr Value MIN = Value(-0x800000);
-    static constexpr Value MAX = Value(0x7FFFFF);
-
     int32_t get() const noexcept {
         return this->_v;
     }
@@ -110,6 +104,14 @@ public:
 
 protected:
     int32_t _v;
+
+public:
+
+    /**
+     * Datasheet pg. 3
+     */
+    static constexpr Value MIN = Value(-0x800000);
+    static constexpr Value MAX = Value(0x7FFFFF);
 
 };
 
