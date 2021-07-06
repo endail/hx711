@@ -48,6 +48,7 @@ protected:
     static const char* const _UNIT_NAMES[];
 
     //deal with mass internally as grams
+    //TODO: change this to greatest precision (ie. ug)?
     double _g;
 
     //unit the calling code has chosen to represent this Mass

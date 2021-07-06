@@ -43,11 +43,6 @@ std::uint8_t HX711::_calculatePulses(const Gain g) noexcept {
         8 * _BYTES_PER_CONVERSION_PERIOD;
 }
 
-bool HX711::_isSaturated(const HX_VALUE v) {
-    //Datasheet pg. 4
-    return v == HX_MIN_VALUE || v == HX_MAX_VALUE;
-}
-
 bool HX711::_isReady() noexcept {
 
     /**
@@ -88,9 +83,9 @@ bool HX711::_readBit() noexcept {
 
 }
 
-std::uint8_t HX711::_readByte() noexcept {
+BYTE HX711::_readByte() noexcept {
 
-    std::uint8_t val = 0;
+    BYTE val = 0;
 
     //8 bits per byte...
     for(std::uint8_t i = 0; i < 8; ++i) {
@@ -108,7 +103,7 @@ std::uint8_t HX711::_readByte() noexcept {
 
 }
 
-void HX711::_readRawBytes(std::uint8_t* bytes) {
+void HX711::_readRawBytes(BYTE* bytes) {
 
     using namespace std::chrono;
 
@@ -135,7 +130,7 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
-    std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
+    BYTE raw[_BYTES_PER_CONVERSION_PERIOD];
 
     //then populate it with values from the hx711
     for(std::uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
@@ -188,9 +183,9 @@ void HX711::_readRawBytes(std::uint8_t* bytes) {
 
 }
 
-HX_VALUE HX711::_readInt() {
+Value HX711::_readInt() {
 
-    std::uint8_t bytes[_BYTES_PER_CONVERSION_PERIOD];
+    BYTE bytes[_BYTES_PER_CONVERSION_PERIOD];
     
     this->_readRawBytes(bytes);
 
@@ -203,11 +198,12 @@ HX_VALUE HX711::_readInt() {
                                    (bytes[1] << 8)  |
                                     bytes[2]         );
 
-    return _convertFromTwosComplement(twosComp);
+    return Value(_convertFromTwosComplement(twosComp));
 
 }
 
 void HX711::_sleepns(const std::chrono::nanoseconds ns) noexcept {
+    //TODO: in this context, this_thread::sleep_for may be more appropiate
     ::lguSleep(static_cast<double>(ns.count()) / decltype(ns)::period::den);
     //std::this_thread::sleep_for(ns);
 }
@@ -250,8 +246,8 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
 
     const uint8_t us = duration_cast<microseconds>(ns).count();
 
-    tLong.tv_sec = us / 1000000;
-    tLong.tv_usec = us % 1000000;
+    tLong.tv_sec = us / decltype(microseconds)::den;
+    tLong.tv_usec = us % decltype(microseconds)::den;
 
     ::gettimeofday(&tNow, nullptr);
     timeradd(&tNow, &tLong, &tEnd);
@@ -296,6 +292,8 @@ void HX711::_watchPin() {
      * caller can timeout while waiting if needed.
      */
 
+    //TODO: can <atomic> be used to sync state?
+
     std::unique_lock<std::mutex> stateLock(this->_pinWatchLock, std::defer_lock);
     std::unique_lock<std::mutex> dataReadyLock(this->_readyLock, std::defer_lock);
     
@@ -324,7 +322,15 @@ void HX711::_watchPin() {
             continue;
         }
 
-        const HX_VALUE v = this->_readInt();
+        const Value v = this->_readInt();
+
+        if(!v.isValid()) {
+            stateLock.unlock();
+            //sleep if out of range
+            //TODO: implement member for this
+            //_sleepns();
+            continue;
+        }
 
         this->_lastVal = v;
         this->_dataReady.notify_all();
@@ -349,7 +355,7 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
-    _lastVal(HX_MAX_VALUE),
+    _lastVal(Value::MIN),
     _watchState(PinWatchState::PAUSE),
     _pauseSleep(_DEFAULT_PAUSE_SLEEP),
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
@@ -418,14 +424,14 @@ std::vector<Timing> HX711::testTiming(const std::size_t samples) noexcept {
 
 }
 
-HX_VALUE HX711::getValue() {
-    HX_VALUE v;
+Value HX711::getValue() {
+    Value v;
     this->getValues(&v, 1);
     return v;
 }
 
 void HX711::getValues(
-    HX_VALUE* const arr,
+    Value* const arr,
     const std::size_t len,
     const std::chrono::nanoseconds maxWait) {
 
@@ -526,7 +532,6 @@ void HX711::powerDown() noexcept {
     std::lock_guard<std::mutex> lock(this->_commLock);
 
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    //_delayMicroseconds(1);
     _delayns(duration_cast<nanoseconds>(microseconds(1)));
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 

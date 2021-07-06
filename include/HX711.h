@@ -42,6 +42,7 @@ namespace HX711 {
  * treated as 32-bit integers and not floating point numbers.
  */
 typedef std::int32_t HX_VALUE;
+typedef std::uint8_t BYTE;
 
 enum class Format {
     MSB = 0, //most significant bit
@@ -85,22 +86,27 @@ const std::uint8_t PULSES[3] = {
 
 struct Value {
 public:
-    static const int32_t MIN = -0x800000;
-    static const int32_t MAX = 0x7FFFFF;
+
+    /**
+     * Datasheet pg. 3
+     */
+    static constexpr Value MIN = Value(-0x800000);
+    static constexpr Value MAX = Value(0x7FFFFF);
 
     int32_t get() const noexcept {
         return this->_v;
     }
 
     bool isSaturated() const noexcept {
-        return this->_v == MIN || this->_v == MAX;
+        return this->_v == MIN->_v || this->_v == MAX->_v;
     }
 
     bool isValid() const noexcept {
-        return this->_v >= MIN && this->_v <= MAX;
+        return this->_v >= MIN->_v && this->_v <= MAX->_v;
     }
 
-    Value(const int32_t v) : _v(v) { }
+    Value() : _v(MIN->_v) { } noexcept
+    Value(const int32_t v) : _v(v) { } noexcept
 
 protected:
     int32_t _v;
@@ -141,12 +147,6 @@ protected:
 
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
 
-    /**
-     * Datasheet pg. 3
-     */
-    static const HX_VALUE HX_MIN_VALUE = 0x800000;
-    static const HX_VALUE HX_MAX_VALUE = 0x7FFFFF;
-
     static constexpr std::chrono::nanoseconds _DEFAULT_MAX_WAIT =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::seconds(1));
@@ -170,7 +170,7 @@ protected:
     std::mutex _readyLock;
     std::mutex _pinWatchLock;
     std::condition_variable _dataReady;
-    HX_VALUE _lastVal;
+    Value _lastVal;
     PinWatchState _watchState;
     std::chrono::nanoseconds _pauseSleep;
     std::chrono::nanoseconds _notReadySleep;
@@ -183,12 +183,11 @@ protected:
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     static std::uint8_t _calculatePulses(const Gain g) noexcept;
-    static bool _isSaturated(const HX_VALUE v);
     bool _isReady() noexcept;
     bool _readBit() noexcept;
-    std::uint8_t _readByte() noexcept;
-    void _readRawBytes(std::uint8_t* bytes = nullptr);
-    HX_VALUE _readInt();
+    BYTE _readByte() noexcept;
+    void _readRawBytes(BYTE* bytes = nullptr);
+    Value _readInt();
     static void _sleepns(const std::chrono::nanoseconds ns) noexcept;
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
     void _watchPin();
@@ -210,9 +209,9 @@ public:
 
     std::vector<Timing> testTiming(const std::size_t samples = 1000) noexcept;
 
-    HX_VALUE getValue();
+    Value getValue();
     void getValues(
-        HX_VALUE* const arr,
+        Value* const arr,
         const std::size_t len,
         const std::chrono::nanoseconds maxWait = _DEFAULT_MAX_WAIT);
 

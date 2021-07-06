@@ -213,6 +213,7 @@ double Mass::convert(
 }
 
 // ratios of units to g
+// TODO: change these to use std::ratio
 const double Mass::_CONVERSIONS[10] = {
     1e-6,           //ug
     0.001,          //mg
@@ -226,6 +227,7 @@ const double Mass::_CONVERSIONS[10] = {
     28.3495         //oz
 };
 
+//TODO: change this to a std::map?
 const char* const Mass::_UNIT_NAMES[] = {
     "μg",
     "mg",
