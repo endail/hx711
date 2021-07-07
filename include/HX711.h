@@ -87,20 +87,11 @@ const std::uint8_t PULSES[3] = {
 struct Value {
 public:
 
-    int32_t get() const noexcept {
-        return this->_v;
-    }
-
-    bool isSaturated() const noexcept {
-        return this->_v == MIN->_v || this->_v == MAX->_v;
-    }
-
-    bool isValid() const noexcept {
-        return this->_v >= MIN->_v && this->_v <= MAX->_v;
-    }
-
-    Value() noexcept : _v(MIN->_v) { }
-    Value(const int32_t v) noexcept : _v(v) { }
+    int32_t get() const noexcept;
+    bool isSaturated() const noexcept;
+    bool isValid() const noexcept;
+    Value() noexcept;
+    Value(const int32_t v) noexcept;
 
 protected:
     int32_t _v;
@@ -110,8 +101,8 @@ public:
     /**
      * Datasheet pg. 3
      */
-    static constexpr Value MIN = Value(-0x800000);
-    static constexpr Value MAX = Value(0x7FFFFF);
+    static constexpr Value MIN;
+    static constexpr Value MAX;
 
 };
 

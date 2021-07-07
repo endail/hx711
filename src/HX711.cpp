@@ -32,6 +32,22 @@
 
 namespace HX711 {
 
+constexpr Value::MIN = Value(-0x800000);
+constexpr Value::MAX = Value(0x7FFFFF);
+
+int32_t Value::get() const noexcept {
+    return this->_v;
+}
+
+bool Value::isSaturated() const noexcept {
+    return this->_v == Value::MIN._v || 
+        this->_v == Value::MAX._v;
+}
+
+Value Value() noexcept : _v(Value::MIN._v) { }
+
+Value Value::Value(const int32_t v) noexcept : _v(v) { }
+
 constexpr std::chrono::nanoseconds HX711::_DEFAULT_MAX_WAIT;
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
