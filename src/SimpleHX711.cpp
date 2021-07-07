@@ -31,7 +31,7 @@
 
 namespace HX711 {
 
-double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
+double SimpleHX711::_median(const std::vector<Value>* vals) {
 
     if(vals == nullptr || vals->empty()) {
         throw std::invalid_argument("vals is null or empty");
@@ -43,7 +43,7 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 
     //to calculate the median the vector needs to be modifiable
     //hence, a copy is made
-    std::vector<HX_VALUE> copied = *vals;
+    std::vector<Value> copied = *vals;
 
     //https://stackoverflow.com/a/42791986/570787
     if(copied.size() % 2 == 0) {
@@ -68,7 +68,7 @@ double SimpleHX711::_median(const std::vector<HX_VALUE>* vals) {
 
 }
 
-double SimpleHX711::_average(const std::vector<HX_VALUE>* vals) {
+double SimpleHX711::_average(const std::vector<Value>* vals) {
 
     if(vals == nullptr || vals->empty()) {
         throw std::invalid_argument("vals is null or empty");
@@ -91,8 +91,8 @@ SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
 SimpleHX711::SimpleHX711(
     const int dataPin,
     const int clockPin,
-    const HX_VALUE refUnit,
-    const HX_VALUE offset) :
+    const Value refUnit,
+    const Value offset) :
         _hx(nullptr),
         _scaleUnit(Mass::Unit::G),
         _channel(Channel::A),
@@ -114,11 +114,11 @@ Mass::Unit SimpleHX711::getUnit() const noexcept {
     return this->_scaleUnit;
 }
 
-HX_VALUE SimpleHX711::getReferenceUnit() const noexcept {
+Value SimpleHX711::getReferenceUnit() const noexcept {
     return this->_refUnit;
 }
 
-void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) {
+void SimpleHX711::setReferenceUnit(const Value refUnit) {
 
     if(refUnit == 0) {
         throw std::invalid_argument("reference unit cannot be 0");
@@ -128,11 +128,11 @@ void SimpleHX711::setReferenceUnit(const HX_VALUE refUnit) {
 
 }
 
-HX_VALUE SimpleHX711::getOffset() const noexcept {
+Value SimpleHX711::getOffset() const noexcept {
     return this->_offset;
 }
 
-void SimpleHX711::setOffset(const HX_VALUE offset) noexcept {
+void SimpleHX711::setOffset(const Value offset) noexcept {
     this->_offset = offset;
 }
 
@@ -148,17 +148,17 @@ HX711* SimpleHX711::getBase() noexcept {
     return this->_hx;
 }
 
-std::vector<HX_VALUE> SimpleHX711::readValues(const std::size_t samples) {
-    std::vector<HX_VALUE> vals;
+std::vector<Value> SimpleHX711::readValues(const std::size_t samples) {
+    std::vector<Value> vals;
     vals.resize(samples);
     this->_hx->getValues(vals.data(), samples);
     return vals;
 }
 
 void SimpleHX711::tare(const ReadType r, const size_t samples) {
-    const HX_VALUE backup = this->_refUnit;
+    const Value backup = this->_refUnit;
     this->setReferenceUnit(1);
-    this->_offset = static_cast<HX_VALUE>(std::round(this->read(r, samples)));
+    this->_offset = static_cast<Value>(std::round(this->read(r, samples)));
     this->setReferenceUnit(backup);
 }
 
@@ -174,7 +174,7 @@ double SimpleHX711::read(const ReadType r, const std::size_t samples) {
 
     double val;
 
-    std::vector<HX_VALUE> vals = this->readValues(samples);
+    std::vector<Value> vals = this->readValues(samples);
 
     switch(r) {
         case ReadType::Median:

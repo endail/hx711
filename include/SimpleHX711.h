@@ -45,11 +45,11 @@ protected:
     HX711* _hx;
     Mass::Unit _scaleUnit;
     Channel _channel;
-    HX_VALUE _refUnit;
-    HX_VALUE _offset;
+    Value _refUnit;
+    Value _offset;
 
-    static double _median(const std::vector<HX_VALUE>* vals);
-    static double _average(const std::vector<HX_VALUE>* vals);
+    static double _median(const std::vector<Value>* vals);
+    static double _average(const std::vector<Value>* vals);
 
     //prohibit copying and assignment
     SimpleHX711(const SimpleHX711& s2) noexcept;
@@ -61,19 +61,19 @@ public:
     SimpleHX711(
         const int dataPin,
         const int clockPin,
-        const HX_VALUE refUnit = 1,
-        const HX_VALUE offset = 0);
+        const Value refUnit = 1,
+        const Value offset = 0);
 
     ~SimpleHX711();
 
     void setUnit(const Mass::Unit unit) noexcept;
     Mass::Unit getUnit() const noexcept;
 
-    HX_VALUE getReferenceUnit() const noexcept;
-    void setReferenceUnit(const HX_VALUE refUnit);
+    Value getReferenceUnit() const noexcept;
+    void setReferenceUnit(const Value refUnit);
 
-    HX_VALUE getOffset() const noexcept;
-    void setOffset(const HX_VALUE offset) noexcept;
+    Value getOffset() const noexcept;
+    void setOffset(const Value offset) noexcept;
 
     void setChannel(const Channel ch) noexcept;
     Channel getChannel() const noexcept;
@@ -86,9 +86,9 @@ public:
      * Note that the values in the vector are not adjusted as per the
      * reference unit or offset.
      * @param  {std::size_t} samples    : 
-     * @return {std::vector<HX_VALUE>}  : 
+     * @return {std::vector<Value>}  : 
      */
-    std::vector<HX_VALUE> readValues(const std::size_t samples = 3);
+    std::vector<Value> readValues(const std::size_t samples = 3);
 
     void tare(const ReadType r = ReadType::Median, const size_t samples = 3);
     Mass weight(const ReadType r = ReadType::Median, const size_t samples = 3);

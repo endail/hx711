@@ -32,21 +32,24 @@
 
 namespace HX711 {
 
-constexpr Value::MIN = Value(-0x800000);
-constexpr Value::MAX = Value(0x7FFFFF);
-
-int32_t Value::get() const noexcept {
+Value::operator int32_t() const noexcept {
     return this->_v;
 }
 
 bool Value::isSaturated() const noexcept {
-    return this->_v == Value::MIN._v || 
-        this->_v == Value::MAX._v;
+    return this->_v == _MIN || this->_v == _MAX;
 }
 
-Value Value() noexcept : _v(Value::MIN._v) { }
+bool Value::isValid() const noexcept {
+    return this->_v >= _MIN && this->_v <= _MAX;
+}
 
-Value Value::Value(const int32_t v) noexcept : _v(v) { }
+Value::Value(const std::int32_t v) noexcept : _v(v) {
+}
+
+const Value& Value::operator=(const Value& v2) const noexcept {
+    return v2;
+}
 
 constexpr std::chrono::nanoseconds HX711::_DEFAULT_MAX_WAIT;
 
@@ -195,7 +198,7 @@ void HX711::_readRawBytes(BYTE* bytes) {
     }
 
     //finally, copy the local raw bytes to the byte array
-    std::copy(std::begin(raw), std::end(raw), std::begin(bytes));
+    std::copy(std::begin(raw), std::end(raw), bytes);
 
 }
 
@@ -262,8 +265,8 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
 
     const uint8_t us = duration_cast<microseconds>(ns).count();
 
-    tLong.tv_sec = us / decltype(microseconds)::den;
-    tLong.tv_usec = us % decltype(microseconds)::den;
+    tLong.tv_sec = us / microseconds::period::den;
+    tLong.tv_usec = us % microseconds::period::den;
 
     ::gettimeofday(&tNow, nullptr);
     timeradd(&tNow, &tLong, &tEnd);
@@ -371,11 +374,10 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
-    _lastVal(Value::MIN),
+    _lastVal(Value()),
     _watchState(PinWatchState::PAUSE),
     _pauseSleep(_DEFAULT_PAUSE_SLEEP),
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
-    _saturatedSleep(_DEFAULT_SATURATED_SLEEP),
     _pollSleep(_DEFAULT_POLL_SLEEP),
     _rate(Rate::HZ_10),
     _channel(Channel::A),

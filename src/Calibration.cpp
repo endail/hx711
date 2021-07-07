@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
 
     const double raw = hx->read(ReadType::Median, samples);
     const double refUnitFloat = (raw - zeroValue) / knownWeight;
-    const HX_VALUE refUnit = static_cast<HX_VALUE>(round(refUnitFloat));
+    const Value refUnit = static_cast<Value>(round(refUnitFloat));
     delete hx;
 
     cout    << endl << endl
