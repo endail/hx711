@@ -81,7 +81,6 @@ const std::uint8_t PULSES[3] = {
 
 class Value {
 public:
-    int32_t get() const noexcept;
     operator int32_t() const noexcept;
     bool isSaturated() const noexcept;
     bool isValid() const noexcept;
