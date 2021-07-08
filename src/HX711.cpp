@@ -47,8 +47,9 @@ bool Value::isValid() const noexcept {
 Value::Value(const std::int32_t v) noexcept : _v(v) {
 }
 
-const Value& Value::operator=(const Value& v2) const noexcept {
-    return v2;
+Value& Value::operator=(const Value& v2) noexcept {
+    this->_v = v2._v;
+    return *this;
 }
 
 constexpr std::chrono::nanoseconds HX711::_DEFAULT_MAX_WAIT;

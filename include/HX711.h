@@ -85,10 +85,10 @@ public:
     bool isSaturated() const noexcept;
     bool isValid() const noexcept;
     Value(const std::int32_t v = _MIN) noexcept;
-    const Value& operator=(const Value& v2) const noexcept;
+    Value& operator=(const Value& v2) noexcept;
 
 protected:
-    const int32_t _v;
+    int32_t _v;
 
     /**
      * Datasheet pg. 3
