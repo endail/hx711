@@ -25,12 +25,13 @@
 #include <algorithm>
 #include <cerrno>
 #include <iterator>
-#include <utility>
+#include <limits>
 #include <stdexcept>
 #include <thread>
+#include <utility>
 #include <lgpio.h>
-#include <sys/time.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 namespace HX711 {
 
@@ -47,6 +48,9 @@ bool Value::isValid() const noexcept {
 }
 
 Value::Value(const std::int32_t v) noexcept : _v(v) {
+}
+
+Value::Value() noexcept : _v(std::numeric_limits<std::int32_t>::min()) {
 }
 
 Value& Value::operator=(const Value& v2) noexcept {
@@ -90,6 +94,10 @@ bool HX711::_readBit() noexcept {
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
+    //
+    //NOTE: in practice this [probably] isn't really going to matter
+    //due to how miniscule the amount of time is and how slow the
+    //execution of the code is in comparison
     _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
     //at this stage, DOUT is ready and the clock pin has been held
@@ -98,6 +106,8 @@ bool HX711::_readBit() noexcept {
 
     //the clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
+    //
+    //NOTE: as before, the delay probably isn't going to matter
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
     _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
@@ -129,24 +139,14 @@ void HX711::_readRawBytes(BYTE* bytes) {
 
     using namespace std::chrono;
 
-    /**
-     * Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
-     * wait until this occurs.
-     * Datasheet pg. 5
-     * 
-     * The - potential- issue is that DOUT going low does not appear to be
-     * defined. It appears to occur whenever it is ready, whenever that is.
-     * 
-     * The code below should limit that to a reasonable time-frame of checking
-     * after a predefined interval for a predefined number of attempts.
-     */
-
     std::unique_lock<std::mutex> communication(this->_commLock);
 
     /**
      * When DOUT goes low, there is a minimum of 0.1us until the clock pin
      * can go high. T1 in Fig.2.
      * Datasheet pg. 5
+     * 
+     * NOTE: as described earlier, this [probably] isn't going to matter
      */
     _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
@@ -263,15 +263,18 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
     using namespace std::chrono;
 
     struct timeval tNow;
-    struct timeval tLong;
+    struct timeval tLong = {0};
     struct timeval tEnd;
 
     //This data type is intentionally small. See notes above.
     const uint8_t us = duration_cast<microseconds>(ns).count();
 
-    //TODO: if this function is only going to be used for
-    //small delays (ie. < 0s), tv_sec will always be 0, correct?
-    tLong.tv_sec = us / microseconds::period::den;
+    /**
+     * TODO: if this function is only going to be used for
+     * small delays (ie. < 0s), tv_sec will always be 0, correct?
+     */
+    //tLong.tv_sec = us / microseconds::period::den;
+    //tLong.tv_sec = 0;
     tLong.tv_usec = us % microseconds::period::den;
 
     ::gettimeofday(&tNow, nullptr);
@@ -394,14 +397,36 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
+
+    /**
+     * The intention here is for the initial value to be one which is
+     * invalid. At construction, no values have been read, so the value
+     * currently held should not be usabled. Value::isValid() will
+     * therefore return false in this case.
+     */
     _lastVal(Value()),
     _watchState(PinWatchState::PAUSE),
     _pauseSleep(_DEFAULT_PAUSE_SLEEP),
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
     _pollSleep(_DEFAULT_POLL_SLEEP),
+
+    /**
+     * The HX711 chip's output rate will be at 10Hz when its X1 pin is
+     * pulled to ground. On boards such as Sparkfun's HX711, this is the
+     * default.
+     */
     _rate(Rate::HZ_10),
+
+    /**
+     * Datasheet pg. 5 describes that after a reset, the HX711 will default
+     * to channel A and a gain of 128.
+     */
     _channel(Channel::A),
     _gain(Gain::GAIN_128),
+
+    /**
+     * Datasheet pg. 4 describes the HX711 outputting bits in MSB order.
+     */
     _bitFormat(Format::MSB),
     _byteFormat(Format::MSB) {
 }
@@ -417,6 +442,7 @@ void HX711::begin() {
 
     /**
      * TODO: move this to constructor?
+     * 
      * Update 1: This seems a bit too involved for a constructor with
      * exceptions possibly being thrown. I'm comfortable leaving it as
      * a separate begin() function as it is.
@@ -432,9 +458,6 @@ void HX711::begin() {
 
     std::thread th = std::thread(&HX711::_watchPin, this);
 
-    struct sched_param schParams = {0};
-    schParams.sched_priority = ::sched_get_priority_max(_PINWATCH_SCHED_POLICY);
-
     /**
      * This may return...
      * 
@@ -446,6 +469,9 @@ void HX711::begin() {
      * priority? Yes. Use sudo if needed or calling code can temporarily
      * elevate permissions.
      */
+    struct sched_param schParams = {0};
+    schParams.sched_priority = ::sched_get_priority_max(_PINWATCH_SCHED_POLICY);
+
     const int thcode = ::pthread_setschedparam(
         th.native_handle(),
         _PINWATCH_SCHED_POLICY,
@@ -455,7 +481,7 @@ void HX711::begin() {
         case ESRCH:
         case EINVAL:
         case ENOTSUP:
-            throw std::runtime_error("unable to modify thread scheduling policy");
+            throw std::runtime_error("fatal error setting schedule policy");
     }
     
     th.detach();
@@ -545,14 +571,16 @@ Gain HX711::getGain() const noexcept {
 
 void HX711::setConfig(const Channel c, const Gain g, const Rate r) {
 
+    //the rate is unrelated to channel and gain, so change it regardless
+    //of whether the channel and gain combination is valid
+    this->_rate = r;
+
     if(c == Channel::A && g == Gain::GAIN_32) {
         throw std::invalid_argument("Channel A can only use a gain of 128 or 64");
     }
     else if(c == Channel::B && g != Gain::GAIN_32) {
         throw std::invalid_argument("Channel B can only use a gain of 32");
     }
-
-    this->_rate = r;
 
     const Channel backupChannel = this->_channel;
     const Gain backupGain = this->_gain;

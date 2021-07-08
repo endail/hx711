@@ -40,9 +40,13 @@ namespace HX711 {
 
 typedef std::uint8_t BYTE;
 
+/**
+ * MSB - most significant bit
+ * LSB - least significant bit
+ */
 enum class Format {
-    MSB = 0, //most significant bit
-    LSB //least significant bit
+    MSB = 0,
+    LSB
 };
 
 enum class Channel {
@@ -64,6 +68,7 @@ enum class PinWatchState {
     END
 };
 
+//Datasheet pg. 3
 enum class Rate {
     HZ_10,
     HZ_80
@@ -82,17 +87,33 @@ const std::uint8_t PULSES[3] = {
 
 class Value {
 public:
-    operator int32_t() const noexcept;
+
+    /**
+     * When input differential signal goes out of
+     * the 24 bit range, the output data will be saturated
+     * at 800000h (MIN) or 7FFFFFh (MAX), until the
+     * input signal comes back to the input range.
+     * Datasheet pg. 4
+     */
     bool isSaturated() const noexcept;
+
+    /**
+     * A 32 bit integer holds the actual value from the sensor. Calling
+     * this function makes sure it is within the 24 bit range used by
+     * the sensor.
+     */
     bool isValid() const noexcept;
-    Value(const std::int32_t v = _MIN) noexcept;
+    operator std::int32_t() const noexcept;
+    Value(const std::int32_t v) noexcept;
+    Value() noexcept;
     Value& operator=(const Value& v2) noexcept;
 
 protected:
-    int32_t _v;
+    std::int32_t _v;
 
     /**
      * Datasheet pg. 3
+     * But also a consequence of the sensor being 24 bits
      */
     static const int32_t _MIN = -0x800000;
     static const int32_t _MAX = 0x7FFFFF;
