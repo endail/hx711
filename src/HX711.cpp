@@ -23,6 +23,7 @@
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
 #include <algorithm>
+#include <cassert>
 #include <cerrno>
 #include <iterator>
 #include <limits>
@@ -71,6 +72,8 @@ std::uint8_t HX711::_calculatePulses(const Gain g) noexcept {
 
 bool HX711::_isReady() noexcept {
 
+    assert(this->_gpioHandle != -1);
+
     /**
      * HX711 will be "ready" when DOUT is low.
      * "Ready" means "data is ready for retrieval".
@@ -87,6 +90,8 @@ bool HX711::_isReady() noexcept {
 bool HX711::_readBit() noexcept {
 
     using namespace std::chrono;
+
+    assert(this->_gpioHandle != -1);
 
     //first, clock pin is set high to make DOUT ready to be read from
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
@@ -225,9 +230,13 @@ Value HX711::_readInt() {
 }
 
 void HX711::_sleepns(const std::chrono::nanoseconds ns) noexcept {
-    //TODO: in this context, this_thread::sleep_for may be more appropiate
-    ::lguSleep(static_cast<double>(ns.count()) / decltype(ns)::period::den);
-    //std::this_thread::sleep_for(ns);
+
+    /**
+     * TODO: in this context, this_thread::sleep_for may be more appropiate
+     */
+    //::lguSleep(static_cast<double>(ns.count()) / decltype(ns)::period::den);
+    std::this_thread::sleep_for(ns);
+
 }
 
 void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
@@ -268,6 +277,8 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
 
     //This data type is intentionally small. See notes above.
     const uint8_t us = duration_cast<microseconds>(ns).count();
+
+    assert(us <= 100);
 
     /**
      * TODO: if this function is only going to be used for
@@ -322,6 +333,7 @@ void HX711::_watchPin() {
 
     /**
      * TODO: can <atomic> be used to sync state?
+     * 
      * Update 1: Perhaps not. Need finer-grained control over WHEN
      * the state can be modified. Mutex serves that purpose.
      */
@@ -433,6 +445,7 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
 
 HX711::~HX711() {
     this->_changeWatchState(PinWatchState::END);
+    assert(this->_watchState == PinWatchState::END);
     ::lgGpioFree(this->_gpioHandle, this->_clockPin);
     ::lgGpioFree(this->_gpioHandle, this->_dataPin);
     ::lgGpiochipClose(this->_gpioHandle);
@@ -535,6 +548,7 @@ void HX711::getValues(
         std::unique_lock<std::mutex> ready(this->_readyLock, std::defer_lock);
 
         this->_changeWatchState(PinWatchState::NORMAL);
+        assert(this->_watchState == PinWatchState::NORMAL);
 
         for(size_t i = 0; i < len; ++i) {
             
@@ -550,6 +564,7 @@ void HX711::getValues(
         }
 
         this->_changeWatchState(PinWatchState::PAUSE);
+        assert(this->_watchState == PinWatchState::PAUSE);
 
 }
 
@@ -630,6 +645,8 @@ void HX711::powerDown() noexcept {
 
     using namespace std::chrono;
 
+    assert(this->_gpioHandle != -1);
+
     std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
@@ -654,6 +671,8 @@ void HX711::powerDown() noexcept {
 void HX711::powerUp() {
 
     using namespace std::chrono;
+
+    assert(this->_gpioHandle != -1);
 
     std::unique_lock<std::mutex> lock(this->_commLock);
 
