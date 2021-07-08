@@ -23,12 +23,14 @@
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
 #include <algorithm>
+#include <cerrno>
 #include <iterator>
 #include <utility>
 #include <stdexcept>
 #include <thread>
 #include <lgpio.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 namespace HX711 {
 
@@ -264,8 +266,11 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
     struct timeval tLong;
     struct timeval tEnd;
 
+    //This data type is intentionally small. See notes above.
     const uint8_t us = duration_cast<microseconds>(ns).count();
 
+    //TODO: if this function is only going to be used for
+    //small delays (ie. < 0s), tv_sec will always be 0, correct?
     tLong.tv_sec = us / microseconds::period::den;
     tLong.tv_usec = us % microseconds::period::den;
 
@@ -312,11 +317,25 @@ void HX711::_watchPin() {
      * caller can timeout while waiting if needed.
      */
 
-    //TODO: can <atomic> be used to sync state?
+    /**
+     * TODO: can <atomic> be used to sync state?
+     * Update 1: Perhaps not. Need finer-grained control over WHEN
+     * the state can be modified. Mutex serves that purpose.
+     */
 
     std::unique_lock<std::mutex> stateLock(this->_pinWatchLock, std::defer_lock);
     std::unique_lock<std::mutex> dataReadyLock(this->_readyLock, std::defer_lock);
     
+    /**
+     * Leaving this here for future readers.
+     * 
+     * Any processes or threads using SCHED_FIFO or SCHED_RR shall be 
+     * unaffected by a call to setpriority().
+     * https://linux.die.net/man/3/setpriority
+     * 
+     * ::setpriority(PRIO_PROCESS, 0, PRIO_MAX);
+     */
+
     for(;;) {
 
         stateLock.lock();
@@ -396,7 +415,12 @@ HX711::~HX711() {
 
 void HX711::begin() {
 
-    //TODO: move this to constructor?
+    /**
+     * TODO: move this to constructor?
+     * Update 1: This seems a bit too involved for a constructor with
+     * exceptions possibly being thrown. I'm comfortable leaving it as
+     * a separate begin() function as it is.
+     */
 
     if(!(   
         (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
@@ -406,7 +430,35 @@ void HX711::begin() {
         throw std::runtime_error("unable to access GPIO");
     }
 
-    std::thread(&HX711::_watchPin, this).detach();
+    std::thread th = std::thread(&HX711::_watchPin, this);
+
+    struct sched_param schParams = {0};
+    schParams.sched_priority = ::sched_get_priority_max(_PINWATCH_SCHED_POLICY);
+
+    /**
+     * This may return...
+     * 
+     * EPERM  The caller does not have appropriate privileges to set the
+     * specified scheduling policy and parameters.
+     * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
+     * 
+     * If this occurs, is it still acceptable to continue at a reduced
+     * priority? Yes. Use sudo if needed or calling code can temporarily
+     * elevate permissions.
+     */
+    const int thcode = ::pthread_setschedparam(
+        th.native_handle(),
+        _PINWATCH_SCHED_POLICY,
+        &schParams);
+
+    switch(thcode) {
+        case ESRCH:
+        case EINVAL:
+        case ENOTSUP:
+            throw std::runtime_error("unable to modify thread scheduling policy");
+    }
+    
+    th.detach();
 
     this->powerDown();
     this->powerUp();
@@ -491,7 +543,7 @@ Gain HX711::getGain() const noexcept {
     return this->_gain;
 }
 
-void HX711::setConfig(const Channel c, const Gain g) {
+void HX711::setConfig(const Channel c, const Gain g, const Rate r) {
 
     if(c == Channel::A && g == Gain::GAIN_32) {
         throw std::invalid_argument("Channel A can only use a gain of 128 or 64");
@@ -499,6 +551,8 @@ void HX711::setConfig(const Channel c, const Gain g) {
     else if(c == Channel::B && g != Gain::GAIN_32) {
         throw std::invalid_argument("Channel B can only use a gain of 32");
     }
+
+    this->_rate = r;
 
     const Channel backupChannel = this->_channel;
     const Gain backupGain = this->_gain;
@@ -550,6 +604,11 @@ void HX711::powerDown() noexcept {
 
     std::lock_guard<std::mutex> lock(this->_commLock);
 
+    /**
+     * The delay between low to high is probably not necessary, but it
+     * should help to keep the underlying code from optimising it away -
+     * if does at all.
+     */
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
     _delayns(duration_cast<nanoseconds>(microseconds(1)));
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
@@ -565,6 +624,8 @@ void HX711::powerDown() noexcept {
 }
 
 void HX711::powerUp() {
+
+    using namespace std::chrono;
 
     std::unique_lock<std::mutex> lock(this->_commLock);
 
@@ -588,6 +649,17 @@ void HX711::powerUp() {
      */
     if(this->_gain != Gain::GAIN_128) {
         this->setConfig(this->_channel, this->_gain);
+    }
+
+    /**
+     * Settling time
+     * Datasheet pg. 3
+     */
+    if(this->_rate == Rate::HZ_10) {
+        _sleepns(duration_cast<nanoseconds>(milliseconds(400)));
+    }
+    else if(this->_rate == Rate::HZ_80) {
+        _sleepns(duration_cast<nanoseconds>(milliseconds(50)));
     }
 
 }

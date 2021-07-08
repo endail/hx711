@@ -29,6 +29,7 @@
 #include <mutex>
 #include <vector>
 #include <lgpio.h>
+#include <sched.h>
 
 namespace HX711 {
 
@@ -131,6 +132,7 @@ class HX711 {
 protected:
 
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
+    static const int _PINWATCH_SCHED_POLICY = SCHED_FIFO;
 
     static constexpr std::chrono::nanoseconds _DEFAULT_MAX_WAIT =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -190,7 +192,10 @@ public:
 
     Channel getChannel() const noexcept;
     Gain getGain() const noexcept;
-    void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
+    void setConfig(
+        const Channel c = Channel::A,
+        const Gain g = Gain::GAIN_128,
+        const Rate r = Rate::HZ_10);
 
     std::vector<Timing> testTiming(const std::size_t samples = 1000) noexcept;
 
