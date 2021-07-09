@@ -50,8 +50,8 @@ protected:
     static double _median(const std::vector<Value>* vals);
     static double _average(const std::vector<Value>* vals);
 
-    SimpleHX711(const SimpleHX711& shx);
-    operator=(const SimpleHX711& shx);
+    SimpleHX711(const SimpleHX711& shx) noexcept;
+    operator=(const SimpleHX711& shx) noexcept;
 
 public:
 

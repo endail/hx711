@@ -80,14 +80,14 @@ double SimpleHX711::_average(const std::vector<Value>* vals) {
 
 }
 
-SimpleHX711::SimpleHX711(const SimpleHX711 &shx)
+SimpleHX711::SimpleHX711(const SimpleHX711& shx) noexcept :
     _hx(shx._hx),
     _scaleUnit(shx._scaleUnit),
     _refUnit(shx._refUnit),
     _offset(shx._offset) {
 }
 
-SimpleHX711::operator=(const SimpleHX711& shx) {
+SimpleHX711::operator=(const SimpleHX711& shx) noexcept : {
     this->_hx = shx._hx;
     this->_scaleUnit = shx._scaleUnit;
     this->_refUnit = shx._refUnit;
@@ -102,7 +102,7 @@ SimpleHX711::SimpleHX711(
         _hx(nullptr),
         _scaleUnit(Mass::Unit::G),
         _refUnit(refUnit),
-        _offset(offset)  {
+        _offset(offset) {
             this->_hx = new HX711(dataPin, clockPin);
             this->_hx->begin();
 }
