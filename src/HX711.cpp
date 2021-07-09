@@ -94,10 +94,10 @@ bool HX711::_readBit() noexcept {
 
     assert(this->_gpioHandle != -1);
 
-    //first, clock pin is set high to make DOUT ready to be read from
+    //First, clock pin is set high to make DOUT ready to be read from
     ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
 
-    //then delay for sufficient time to allow DOUT to be ready (0.1us)
+    //Then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
     //pin to remain high
     //
@@ -106,11 +106,11 @@ bool HX711::_readBit() noexcept {
     //execution of the code is in comparison
     _delayns(duration_cast<nanoseconds>(microseconds(1)));
 
-    //at this stage, DOUT is ready and the clock pin has been held
+    //At this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
     const bool bit = ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 1;
 
-    //the clock pin then needs to be held for at least 0.2us before
+    //The clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
     //
     //NOTE: as before, the delay probably isn't going to matter
@@ -141,7 +141,7 @@ BYTE HX711::_readByte() noexcept {
 
 }
 
-void HX711::_readRawBytes(BYTE* bytes) {
+void HX711::_readRawBytes(BYTE* const bytes) {
 
     using namespace std::chrono;
 
@@ -231,13 +231,8 @@ Value HX711::_readInt() {
 }
 
 void HX711::_sleepns(const std::chrono::nanoseconds ns) noexcept {
-
-    /**
-     * TODO: in this context, this_thread::sleep_for may be more appropiate
-     */
-    //::lguSleep(static_cast<double>(ns.count()) / decltype(ns)::period::den);
+    //lguSleep could also be used from the lgpio.h header
     std::this_thread::sleep_for(ns);
-
 }
 
 void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
@@ -268,6 +263,11 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
      * behaviour with wiringPi, which constantly calls gettimeofday until return.
      * 
      * In short, use this function for delays under 100us.
+     * 
+     * ALSO - as a consequence of timeval, the highest precision
+     * available is microseconds. So, even though this function's
+     * argument is std::chrono::nanoseconds, the smallest delay
+     * is actually 1 microsecond.
      */
 
     using namespace std::chrono;
@@ -276,18 +276,14 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
     struct timeval tLong = {0};
     struct timeval tEnd;
 
-    //This data type is intentionally small. See notes above.
-    const uint8_t us = duration_cast<microseconds>(ns).count();
-
-    assert(us <= 100);
-
     /**
-     * TODO: if this function is only going to be used for
-     * small delays (ie. < 0s), tv_sec will always be 0, correct?
+     * There is no point setting tLong.tv_sec. This function only
+     * delays for - at most - 100us. tv_sec will therefore always
+     * be 0. But, to be on the safe side, when tLong is declared
+     * it is 0-initialised.
      */
-    //tLong.tv_sec = us / microseconds::period::den;
-    //tLong.tv_sec = 0;
-    tLong.tv_usec = us % microseconds::period::den;
+    tLong.tv_usec = duration_cast<microseconds>(ns).count() % 
+        microseconds::period::den;
 
     ::gettimeofday(&tNow, nullptr);
     timeradd(&tNow, &tLong, &tEnd);
@@ -298,7 +294,7 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
 
 }
 
-void* HX711::_watchPin(void* const arg) {
+void* HX711::_watchPin(void* const hx711ptr) {
     
     /**
      * This is the thread loop function for watching when data is ready from
@@ -339,24 +335,42 @@ void* HX711::_watchPin(void* const arg) {
      * the state can be modified. Mutex serves that purpose.
      */
 
-    HX711* const self = static_cast<HX711*>(arg);
+    assert(hx711ptr != nullptr);
+
+    HX711* const self = static_cast<HX711*>(hx711ptr);
 
     const pthread_t threadId = ::pthread_self();
     std::unique_lock<std::mutex> stateLock(self->_pinWatchLock, std::defer_lock);
     std::unique_lock<std::mutex> dataReadyLock(self->_readyLock, std::defer_lock);
-    
-    /**
-     * Set the thread's policy to realtime and lower the priority to
-     * minimum. Increase the priority once the thread state changes to normal.
-     */
-    struct sched_param schParams = {
-        ::sched_get_priority_min(_PINWATCH_SCHED_POLICY)
-    };
 
-    ::pthread_setschedparam(
-        threadId,
-        _PINWATCH_SCHED_POLICY,
-        &schParams);
+    //scope for sched params to be used and removed from stack 
+    {
+
+        /**
+         * Set the thread's policy to realtime and lower the priority to
+         * minimum. Increase the priority once the thread state changes to normal.
+         */
+        struct sched_param schParams = {
+            ::sched_get_priority_min(_PINWATCH_SCHED_POLICY)
+        };
+
+        /**
+         * This may return...
+         * 
+         * EPERM  The caller does not have appropriate privileges to set the
+         * specified scheduling policy and parameters.
+         * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
+         * 
+         * If this occurs, is it still acceptable to continue at a reduced
+         * priority? Yes. Use sudo if needed or calling code can temporarily
+         * elevate permissions.
+         */
+        ::pthread_setschedparam(
+            threadId,
+            _PINWATCH_SCHED_POLICY,
+            &schParams);
+
+    }
 
     /**
      * Leaving this here for future readers.
@@ -381,7 +395,6 @@ void* HX711::_watchPin(void* const arg) {
             ::pthread_setschedprio(
                 threadId,
                 ::sched_get_priority_min(_PINWATCH_SCHED_POLICY));
-            //std::this_thread::yield();
             ::sched_yield();
             _sleepns(self->_pauseSleep);
             continue;
@@ -498,41 +511,9 @@ void HX711::begin() {
         throw std::runtime_error("unable to access GPIO");
     }
 
-    //std::thread th = std::thread(&HX711::_watchPin, this);
     pthread_t th;
-
     ::pthread_create(&th, nullptr, &HX711::_watchPin, this);
     ::pthread_detach(th);
-
-    /**
-     * This may return...
-     * 
-     * EPERM  The caller does not have appropriate privileges to set the
-     * specified scheduling policy and parameters.
-     * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
-     * 
-     * If this occurs, is it still acceptable to continue at a reduced
-     * priority? Yes. Use sudo if needed or calling code can temporarily
-     * elevate permissions.
-     */
-    /*
-    struct sched_param schParams = {0};
-    schParams.sched_priority = ::sched_get_priority_max(_PINWATCH_SCHED_POLICY);
-
-    const int thcode = ::pthread_setschedparam(
-        th.native_handle(),
-        _PINWATCH_SCHED_POLICY,
-        &schParams);
-
-    switch(thcode) {
-        case ESRCH:
-        case EINVAL:
-        case ENOTSUP:
-            throw std::runtime_error("fatal error setting schedule policy");
-    }
-    
-    th.detach();
-    */
 
     this->powerDown();
     this->powerUp();

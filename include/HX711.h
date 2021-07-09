@@ -194,11 +194,25 @@ protected:
     bool _isReady() noexcept;
     bool _readBit() noexcept;
     BYTE _readByte() noexcept;
-    void _readRawBytes(BYTE* bytes = nullptr);
+    void _readRawBytes(BYTE* const bytes = nullptr);
     Value _readInt();
+
+    /**
+     * Sleep for ns nanoseconds. The _sleepns/_delayns functions are
+     * an attempt to be analogous to usleep/udelay in the kernel.
+     * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
+     */
     static void _sleepns(const std::chrono::nanoseconds ns) noexcept;
+    
+    /**
+     * Delay for ns nanoseconds. The _sleepns/_delayns functions are
+     * an attempt to be analogous to usleep/udelay in the kernel.
+     * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
+     */
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
-    static void* _watchPin(void* const arg);
+    
+    
+    static void* _watchPin(void* const hx711ptr);
     void _changeWatchState(const PinWatchState state);
 
 public:
