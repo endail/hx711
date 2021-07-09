@@ -1,6 +1,3 @@
-src/SimpleHX711Test.cpp:50:11: style: Variable 'count' is assigned a value that is never used. [unreadVariable]
-int count = 0;
-          ^
 src/Mass.cpp:59:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
