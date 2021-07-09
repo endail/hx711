@@ -288,7 +288,7 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
     ::gettimeofday(&tNow, nullptr);
     timeradd(&tNow, &tLong, &tEnd);
 
-    //cppcheck-suppress syntaxError
+    // cppcheck-suppress syntaxError
     while(timercmp(&tNow, &tEnd, <)) {
         ::gettimeofday(&tNow, nullptr);
     }
