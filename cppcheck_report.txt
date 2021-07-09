@@ -1,34 +1,28 @@
-src/SimpleHX711.cpp:90:14: warning: Member variable 'SimpleHX711::_hx' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711::operator=(const SimpleHX711& shx) {
-             ^
-src/SimpleHX711.cpp:90:14: warning: Member variable 'SimpleHX711::_scaleUnit' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711::operator=(const SimpleHX711& shx) {
-             ^
 src/SimpleHX711Test.cpp:50:11: style: Variable 'count' is assigned a value that is never used. [unreadVariable]
 int count = 0;
           ^
 src/Mass.cpp:59:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:146:0: style: The function 'getBase' is never used. [unusedFunction]
+src/SimpleHX711.cpp:149:0: style: The function 'getBase' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:133:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:136:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:119:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/SimpleHX711.cpp:122:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:51:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:137:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:140:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:55:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:164:0: style: The function 'tare' is never used. [unusedFunction]
+src/SimpleHX711.cpp:167:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
