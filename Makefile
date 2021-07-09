@@ -127,7 +127,7 @@ hx711calibration: $(BUILDDIR)/Calibration.o
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o
-	$(CXX) $(CXXFLAGS) $(INC) \
+	$(CXX) $(CXXFLAGS) -pg $(INC) \
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
 		-L $(BUILDDIR)/static \

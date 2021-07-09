@@ -61,7 +61,7 @@ Value& Value::operator=(const Value& v2) noexcept {
     return *this;
 }
 
-constexpr std::chrono::nanoseconds HX711::_DEFAULT_MAX_WAIT;
+constexpr std::chrono::microseconds HX711::_DEFAULT_MAX_WAIT;
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);

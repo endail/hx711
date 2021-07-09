@@ -153,8 +153,8 @@ protected:
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
     static const int _PINWATCH_SCHED_POLICY = SCHED_FIFO;
 
-    static constexpr std::chrono::nanoseconds _DEFAULT_MAX_WAIT =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
+    static constexpr std::chrono::microseconds _DEFAULT_MAX_WAIT =
+        std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::seconds(1));
 
     static constexpr std::chrono::nanoseconds _DEFAULT_PAUSE_SLEEP =
