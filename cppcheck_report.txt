@@ -1,34 +1,34 @@
-src/SimpleHX711.cpp:92:19: warning: Class 'SimpleHX711' does not have a copy constructor which is recommended since it has dynamic memory/resource allocation(s). [noCopyConstructor]
-            this->_hx = new HX711(dataPin, clockPin);
-                  ^
-src/SimpleHX711.cpp:92:19: warning: Class 'SimpleHX711' does not have a operator= which is recommended since it has dynamic memory/resource allocation(s). [noOperatorEq]
-            this->_hx = new HX711(dataPin, clockPin);
-                  ^
+src/SimpleHX711.cpp:91:14: warning: Member variable 'SimpleHX711::_hx' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
+SimpleHX711::operator=(const SimpleHX711& shx) {
+             ^
+src/SimpleHX711.cpp:91:14: warning: Member variable 'SimpleHX711::_scaleUnit' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
+SimpleHX711::operator=(const SimpleHX711& shx) {
+             ^
 src/SimpleHX711Test.cpp:50:11: style: Variable 'count' is assigned a value that is never used. [unreadVariable]
 int count = 0;
           ^
 src/Mass.cpp:59:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:130:0: style: The function 'getBase' is never used. [unusedFunction]
+src/SimpleHX711.cpp:142:0: style: The function 'getBase' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:122:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:134:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:108:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/SimpleHX711.cpp:120:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:51:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:126:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:138:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:55:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:148:0: style: The function 'tare' is never used. [unusedFunction]
+src/SimpleHX711.cpp:160:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
