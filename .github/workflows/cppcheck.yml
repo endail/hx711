@@ -29,6 +29,10 @@ jobs:
         uses: deep5050/cppcheck-action@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN}}
+          check_library: enable
+          inline_suppression: enable
+          platform: unix32
+          std: c++11
         
       - name: Publish report    
         uses: mikeal/publish-to-github-action@master
