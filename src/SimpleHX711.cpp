@@ -24,6 +24,7 @@
 #include "../include/HX711.h"
 #include "../include/Mass.h"
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <numeric>
@@ -33,9 +34,8 @@ namespace HX711 {
 
 double SimpleHX711::_median(const std::vector<Value>* vals) {
 
-    if(vals == nullptr || vals->empty()) {
-        throw std::invalid_argument("vals is null or empty");
-    }
+    assert(vals != nullptr);
+    assert(!vals->empty());
 
     if(vals->size() == 1) {
         return static_cast<double>((*vals)[0]);
@@ -70,22 +70,14 @@ double SimpleHX711::_median(const std::vector<Value>* vals) {
 
 double SimpleHX711::_average(const std::vector<Value>* vals) {
 
-    if(vals == nullptr || vals->empty()) {
-        throw std::invalid_argument("vals is null or empty");
-    }
-    
+    assert(vals != nullptr);
+    assert(!vals->empty());
+
     const long long int sum = std::accumulate(
         vals->begin(), vals->end(), 0);
 
     return static_cast<double>(sum) / vals->size();
 
-}
-
-SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
-}
-
-SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
-    return *this;
 }
 
 SimpleHX711::SimpleHX711(
@@ -95,7 +87,6 @@ SimpleHX711::SimpleHX711(
     const Value offset) :
         _hx(nullptr),
         _scaleUnit(Mass::Unit::G),
-        _channel(Channel::A),
         _refUnit(refUnit),
         _offset(offset)  {
             this->_hx = new HX711(dataPin, clockPin);
@@ -136,30 +127,35 @@ void SimpleHX711::setOffset(const Value offset) noexcept {
     this->_offset = offset;
 }
 
-void SimpleHX711::setChannel(const Channel ch) noexcept {
-    this->_channel = ch;
-}
-
-Channel SimpleHX711::getChannel() const noexcept {
-    return this->_channel;
-}
-
-HX711* SimpleHX711::getBase() noexcept {
+HX711* const SimpleHX711::getBase() noexcept {
     return this->_hx;
 }
 
 std::vector<Value> SimpleHX711::readValues(const std::size_t samples) {
+    
+    if(samples == 0) {
+        throw std::range_error("samples must be at least 1");
+    }
+    
     std::vector<Value> vals;
     vals.resize(samples);
     this->_hx->getValues(vals.data(), samples);
+    
     return vals;
+
 }
 
 void SimpleHX711::tare(const ReadType r, const size_t samples) {
+    
+    if(samples == 0) {
+        throw std::range_error("samples must be at least 1");
+    }
+    
     const Value backup = this->_refUnit;
     this->setReferenceUnit(1);
     this->_offset = static_cast<Value>(std::round(this->read(r, samples)));
     this->setReferenceUnit(backup);
+    
 }
 
 Mass SimpleHX711::weight(const ReadType r, const size_t samples) {

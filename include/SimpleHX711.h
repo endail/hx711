@@ -44,17 +44,11 @@ class SimpleHX711 {
 protected:
     HX711* _hx;
     Mass::Unit _scaleUnit;
-    Channel _channel;
     Value _refUnit;
     Value _offset;
 
     static double _median(const std::vector<Value>* vals);
     static double _average(const std::vector<Value>* vals);
-
-    //prohibit copying and assignment
-    SimpleHX711(const SimpleHX711& s2) noexcept;
-    SimpleHX711& operator=(const SimpleHX711& rhs) noexcept;
-
 
 public:
 
@@ -75,10 +69,7 @@ public:
     Value getOffset() const noexcept;
     void setOffset(const Value offset) noexcept;
 
-    void setChannel(const Channel ch) noexcept;
-    Channel getChannel() const noexcept;
-
-    HX711* getBase() noexcept;
+    HX711* const getBase() noexcept;
 
     /**
      * Returns a vector of values from the sensor. This method is useful

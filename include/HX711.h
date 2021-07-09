@@ -104,6 +104,8 @@ public:
      */
     bool isValid() const noexcept;
     operator std::int32_t() const noexcept;
+    
+    //cppcheck-suppress noExplicitConstructor
     Value(const std::int32_t v) noexcept;
     Value() noexcept;
     Value& operator=(const Value& v2) noexcept;
