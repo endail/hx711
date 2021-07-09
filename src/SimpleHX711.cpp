@@ -80,6 +80,18 @@ double SimpleHX711::_average(const std::vector<Value>* vals) {
 
 }
 
+
+SimpleHX711::SimpleHX711(const SimpleHX711 &shx)
+    _hx(shx._hx),
+    _scaleUnit(shx._scaleUnit),
+    _refUnit(shx._refUnit),
+    _offset(shx._offset) {
+}
+
+SimpleHX711::operator=(const SimpleHX711& shx) {
+    throw std::runtime_error("cannot assign");
+}
+
 SimpleHX711::SimpleHX711(
     const int dataPin,
     const int clockPin,
