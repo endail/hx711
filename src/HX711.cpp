@@ -127,7 +127,7 @@ bool HX711::_readBit() {
     //NOTE: in practice this [probably] isn't really going to matter
     //due to how miniscule the amount of time is and how slow the
     //execution of the code is in comparison
-    _delayus(microseconds(1));
+    //_delayus(microseconds(1));
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -138,7 +138,7 @@ bool HX711::_readBit() {
     //
     //NOTE: as before, the delay probably isn't going to matter
     this->_writeGpio(this->_clockPin, false);
-    _delayus(microseconds(1));
+    //_delayus(microseconds(1));
 
     return bit;
 
@@ -177,7 +177,7 @@ void HX711::_readRawBytes(BYTE* const bytes) {
      * 
      * NOTE: as described earlier, this [probably] isn't going to matter
      */
-    _delayus(microseconds(1));
+    //_delayus(microseconds(1));
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten

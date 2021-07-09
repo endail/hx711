@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
     
-int count = 0;
+    //int count = 0;
 
 /*
     auto samples = hx.getBase()->testTiming(50);
@@ -98,7 +98,7 @@ int count = 0;
 //    this_thread::sleep_for(chrono::seconds(5));
 
 
-    while(true) {
+    for(int i = 0; i < 1000; ++i) {
 
         //use the median from 5 samples
         Mass m = hx.weight(ReadType::Median, 1);

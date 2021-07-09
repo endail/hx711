@@ -8,8 +8,8 @@ SRCEXT := cpp
 LIBS := -llgpio -pthread
 INC := -I $(INCDIR)
 CFLAGS :=	-O2 \
+			-pg \
 			-pipe \
-			-fomit-frame-pointer \
 			-Wall \
 			-Wfatal-errors \
 			-Werror=format-security \
@@ -21,6 +21,8 @@ CFLAGS :=	-O2 \
 			-D_FORTIFY_SOURCE=2 \
 			-fstack-clash-protection \
 			-DNDEBUG=1
+
+#			-fomit-frame-pointer \
 
 ########################################################################
 
@@ -127,7 +129,7 @@ hx711calibration: $(BUILDDIR)/Calibration.o
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o
-	$(CXX) $(CXXFLAGS) -pg $(INC) \
+	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
 		-L $(BUILDDIR)/static \
