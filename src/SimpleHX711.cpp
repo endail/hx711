@@ -88,7 +88,10 @@ SimpleHX711::SimpleHX711(const SimpleHX711 &shx)
 }
 
 SimpleHX711::operator=(const SimpleHX711& shx) {
-    throw std::runtime_error("cannot assign");
+    this->_hx = shx._hx;
+    this->_scaleUnit = shx._scaleUnit;
+    this->_refUnit = shx._refUnit;
+    this->_offset = shx._offset;
 }
 
 SimpleHX711::SimpleHX711(
