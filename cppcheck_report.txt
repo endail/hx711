@@ -4,25 +4,25 @@ int count = 0;
 src/Mass.cpp:59:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:149:0: style: The function 'getBase' is never used. [unusedFunction]
+src/SimpleHX711.cpp:150:0: style: The function 'getBase' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:136:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:137:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:122:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/SimpleHX711.cpp:123:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:51:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:140:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:141:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:55:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:167:0: style: The function 'tare' is never used. [unusedFunction]
+src/SimpleHX711.cpp:168:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
