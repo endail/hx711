@@ -1,9 +1,48 @@
-include/HX711.h:109:5: style: Class 'Value' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Value(const std::int32_t v) noexcept;
-    ^
-src/HX711.cpp:292:34: error: syntax error: <) [syntaxError]
-    while(timercmp(&tNow, &tEnd, <)) {
-                                 ^
+src/Calibration.cpp:42:18: information: --check-library: There is no matching configuration for function this_thread::sleep_for() [checkLibraryFunction]
+    this_thread::sleep_for(chrono::seconds(1));
+                 ^
+src/Calibration.cpp:42:36: information: --check-library: There is no matching configuration for function chrono::seconds() [checkLibraryFunction]
+    this_thread::sleep_for(chrono::seconds(1));
+                                   ^
+src/Calibration.cpp:42:47: information: --check-library: Function sleep_for() should have <noreturn> configuration [checkLibraryNoReturn]
+    this_thread::sleep_for(chrono::seconds(1));
+                                              ^
+src/Calibration.cpp:53:46: information: --check-library: Function setupHx() should have <noreturn> configuration [checkLibraryNoReturn]
+        setupHx(stoi(argv[1]), stoi(argv[2]));
+                                             ^
+src/Mass.cpp:87:20: information: --check-library: There is no matching configuration for function std::invalid_argument() [checkLibraryFunction]
+        throw std::invalid_argument("cannot divide by 0");
+                   ^
+src/Mass.cpp:115:20: information: --check-library: There is no matching configuration for function std::invalid_argument() [checkLibraryFunction]
+        throw std::invalid_argument("cannot divide by 0");
+                   ^
+src/SimpleHX711.cpp:54:14: information: --check-library: There is no matching configuration for function std::nth_element() [checkLibraryFunction]
+        std::nth_element(copied.begin(), median_it1, copied.end());
+             ^
+src/SimpleHX711.cpp:57:14: information: --check-library: There is no matching configuration for function std::nth_element() [checkLibraryFunction]
+        std::nth_element(copied.begin(), median_it2, copied.end());
+             ^
+src/SimpleHX711.cpp:65:14: information: --check-library: There is no matching configuration for function std::nth_element() [checkLibraryFunction]
+        std::nth_element(copied.begin(), median_it, copied.end());
+             ^
+src/SimpleHX711.cpp:76:36: information: --check-library: There is no matching configuration for function std::accumulate() [checkLibraryFunction]
+    const long long int sum = std::accumulate(
+                                   ^
+src/SimpleHX711.cpp:115:20: information: --check-library: There is no matching configuration for function std::invalid_argument() [checkLibraryFunction]
+        throw std::invalid_argument("reference unit cannot be 0");
+                   ^
+src/SimpleHX711.cpp:137:20: information: --check-library: There is no matching configuration for function std::range_error() [checkLibraryFunction]
+        throw std::range_error("samples must be at least 1");
+                   ^
+src/SimpleHX711.cpp:151:20: information: --check-library: There is no matching configuration for function std::range_error() [checkLibraryFunction]
+        throw std::range_error("samples must be at least 1");
+                   ^
+src/SimpleHX711.cpp:168:20: information: --check-library: There is no matching configuration for function std::range_error() [checkLibraryFunction]
+        throw std::range_error("samples must be at least 1");
+                   ^
+src/SimpleHX711.cpp:183:24: information: --check-library: There is no matching configuration for function std::invalid_argument() [checkLibraryFunction]
+            throw std::invalid_argument("unknown read type");
+                       ^
 src/SimpleHX711.cpp:92:19: warning: Class 'SimpleHX711' does not have a copy constructor which is recommended since it has dynamic memory/resource allocation(s). [noCopyConstructor]
             this->_hx = new HX711(dataPin, clockPin);
                   ^
