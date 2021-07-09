@@ -80,7 +80,6 @@ double SimpleHX711::_average(const std::vector<Value>* vals) {
 
 }
 
-
 SimpleHX711::SimpleHX711(const SimpleHX711 &shx)
     _hx(shx._hx),
     _scaleUnit(shx._scaleUnit),
@@ -139,6 +138,11 @@ void SimpleHX711::setOffset(const Value offset) noexcept {
     this->_offset = offset;
 }
 
+double SimpleHX711::normalise(const double v) const noexcept {
+    assert(this->_refUnit != 0);
+    return (v - this->_offset) / this->_refUnit;
+}
+
 HX711* const SimpleHX711::getBase() noexcept {
     return this->_hx;
 }
@@ -195,7 +199,7 @@ double SimpleHX711::read(const ReadType r, const std::size_t samples) {
             throw std::invalid_argument("unknown read type");
     }
 
-    return (val - this->_offset) / this->_refUnit;
+    return this->normalise(val);
 
 }
 

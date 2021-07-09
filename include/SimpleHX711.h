@@ -72,13 +72,15 @@ public:
     Value getOffset() const noexcept;
     void setOffset(const Value offset) noexcept;
 
+    double normalise(const double v) const noexcept;
+
     HX711* const getBase() noexcept;
 
     /**
      * Returns a vector of values from the sensor. This method is useful
      * if you do not want to use the predefined average or median methods.
      * Note that the values in the vector are not adjusted as per the
-     * reference unit or offset.
+     * reference unit or offset. Use the normalise function for this.
      * @param  {std::size_t} samples    : 
      * @return {std::vector<Value>}  : 
      */
