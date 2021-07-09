@@ -36,6 +36,8 @@
 #include <sched.h>
 #include <sys/time.h>
 
+//#define USE_SMALL_DELAYS 1
+
 namespace HX711 {
 
 Value::operator _INTERNAL_TYPE() const noexcept {
@@ -127,7 +129,9 @@ bool HX711::_readBit() {
     //NOTE: in practice this [probably] isn't really going to matter
     //due to how miniscule the amount of time is and how slow the
     //execution of the code is in comparison
-    //_delayus(microseconds(1));
+#ifdef USE_SMALL_DELAYS
+    _delayus(microseconds(1));
+#endif
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -138,7 +142,9 @@ bool HX711::_readBit() {
     //
     //NOTE: as before, the delay probably isn't going to matter
     this->_writeGpio(this->_clockPin, false);
-    //_delayus(microseconds(1));
+#ifdef USE_SMALL_DELAYS
+    _delayus(microseconds(1));
+#endif
 
     return bit;
 
@@ -177,7 +183,9 @@ void HX711::_readRawBytes(BYTE* const bytes) {
      * 
      * NOTE: as described earlier, this [probably] isn't going to matter
      */
-    //_delayus(microseconds(1));
+#ifdef USE_SMALL_DELAYS
+    _delayus(microseconds(1));
+#endif
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
