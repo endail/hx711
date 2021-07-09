@@ -189,9 +189,11 @@ protected:
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     static std::uint8_t _calculatePulses(const Gain g) noexcept;
-    bool _isReady() noexcept;
-    bool _readBit() noexcept;
-    BYTE _readByte() noexcept;
+    bool _readGpio(const int pin);
+    void _writeGpio(const int pin, const bool val);
+    bool _isReady();
+    bool _readBit();
+    BYTE _readByte();
     void _readRawBytes(BYTE* const bytes = nullptr);
     Value _readInt();
 
@@ -201,6 +203,7 @@ protected:
      * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
      */
     static void _sleepns(const std::chrono::nanoseconds ns) noexcept;
+    static void _sleepus(const std::chrono::microseconds us) noexcept;
     
     /**
      * Delay for ns nanoseconds. The _sleepns/_delayns functions are
@@ -208,6 +211,7 @@ protected:
      * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
      */
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
+    static void _delayus(const std::chrono::microseconds us) noexcept;
     
     static void* _watchPin(void* const hx711ptr);
     void _changeWatchState(const PinWatchState state);
@@ -229,19 +233,19 @@ public:
         const Gain g = Gain::GAIN_128,
         const Rate r = Rate::HZ_10);
 
-    std::vector<Timing> testTiming(const std::size_t samples = 1000) noexcept;
+    //std::vector<Timing> testTiming(const std::size_t samples = 1000);
 
     Value getValue();
     void getValues(
         Value* const arr,
         const std::size_t len,
-        const std::chrono::nanoseconds maxWait = _DEFAULT_MAX_WAIT);
+        const std::chrono::microseconds maxWait = _DEFAULT_MAX_WAIT);
 
     Format getBitFormat() const noexcept;
     Format getByteFormat() const noexcept;
     void setFormat(const Format bitF, const Format byteF) noexcept;
 
-    void powerDown() noexcept;
+    void powerDown();
     void powerUp();
 
 };

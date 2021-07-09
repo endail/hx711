@@ -35,7 +35,7 @@ namespace HX711 {
  * or average values read from the sensor
  */
 enum class ReadType {
-    Median = 0,
+    Median,
     Average,
 };
 
