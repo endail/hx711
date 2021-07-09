@@ -1,58 +1,40 @@
-include/HX711.h:107:5: style: Class 'Value' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+include/HX711.h:109:5: style: Class 'Value' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
     Value(const std::int32_t v) noexcept;
     ^
-src/HX711.cpp:291:34: error: syntax error: <) [syntaxError]
+src/HX711.cpp:292:34: error: syntax error: <) [syntaxError]
     while(timercmp(&tNow, &tEnd, <)) {
                                  ^
-src/SimpleHX711.cpp:84:14: warning: Member variable 'SimpleHX711::_hx' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
-             ^
-src/SimpleHX711.cpp:84:14: warning: Member variable 'SimpleHX711::_scaleUnit' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
-             ^
-src/SimpleHX711.cpp:84:14: warning: Member variable 'SimpleHX711::_channel' is not initialized in the constructor. [uninitMemberVar]
-SimpleHX711::SimpleHX711(const SimpleHX711& s2) noexcept {
-             ^
-src/SimpleHX711.cpp:87:27: warning: Member variable 'SimpleHX711::_hx' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
-                          ^
-src/SimpleHX711.cpp:87:27: warning: Member variable 'SimpleHX711::_scaleUnit' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
-                          ^
-src/SimpleHX711.cpp:87:27: warning: Member variable 'SimpleHX711::_channel' is not assigned a value in 'SimpleHX711::operator='. [operatorEqVarError]
-SimpleHX711& SimpleHX711::operator=(const SimpleHX711& rhs) noexcept {
-                          ^
+src/SimpleHX711.cpp:92:19: warning: Class 'SimpleHX711' does not have a copy constructor which is recommended since it has dynamic memory/resource allocation(s). [noCopyConstructor]
+            this->_hx = new HX711(dataPin, clockPin);
+                  ^
+src/SimpleHX711.cpp:92:19: warning: Class 'SimpleHX711' does not have a operator= which is recommended since it has dynamic memory/resource allocation(s). [noOperatorEq]
+            this->_hx = new HX711(dataPin, clockPin);
+                  ^
 src/SimpleHX711Test.cpp:50:11: style: Variable 'count' is assigned a value that is never used. [unreadVariable]
 int count = 0;
           ^
 src/Mass.cpp:59:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:147:0: style: The function 'getBase' is never used. [unusedFunction]
+src/SimpleHX711.cpp:130:0: style: The function 'getBase' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:143:0: style: The function 'getChannel' is never used. [unusedFunction]
+src/SimpleHX711.cpp:122:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:131:0: style: The function 'getOffset' is never used. [unusedFunction]
-
-^
-src/SimpleHX711.cpp:117:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/SimpleHX711.cpp:108:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:51:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:139:0: style: The function 'setChannel' is never used. [unusedFunction]
-
-^
-src/SimpleHX711.cpp:135:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:126:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:55:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:158:0: style: The function 'tare' is never used. [unusedFunction]
+src/SimpleHX711.cpp:148:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
