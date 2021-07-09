@@ -32,6 +32,7 @@
 #include <utility>
 #include <lgpio.h>
 #include <pthread.h>
+#include <sched.h>
 #include <sys/time.h>
 
 namespace HX711 {
@@ -297,7 +298,7 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
 
 }
 
-void HX711::_watchPin() {
+void* HX711::_watchPin(void* const arg) {
     
     /**
      * This is the thread loop function for watching when data is ready from
@@ -338,9 +339,25 @@ void HX711::_watchPin() {
      * the state can be modified. Mutex serves that purpose.
      */
 
-    std::unique_lock<std::mutex> stateLock(this->_pinWatchLock, std::defer_lock);
-    std::unique_lock<std::mutex> dataReadyLock(this->_readyLock, std::defer_lock);
+    HX711* const self = static_cast<HX711*>(arg);
+
+    const pthread_t threadId = ::pthread_self();
+    std::unique_lock<std::mutex> stateLock(self->_pinWatchLock, std::defer_lock);
+    std::unique_lock<std::mutex> dataReadyLock(self->_readyLock, std::defer_lock);
     
+    /**
+     * Set the thread's policy to realtime and lower the priority to
+     * minimum. Increase the priority once the thread state changes to normal.
+     */
+    struct sched_param schParams = {
+        ::sched_get_priority_min(_PINWATCH_SCHED_POLICY)
+    };
+
+    ::pthread_setschedparam(
+        threadId,
+        _PINWATCH_SCHED_POLICY,
+        &schParams);
+
     /**
      * Leaving this here for future readers.
      * 
@@ -355,48 +372,60 @@ void HX711::_watchPin() {
 
         stateLock.lock();
 
-        if(this->_watchState == PinWatchState::END) {
+        if(self->_watchState == PinWatchState::END) {
             break;
         }
         
-        if(this->_watchState == PinWatchState::PAUSE) {
+        if(self->_watchState == PinWatchState::PAUSE) {
             stateLock.unlock();
-            std::this_thread::yield();
-            _sleepns(this->_pauseSleep);
+            ::pthread_setschedprio(
+                threadId,
+                ::sched_get_priority_min(_PINWATCH_SCHED_POLICY));
+            //std::this_thread::yield();
+            ::sched_yield();
+            _sleepns(self->_pauseSleep);
             continue;
         }
+
+        //thread is in normal state; increase priority to max
+        ::pthread_setschedprio(
+            threadId,
+            ::sched_get_priority_max(_PINWATCH_SCHED_POLICY));
 
         if(!dataReadyLock.owns_lock()) {
             dataReadyLock.lock();
         }
 
-        if(!this->_isReady()) {
+        if(!self->_isReady()) {
             stateLock.unlock();
-            _sleepns(this->_notReadySleep);
+            //::sched_yield();
+            _sleepns(self->_notReadySleep);
             continue;
         }
 
-        const Value v = this->_readInt();
+        const Value v = self->_readInt();
 
         if(!v.isValid()) {
             stateLock.unlock();
             //sleep if out of range
             //TODO: implement member for this
+            //::sched_yield();
             //_sleepns();
             continue;
         }
 
-        this->_lastVal = v;
-        this->_dataReady.notify_all();
+        self->_lastVal = v;
+        self->_dataReady.notify_all();
         dataReadyLock.unlock();
         stateLock.unlock();
-        _sleepns(this->_pollSleep);
+        _sleepns(self->_pollSleep);
 
     }
 
     /**
      * Any thread cleanup stuff goes here, under the loop
      */
+    ::pthread_exit(nullptr);
 
 }
 
@@ -469,7 +498,11 @@ void HX711::begin() {
         throw std::runtime_error("unable to access GPIO");
     }
 
-    std::thread th = std::thread(&HX711::_watchPin, this);
+    //std::thread th = std::thread(&HX711::_watchPin, this);
+    pthread_t th;
+
+    ::pthread_create(&th, nullptr, &HX711::_watchPin, this);
+    ::pthread_detach(th);
 
     /**
      * This may return...
@@ -482,6 +515,7 @@ void HX711::begin() {
      * priority? Yes. Use sudo if needed or calling code can temporarily
      * elevate permissions.
      */
+    /*
     struct sched_param schParams = {0};
     schParams.sched_priority = ::sched_get_priority_max(_PINWATCH_SCHED_POLICY);
 
@@ -498,6 +532,7 @@ void HX711::begin() {
     }
     
     th.detach();
+    */
 
     this->powerDown();
     this->powerUp();

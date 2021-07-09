@@ -198,7 +198,7 @@ protected:
     Value _readInt();
     static void _sleepns(const std::chrono::nanoseconds ns) noexcept;
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
-    void _watchPin();
+    static void* _watchPin(void* const arg);
     void _changeWatchState(const PinWatchState state);
 
 public:
