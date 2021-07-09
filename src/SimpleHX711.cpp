@@ -87,11 +87,12 @@ SimpleHX711::SimpleHX711(const SimpleHX711& shx) noexcept :
     _offset(shx._offset) {
 }
 
-SimpleHX711::operator=(const SimpleHX711& shx) noexcept : {
+SimpleHX711& SimpleHX711::operator=(const SimpleHX711& shx) noexcept {
     this->_hx = shx._hx;
     this->_scaleUnit = shx._scaleUnit;
     this->_refUnit = shx._refUnit;
     this->_offset = shx._offset;
+    return *this;
 }
 
 SimpleHX711::SimpleHX711(

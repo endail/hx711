@@ -51,7 +51,7 @@ protected:
     static double _average(const std::vector<Value>* vals);
 
     SimpleHX711(const SimpleHX711& shx) noexcept;
-    operator=(const SimpleHX711& shx) noexcept;
+    SimpleHX711& operator=(const SimpleHX711& shx) noexcept;
 
 public:
 

@@ -29,23 +29,23 @@
 namespace HX711 {
 
 Mass::Mass(const double amount, const Unit u) noexcept
-    :   _g(Mass::convert(amount, u, Unit::G)),
+    :   _ug(Mass::convert(amount, u, Unit::UG)),
         _u(u) {
 }
 
 Mass::Mass(const Mass& m2) noexcept 
-    :   _g(m2._g),
+    :   _ug(m2._ug),
         _u(m2._u) {
 }
 
 Mass& Mass::operator=(const Mass& rhs) noexcept {
-    this->_g = rhs._g;
+    this->_ug = rhs._ug;
     this->_u = rhs._u;
     return *this;
 }
 
 double Mass::getValue(Unit u) const noexcept {
-    return Mass::convert(this->_g, Unit::G, u);
+    return Mass::convert(this->_ug, Unit::UG, u);
 }
 
 Mass::Unit Mass::getUnit() const noexcept {
@@ -57,71 +57,71 @@ void Mass::setUnit(const Unit u) noexcept {
 }
 
 Mass Mass::convertTo(const Unit to) const noexcept {
-    return Mass(this->_g, to);
+    return Mass(this->_ug, to);
 }
 
 Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
-        lhs._g + rhs._g,
+        lhs._ug + rhs._ug,
         lhs._u
     );
 }
 
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
-        lhs._g - rhs._g,
+        lhs._ug - rhs._ug,
         lhs._u
     );
 }
 
 Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
-        lhs._g * rhs._g,
+        lhs._ug * rhs._ug,
         lhs._u
     );
 }
 
 Mass operator/(const Mass& lhs, const Mass& rhs) {
     
-    if(rhs._g == 0) {
+    if(rhs._ug == 0) {
         throw std::invalid_argument("cannot divide by 0");
     }
     
     return Mass(
-        lhs._g / rhs._g,
+        lhs._ug / rhs._ug,
         lhs._u
     );
 
 }
 
 Mass& Mass::operator+=(const Mass& rhs) noexcept {
-    this->_g += rhs._g;
+    this->_ug += rhs._ug;
     return *this;
 }
 
 Mass& Mass::operator-=(const Mass& rhs) noexcept {
-    this->_g -= rhs._g;
+    this->_ug -= rhs._ug;
     return *this;
 }
 
 Mass& Mass::operator*=(const Mass& rhs) noexcept {
-    this->_g *= rhs._g;
+    this->_ug *= rhs._ug;
     return *this;
 }
 
 Mass& Mass::operator/=(const Mass& rhs) {
 
-    if(rhs._g == 0) {
+    if(rhs._ug == 0) {
         throw std::invalid_argument("cannot divide by 0");
     }
 
-    this->_g /= rhs._g;
+    this->_ug /= rhs._ug;
     return *this;
 
 }
 
 bool operator==(const Mass& lhs, const Mass& rhs) noexcept {
-    return lhs._g == rhs._g;
+    return lhs._ug == rhs._ug;
 }
 
 bool operator!=(const Mass& lhs, const Mass& rhs) noexcept {
@@ -129,7 +129,7 @@ bool operator!=(const Mass& lhs, const Mass& rhs) noexcept {
 }
 
 bool operator<(const Mass& lhs, const Mass& rhs) noexcept {
-    return lhs._g < rhs._g;
+    return lhs._ug < rhs._ug;
 }
 
 bool operator>(const Mass& lhs, const Mass& rhs) noexcept {
@@ -157,7 +157,7 @@ std::string Mass::toString(const Unit u) const noexcept {
     double f; //fractional
     int d = 0; //decimals
 
-    n = Mass::convert(this->_g, Unit::G, u);
+    n = Mass::convert(this->_ug, Unit::UG, u);
     f = std::modf(n, &i);
 
     /**
@@ -176,8 +176,7 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     /**
      * At this point d may be 1 even if the only decimal is 0. I
-     * do not know why this is, but I will leave it instead of 
-     * "fixing" it with string manipulation.
+     * do not know why this is.
      */
 
     ss  << std::fixed
@@ -185,7 +184,7 @@ std::string Mass::toString(const Unit u) const noexcept {
         << std::noshowpoint
         << n
         << " "
-        << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
+        << _NAMES.at(u);
     
     return ss.str();
 
@@ -201,44 +200,42 @@ double Mass::convert(
     const Unit from,
     const Unit to) noexcept {
 
-        if(to == Unit::G) {
-            return amount * Mass::_CONVERSIONS[static_cast<std::size_t>(from)];
+        if(to == Unit::UG) {
+            return amount * _RATIOS.at(from);
         }
-        else if(from == Unit::G) {
-            return amount / Mass::_CONVERSIONS[static_cast<std::size_t>(to)];
+        
+        if(from == Unit::UG) {
+            return amount / _RATIOS.at(to);
         }
 
-        return Mass::convert(amount, to, Unit::G);
+        return Mass::convert(amount, to, Unit::UG);
 
 }
 
-// ratios of units to g
-// TODO: change these to use std::ratio
-const double Mass::_CONVERSIONS[10] = {
-    1e-6,           //ug
-    0.001,          //mg
-    1.0,            //g
-    1000.0,         //kg
-    1e+6,           //ton
-    1.016e+6,       //ton (IMP)
-    907185,         //ton (US)
-    6350.29,        //st
-    535.592,        //lb
-    28.3495         //oz
-};
+const std::unordered_map<const Mass::Unit, const double> Mass::_RATIOS({
+    { Unit::UG, 1.0 },
+    { Unit::MG, 1000.0 },
+    { Unit::G,  1000000.0 },
+    { Unit::KG, 1000000000.0 },
+    { Unit::TON, 1000000000000.0 },
+    { Unit::IMP_TON, 1016046908800.0 },
+    { Unit::US_TON, 907184740000.0 },
+    { Unit::ST, 6350293180.0 },
+    { Unit::LB, 453592370.0 },
+    { Unit::OZ, 28349523.125 }
+});
 
-//TODO: change this to a std::map?
-const char* const Mass::_UNIT_NAMES[] = {
-    "μg",
-    "mg",
-    "g",
-    "kg",
-    "ton",
-    "ton (IMP)",
-    "ton (US)",
-    "st",
-    "lb",
-    "oz"
-};
+const std::unordered_map<const Mass::Unit, const char* const> Mass::_NAMES({
+    { Unit::UG, "μg" },
+    { Unit::MG, "mg" },
+    { Unit::G,  "mg" },
+    { Unit::KG, "kg" },
+    { Unit::TON, "ton" },
+    { Unit::IMP_TON, "ton (IMP)" },
+    { Unit::US_TON, "ton (US)" },
+    { Unit::ST, "st" },
+    { Unit::LB, "lb" },
+    { Unit::OZ, "oz" }
+});
 
 };

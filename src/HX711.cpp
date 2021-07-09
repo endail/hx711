@@ -37,7 +37,7 @@
 
 namespace HX711 {
 
-Value::operator int32_t() const noexcept {
+Value::operator _INTERNAL_TYPE() const noexcept {
     return this->_v;
 }
 
@@ -49,10 +49,10 @@ bool Value::isValid() const noexcept {
     return this->_v >= _MIN && this->_v <= _MAX;
 }
 
-Value::Value(const std::int32_t v) noexcept : _v(v) {
+Value::Value(const _INTERNAL_TYPE v) noexcept : _v(v) {
 }
 
-Value::Value() noexcept : _v(std::numeric_limits<std::int32_t>::min()) {
+Value::Value() noexcept : _v(std::numeric_limits<_INTERNAL_TYPE>::min()) {
 }
 
 Value& Value::operator=(const Value& v2) noexcept {
@@ -67,8 +67,7 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
 }
 
 std::uint8_t HX711::_calculatePulses(const Gain g) noexcept {
-    return PULSES[static_cast<std::uint8_t>(g)] -
-        8 * _BYTES_PER_CONVERSION_PERIOD;
+    return _PULSES.at(g) - (8 * _BYTES_PER_CONVERSION_PERIOD);
 }
 
 bool HX711::_isReady() noexcept {
@@ -650,12 +649,10 @@ Format HX711::getByteFormat() const noexcept {
     return this->_byteFormat;
 }
 
-void HX711::setBitFormat(const Format f) noexcept {
-    this->_bitFormat = f;
-}
-
-void HX711::setByteFormat(const Format f) noexcept {
-    this->_byteFormat = f;
+void HX711::setFormat(const Format bitF, const Format byteF) noexcept {
+    std::lock_guard<std::mutex> lock(this->_commLock);
+    this->_bitFormat = bitF;
+    this->_byteFormat = byteF;
 }
 
 void HX711::powerDown() noexcept {
@@ -727,5 +724,16 @@ void HX711::powerUp() {
     }
 
 }
+
+/**
+ * Used to select to correct number of clock pulses depending on the
+ * gain
+ * Datasheet pg. 4
+ */
+const std::unordered_map<const Gain, const std::uint8_t> HX711::_PULSES({
+    { Gain::GAIN_128, 25 },
+    { Gain::GAIN_32,  26 },
+    { Gain::GAIN_64,  27 }
+});
 
 };

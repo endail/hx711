@@ -27,6 +27,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 #include <lgpio.h>
 #include <sched.h>
@@ -45,24 +46,24 @@ typedef std::uint8_t BYTE;
  * LSB - least significant bit
  */
 enum class Format {
-    MSB = 0,
+    MSB,
     LSB
 };
 
 enum class Channel {
-    A = 0,
+    A,
     B
 };
 
 //Datasheet pg. 4
 enum class Gain {
-    GAIN_128 = 0,
+    GAIN_128,
     GAIN_32,
     GAIN_64
 };
 
 enum class PinWatchState {
-    NONE = 0,
+    NONE,
     NORMAL,
     PAUSE,
     END
@@ -71,21 +72,25 @@ enum class PinWatchState {
 //Datasheet pg. 3
 enum class Rate {
     HZ_10,
-    HZ_80
-};
-
-/**
- * Used as a map to select to correct number of clock pulses
- * depending on the set gain
- * Datasheet pg. 4
- */
-const std::uint8_t PULSES[3] = {
-    25,
-    26,
-    27
+    HZ_80,
+    OTHER
 };
 
 class Value {
+
+protected:
+
+    typedef std::int32_t _INTERNAL_TYPE;
+
+    _INTERNAL_TYPE _v;
+
+    /**
+     * Datasheet pg. 3
+     * But also a consequence of the sensor being 24 bits
+     */
+    static const _INTERNAL_TYPE _MIN = -0x800000;
+    static const _INTERNAL_TYPE _MAX = 0x7FFFFF;
+
 public:
 
     /**
@@ -103,22 +108,12 @@ public:
      * the sensor.
      */
     bool isValid() const noexcept;
-    operator std::int32_t() const noexcept;
+    operator _INTERNAL_TYPE() const noexcept;
     
     //cppcheck-suppress noExplicitConstructor
-    Value(const std::int32_t v) noexcept;
+    Value(const _INTERNAL_TYPE v) noexcept;
     Value() noexcept;
     Value& operator=(const Value& v2) noexcept;
-
-protected:
-    std::int32_t _v;
-
-    /**
-     * Datasheet pg. 3
-     * But also a consequence of the sensor being 24 bits
-     */
-    static const int32_t _MIN = -0x800000;
-    static const int32_t _MAX = 0x7FFFFF;
 
 };
 
@@ -153,7 +148,8 @@ struct Timing {
 class HX711 {
 
 protected:
-
+    
+    static const std::unordered_map<const Gain, const std::uint8_t> _PULSES;
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
     static const int _PINWATCH_SCHED_POLICY = SCHED_FIFO;
 
@@ -213,7 +209,6 @@ protected:
      */
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
     
-    
     static void* _watchPin(void* const hx711ptr);
     void _changeWatchState(const PinWatchState state);
 
@@ -244,8 +239,7 @@ public:
 
     Format getBitFormat() const noexcept;
     Format getByteFormat() const noexcept;
-    void setBitFormat(const Format f) noexcept;
-    void setByteFormat(const Format f) noexcept;
+    void setFormat(const Format bitF, const Format byteF) noexcept;
 
     void powerDown() noexcept;
     void powerUp();
