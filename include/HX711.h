@@ -267,6 +267,7 @@ public:
 };
 
 #include "Mass.h"
+#include "GpioException.h"
 #include "TimeoutException.h"
 #include "SimpleHX711.h"
 
