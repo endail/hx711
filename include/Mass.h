@@ -90,7 +90,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Mass& m) noexcept;
 
     static double convert(
-        const double& amount,
+        const double amount,
         const Unit from,
         const Unit to = Unit::UG) noexcept;
 

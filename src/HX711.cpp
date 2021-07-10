@@ -113,7 +113,7 @@ bool HX711::_readGpio(const int pin) {
 }
 
 void HX711::_writeGpio(const int pin, const bool val) {
-    if(::lgGpioWrite(this->_gpioHandle, pin, val ? 1 : 0) < 0) {
+    if(::lgGpioWrite(this->_gpioHandle, pin, val) < 0) {
         throw GpioException("GPIO write failure");
     }
 }

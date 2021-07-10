@@ -196,7 +196,7 @@ std::ostream& operator<<(std::ostream& os, const Mass& m) noexcept {
 }
 
 double Mass::convert(
-    const double& amount,
+    const double amount,
     const Unit from,
     const Unit to) noexcept {
 
