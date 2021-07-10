@@ -28,6 +28,32 @@
 
 namespace HX711 {
 
+const std::unordered_map<const Mass::Unit, const double> Mass::_RATIOS({
+    { Unit::UG,         1.0 },
+    { Unit::MG,         1000.0 },
+    { Unit::G,          1000000.0 },
+    { Unit::KG,         1000000000.0 },
+    { Unit::TON,        1000000000000.0 },
+    { Unit::IMP_TON,    1016046908800.0 },
+    { Unit::US_TON,     907184740000.0 },
+    { Unit::ST,         6350293180.0 },
+    { Unit::LB,         453592370.0 },
+    { Unit::OZ,         28349523.125 }
+});
+
+const std::unordered_map<const Mass::Unit, const char* const> Mass::_NAMES({
+    { Unit::UG,         "μg" },
+    { Unit::MG,         "mg" },
+    { Unit::G,          "g" },
+    { Unit::KG,         "kg" },
+    { Unit::TON,        "ton" },
+    { Unit::IMP_TON,    "ton (IMP)" },
+    { Unit::US_TON,     "ton (US)" },
+    { Unit::ST,         "st" },
+    { Unit::LB,         "lb" },
+    { Unit::OZ,         "oz" }
+});
+
 Mass::Mass(const double amount, const Unit u) noexcept
     :   _ug(Mass::convert(amount, u, Unit::UG)),
         _u(u) {
@@ -42,6 +68,10 @@ Mass& Mass::operator=(const Mass& rhs) noexcept {
     this->_ug = rhs._ug;
     this->_u = rhs._u;
     return *this;
+}
+
+Mass::operator const double() const noexcept {
+    return this->getValue(this->_u);
 }
 
 double Mass::getValue(Unit u) const noexcept {
@@ -150,7 +180,7 @@ std::string Mass::toString() const noexcept {
 
 std::string Mass::toString(const Unit u) const noexcept {
     
-    std::stringstream ss;
+    std::stringstream ss(std::string(20, '\0'));
 
     double n; //mass as a double converted to u
     double i; //integer (discard; don't use)
@@ -183,7 +213,7 @@ std::string Mass::toString(const Unit u) const noexcept {
         << std::setprecision(d)
         << std::noshowpoint
         << n
-        << " "
+        << ' '
         << _NAMES.at(u);
     
     return ss.str();
@@ -200,6 +230,10 @@ double Mass::convert(
     const Unit from,
     const Unit to) noexcept {
 
+        if(from == to) {
+            return amount;
+        }
+
         if(to == Unit::UG) {
             return amount * _RATIOS.at(from);
         }
@@ -211,31 +245,5 @@ double Mass::convert(
         return Mass::convert(amount, to, Unit::UG);
 
 }
-
-const std::unordered_map<const Mass::Unit, const double> Mass::_RATIOS({
-    { Unit::UG, 1.0 },
-    { Unit::MG, 1000.0 },
-    { Unit::G,  1000000.0 },
-    { Unit::KG, 1000000000.0 },
-    { Unit::TON, 1000000000000.0 },
-    { Unit::IMP_TON, 1016046908800.0 },
-    { Unit::US_TON, 907184740000.0 },
-    { Unit::ST, 6350293180.0 },
-    { Unit::LB, 453592370.0 },
-    { Unit::OZ, 28349523.125 }
-});
-
-const std::unordered_map<const Mass::Unit, const char* const> Mass::_NAMES({
-    { Unit::UG, "μg" },
-    { Unit::MG, "mg" },
-    { Unit::G,  "mg" },
-    { Unit::KG, "kg" },
-    { Unit::TON, "ton" },
-    { Unit::IMP_TON, "ton (IMP)" },
-    { Unit::US_TON, "ton (US)" },
-    { Unit::ST, "st" },
-    { Unit::LB, "lb" },
-    { Unit::OZ, "oz" }
-});
 
 };

@@ -52,9 +52,9 @@ constexpr std::chrono::microseconds HX711::_DEFAULT_MAX_WAIT;
  * Datasheet pg. 4
  */
 const std::unordered_map<const Gain, const std::uint8_t> HX711::_PULSES({
-    { Gain::GAIN_128, 25 },
-    { Gain::GAIN_32,  26 },
-    { Gain::GAIN_64,  27 }
+    { Gain::GAIN_128,       25 },
+    { Gain::GAIN_32,        26 },
+    { Gain::GAIN_64,        27 }
 });
 
 /**
@@ -69,7 +69,7 @@ const std::unordered_map<const Rate, const std::chrono::nanoseconds>
             std::chrono::milliseconds(50)) }
 });
 
-Value::operator _INTERNAL_TYPE() const noexcept {
+Value::operator const _INTERNAL_TYPE&() const noexcept {
     return this->_v;
 }
 

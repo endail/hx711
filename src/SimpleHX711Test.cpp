@@ -46,6 +46,8 @@ int main(int argc, char** argv) {
     const int offset = stoi(argv[4]);
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
+
+    hx.tare();
     
     //int count = 0;
 
@@ -101,7 +103,7 @@ int main(int argc, char** argv) {
     for(int i = 0; i < 1000; ++i) {
 
         //use the median from 5 samples
-        Mass m = hx.weight(ReadType::Median, 1);
+        const Mass m = hx.weight(ReadType::Median, 1);
         //count++;
 
         //cout << "\x1B[2J\x1B[H" << double(count % 80) << endl;

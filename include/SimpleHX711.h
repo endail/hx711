@@ -47,8 +47,8 @@ protected:
     Value _refUnit;
     Value _offset;
 
-    static double _median(const std::vector<Value>* vals);
-    static double _average(const std::vector<Value>* vals);
+    static double _median(const std::vector<Value>* const vals);
+    static double _average(const std::vector<Value>* const vals);
 
     SimpleHX711(const SimpleHX711& shx) noexcept;
     SimpleHX711& operator=(const SimpleHX711& shx) noexcept;
@@ -86,9 +86,9 @@ public:
      */
     std::vector<Value> readValues(const std::size_t samples = 3);
 
-    void tare(const ReadType r = ReadType::Median, const size_t samples = 3);
-    Mass weight(const ReadType r = ReadType::Median, const size_t samples = 3);
-    double read(const ReadType r = ReadType::Median, const size_t samples = 3);
+    void tare(const ReadType r = ReadType::Median, const std::size_t samples = 3);
+    Mass weight(const ReadType r = ReadType::Median, const std::size_t samples = 3);
+    double read(const ReadType r = ReadType::Median, const std::size_t samples = 3);
 
 };
 };

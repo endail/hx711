@@ -32,7 +32,7 @@
 
 namespace HX711 {
 
-double SimpleHX711::_median(const std::vector<Value>* vals) {
+double SimpleHX711::_median(const std::vector<Value>* const vals) {
 
     assert(vals != nullptr);
     assert(!vals->empty());
@@ -68,7 +68,7 @@ double SimpleHX711::_median(const std::vector<Value>* vals) {
 
 }
 
-double SimpleHX711::_average(const std::vector<Value>* vals) {
+double SimpleHX711::_average(const std::vector<Value>* const vals) {
 
     assert(vals != nullptr);
     assert(!vals->empty());
@@ -165,7 +165,7 @@ std::vector<Value> SimpleHX711::readValues(const std::size_t samples) {
 
 }
 
-void SimpleHX711::tare(const ReadType r, const size_t samples) {
+void SimpleHX711::tare(const ReadType r, const std::size_t samples) {
     
     if(samples == 0) {
         throw std::range_error("samples must be at least 1");
@@ -178,7 +178,7 @@ void SimpleHX711::tare(const ReadType r, const size_t samples) {
     
 }
 
-Mass SimpleHX711::weight(const ReadType r, const size_t samples) {
+Mass SimpleHX711::weight(const ReadType r, const std::size_t samples) {
     return Mass(this->read(r, samples), this->_scaleUnit);
 }
 
