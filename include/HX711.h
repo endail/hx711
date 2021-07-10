@@ -248,8 +248,6 @@ public:
         const Gain g = Gain::GAIN_128,
         const Rate r = Rate::HZ_10);
 
-    //std::vector<Timing> testTiming(const std::size_t samples = 1000);
-
     Value getValue();
     void getValues(
         Value* const arr,

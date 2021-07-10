@@ -659,40 +659,6 @@ void HX711::begin() {
 
 }
 
-/*
-std::vector<Timing> HX711::testTiming(const std::size_t samples) {
-
-    //TODO: move this to a derived class?
-
-    using namespace std::chrono;
-
-    std::vector<Timing> vec;
-    vec.reserve(samples);
-
-    for(size_t i = 0; i < samples; ++i) {
-
-        Timing t;
-
-        t.begin = high_resolution_clock::now();
-        
-        while(!this->_isReady());
-        t.ready = high_resolution_clock::now();
-
-        this->_readInt();
-        t.end = high_resolution_clock::now();
-
-        while(!this->_isReady()) ;
-        t.nextbegin = high_resolution_clock::now();
-
-        vec.push_back(t);
-
-    }
-
-    return vec;
-
-}
-*/
-
 Value HX711::getValue() {
     Value v;
     this->getValues(&v, 1);
