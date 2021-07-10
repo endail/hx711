@@ -180,8 +180,8 @@ std::string Mass::toString() const noexcept {
 
 std::string Mass::toString(const Unit u) const noexcept {
     
-    std::stringstream ss(std::string(20, '\0'));
-
+    std::stringstream ss;
+    
     double n; //mass as a double converted to u
     double i; //integer (discard; don't use)
     double f; //fractional
