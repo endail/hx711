@@ -28,7 +28,6 @@
 #include <cstdint>
 #include <mutex>
 #include <unordered_map>
-#include <vector>
 #include <lgpio.h>
 #include <sched.h>
 
@@ -69,7 +68,10 @@ enum class PinWatchState {
     END
 };
 
-//Datasheet pg. 3
+/**
+ * Datasheet pg. 3
+ * OTHER is to be used when an external clock (ie. crystal is used)
+ */
 enum class Rate {
     HZ_10,
     HZ_80,
@@ -150,8 +152,18 @@ class HX711 {
 protected:
     
     static const std::unordered_map<const Gain, const std::uint8_t> _PULSES;
+    static const std::unordered_map<const Rate, const std::chrono::nanoseconds> _SETTLING_TIMES;
+    
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
     static const int _PINWATCH_SCHED_POLICY = SCHED_FIFO;
+
+    static constexpr std::chrono::nanoseconds _T1 = std::chrono::nanoseconds(100);
+    static constexpr std::chrono::nanoseconds _T2 = std::chrono::nanoseconds(100);
+    static constexpr std::chrono::nanoseconds _T3 = std::chrono::nanoseconds(200);
+    static constexpr std::chrono::nanoseconds _T4 = std::chrono::nanoseconds(200);
+    
+    static constexpr std::chrono::microseconds _POWER_DOWN_TIMEOUT =
+        std::chrono::microseconds(60);
 
     static constexpr std::chrono::microseconds _DEFAULT_MAX_WAIT =
         std::chrono::duration_cast<std::chrono::microseconds>(
@@ -172,15 +184,18 @@ protected:
     int _gpioHandle;
     const int _dataPin;
     const int _clockPin;
+
     std::mutex _commLock;
     std::mutex _readyLock;
     std::mutex _pinWatchLock;
     std::condition_variable _dataReady;
+
     Value _lastVal;
     PinWatchState _watchState;
     std::chrono::nanoseconds _pauseSleep;
     std::chrono::nanoseconds _notReadySleep;
     std::chrono::nanoseconds _pollSleep;
+
     Rate _rate;
     Channel _channel;
     Gain _gain;

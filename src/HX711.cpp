@@ -22,6 +22,7 @@
 
 #include "../include/HX711.h"
 #include "../include/TimeoutException.h"
+#include "../include/GpioException.h"
 #include <algorithm>
 #include <cassert>
 #include <cerrno>
@@ -36,9 +37,37 @@
 #include <sched.h>
 #include <sys/time.h>
 
-//#define USE_SMALL_DELAYS 1
-
 namespace HX711 {
+
+constexpr std::chrono::nanoseconds HX711::_T1;
+constexpr std::chrono::nanoseconds HX711::_T2;
+constexpr std::chrono::nanoseconds HX711::_T3;
+constexpr std::chrono::nanoseconds HX711::_T4;
+constexpr std::chrono::microseconds HX711::_POWER_DOWN_TIMEOUT;
+constexpr std::chrono::microseconds HX711::_DEFAULT_MAX_WAIT;
+
+/**
+ * Used to select the correct number of clock pulses depending on the
+ * gain
+ * Datasheet pg. 4
+ */
+const std::unordered_map<const Gain, const std::uint8_t> HX711::_PULSES({
+    { Gain::GAIN_128, 25 },
+    { Gain::GAIN_32,  26 },
+    { Gain::GAIN_64,  27 }
+});
+
+/**
+ * Used to select the correct settling time depending on rate
+ * Datasheet pg. 3
+ */
+const std::unordered_map<const Rate, const std::chrono::nanoseconds> 
+    HX711::_SETTLING_TIMES({
+        { Rate::HZ_10, std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds(400)) },
+        { Rate::HZ_80, std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::milliseconds(50)) }
+});
 
 Value::operator _INTERNAL_TYPE() const noexcept {
     return this->_v;
@@ -63,8 +92,6 @@ Value& Value::operator=(const Value& v2) noexcept {
     return *this;
 }
 
-constexpr std::chrono::microseconds HX711::_DEFAULT_MAX_WAIT;
-
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
@@ -78,7 +105,7 @@ bool HX711::_readGpio(const int pin) {
     const int code = ::lgGpioRead(this->_gpioHandle, pin);
 
     if(code < 0) {
-        throw std::runtime_error("GPIO read failure");
+        throw GpioException("GPIO read failure");
     }
 
     return static_cast<bool>(code);
@@ -87,7 +114,7 @@ bool HX711::_readGpio(const int pin) {
 
 void HX711::_writeGpio(const int pin, const bool val) {
     if(::lgGpioWrite(this->_gpioHandle, pin, val ? 1 : 0) < 0) {
-        throw std::runtime_error("GPIO write failure");
+        throw GpioException("GPIO write failure");
     }
 }
 
@@ -107,7 +134,7 @@ bool HX711::_isReady() {
     try {
         return !this->_readGpio(this->_dataPin);
     }
-    catch(const std::runtime_error& ex) {
+    catch(const GpioException& ex) {
         return false;
     }
 
@@ -129,9 +156,7 @@ bool HX711::_readBit() {
     //NOTE: in practice this [probably] isn't really going to matter
     //due to how miniscule the amount of time is and how slow the
     //execution of the code is in comparison
-#ifdef USE_SMALL_DELAYS
-    _delayus(microseconds(1));
-#endif
+    _delayns(std::max(_T2, _T3));
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -142,9 +167,7 @@ bool HX711::_readBit() {
     //
     //NOTE: as before, the delay probably isn't going to matter
     this->_writeGpio(this->_clockPin, false);
-#ifdef USE_SMALL_DELAYS
-    _delayus(microseconds(1));
-#endif
+    _delayns(_T4);
 
     return bit;
 
@@ -183,9 +206,7 @@ void HX711::_readRawBytes(BYTE* const bytes) {
      * 
      * NOTE: as described earlier, this [probably] isn't going to matter
      */
-#ifdef USE_SMALL_DELAYS
-    _delayus(microseconds(1));
-#endif
+    _delayns(_T1);
 
     //delcare array of bytes of sufficient size
     //uninitialised is fine; they'll be overwritten
@@ -262,7 +283,17 @@ Value HX711::_readInt() {
 }
 
 void HX711::_sleepns(const std::chrono::nanoseconds ns) noexcept {
+
+    using namespace std::chrono;
+
+    static const constexpr microseconds THRESHOLD = microseconds(1);
+
+    if(ns < THRESHOLD) {
+        std::this_thread::sleep_for(THRESHOLD);
+    }
+
     std::this_thread::sleep_for(ns);
+
 }
 
 void HX711::_sleepus(const std::chrono::microseconds us) noexcept {
@@ -273,7 +304,13 @@ void HX711::_sleepus(const std::chrono::microseconds us) noexcept {
 void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
     
     using namespace std::chrono;
+
+    static const constexpr microseconds THRESHOLD = microseconds(1);
     
+    if(ns < THRESHOLD) {
+        return;
+    }
+
     /**
      * _delayus is called as microseconds is the highest precision
      * available for a busy-wait loop (at least in userspace)
@@ -425,18 +462,87 @@ void* HX711::_watchPin(void* const hx711ptr) {
 
     for(;;) {
 
-        stateLock.lock();
+        switch(self->_watchState) {
+        case PinWatchState::NORMAL:
 
-        if(self->_watchState == PinWatchState::END) {
-            break;
-        }
-        
-        if(self->_watchState == PinWatchState::PAUSE) {
+            //once in normal state, lock to ensure the process of
+            //obtaining sensor data is not interrupted
+            stateLock.lock();
 
+            //thread is now in normal state; increase priority to max
+            /**
+             * ISSUE: this will be called even if the priority is already
+             * at max. The question is whether it is more expensive to
+             * call it again versus checking if it NEEDS to be called
+             * again.
+             */
+            ::pthread_setschedprio(
+                threadId,
+                ::sched_get_priority_max(_PINWATCH_SCHED_POLICY));
+
+            //it is possible at this point that a lock is already in place
+            //eg. if the HX711 was not ready to send data
+            if(!dataReadyLock.owns_lock()) {
+                dataReadyLock.lock();
+            }
+
+            //check if the sensor is ready to send data
+            //if not, the thread should sleep and check again after
+            //waking up
+            if(!self->_isReady()) {
+                stateLock.unlock();
+                ::sched_yield();
+                _sleepns(self->_notReadySleep);
+                continue;
+            }
+
+            //at this point, all OK to read the sensor's value
+            try {
+                self->_lastVal = self->_readInt();
+            }
+            catch(const GpioException& ex) { 
+                
+                /**
+                 * An exception here is assumed to be at the hardware-level. That is,
+                 * a hardware GPIO issue. The sensor read retry should be instant.
+                 * 
+                 * Technically, if the retry is instant, the state should remain
+                 * locked. However, in the case that the GPIO issue is NOT
+                 * momentary, not unlocking will lead to an infinite loop with
+                 * this thread holding the lock with no way to break it.
+                 * 
+                 * So, even though the following unlock() will very quickly be
+                 * followed-up with a lock() at the beginning of the NORMAL case,
+                 * it does give an opportunity for it to be broken by other code
+                 * wanting to change state (ie. an error detection mechanism).
+                 */
+                stateLock.unlock();
+                continue;
+
+            }
+
+            //after having read the value, let the other thread(s)
+            //know it is ready, and then release the locks
+            self->_dataReady.notify_all();
+            dataReadyLock.unlock();
             stateLock.unlock();
+
+            //finally, sleep for a reasonable amount of time
+            //to go through the process again
+            _sleepns(self->_pollSleep);
+            continue;
+
+
+        case PinWatchState::PAUSE:
             
             //since state has changed to pause, the thread priority should
             //be lowered
+            /**
+             * ISSUE: this will be called even if the priority is already
+             * at min. The question is whether it is more expensive to
+             * call it again versus checking if it NEEDS to be called
+             * again.
+             */
             ::pthread_setschedprio(
                 threadId,
                 ::sched_get_priority_min(_PINWATCH_SCHED_POLICY));
@@ -446,54 +552,27 @@ void* HX711::_watchPin(void* const hx711ptr) {
             ::sched_yield();
             
             _sleepns(self->_pauseSleep);
-            
+
             continue;
 
+        case PinWatchState::END:
+        case PinWatchState::NONE:
+        default:
+            goto endthread;
+
         }
-
-        //thread is now in normal state; increase priority to max
-        ::pthread_setschedprio(
-            threadId,
-            ::sched_get_priority_max(_PINWATCH_SCHED_POLICY));
-
-        //it is possible at this point that a lock is already in place
-        //eg. if the HX711 was not ready to send data
-        if(!dataReadyLock.owns_lock()) {
-            dataReadyLock.lock();
-        }
-
-        //check if the sensor is ready to send data
-        //if not, the thread should sleep and check again after
-        //waking up
-        if(!self->_isReady()) {
-            stateLock.unlock();
-            ::sched_yield();
-            _sleepns(self->_notReadySleep);
-            continue;
-        }
-
-        //at this point, all OK to read the sensor's value
-        self->_lastVal = self->_readInt();
-
-        //after having read the value, let the other thread(s)
-        //know it is ready, and then release the locks
-        self->_dataReady.notify_all();
-        dataReadyLock.unlock();
-        stateLock.unlock();
-
-        //finally, sleep for a reasonable amount of time
-        //to go through the process again
-        _sleepns(self->_pollSleep);
 
     }
 
     /**
-     * Any thread cleanup stuff goes here, under the loop
+     * Any thread cleanup stuff goes here
      * 
-     * pthread_exit is not needed since the other thread
-     * is not worried about any return value
+     * This is a label for a goto to break out of the switch
+     * and for loop.
      */
+    endthread:
 
+    //return a code to stop the warning against non-return
     return EXIT_SUCCESS;
 
 }
@@ -504,6 +583,10 @@ void HX711::_changeWatchState(const PinWatchState state) {
 }
 
 HX711::HX711(const int dataPin, const int clockPin) noexcept :
+    
+    /**
+     * GPIO defaults
+     */
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
@@ -539,6 +622,7 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
      */
     _bitFormat(Format::MSB),
     _byteFormat(Format::MSB) {
+
 }
 
 HX711::~HX711() {
@@ -563,7 +647,7 @@ void HX711::begin() {
         ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
         ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) == 0
     )) {
-        throw std::runtime_error("unable to access GPIO");
+        throw GpioException("unable to access GPIO");
     }
 
     pthread_t th;
@@ -630,6 +714,9 @@ void HX711::getValues(
             ready.lock();
 
             if(this->_dataReady.wait_for(ready, maxWait) == std::cv_status::timeout) {
+                //ready will go out of scope and unlock on its own, but pause
+                //the other thread
+                this->_changeWatchState(PinWatchState::PAUSE);
                 throw TimeoutException("timed out while trying to read from HX711");
             }
 
@@ -709,9 +796,13 @@ Format HX711::getByteFormat() const noexcept {
 }
 
 void HX711::setFormat(const Format bitF, const Format byteF) noexcept {
+
+    //lock here to avoid changes during a conversion
     std::lock_guard<std::mutex> lock(this->_commLock);
+
     this->_bitFormat = bitF;
     this->_byteFormat = byteF;
+
 }
 
 void HX711::powerDown() {
@@ -737,7 +828,7 @@ void HX711::powerDown() {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    _sleepus(microseconds(60));
+    _sleepus(_POWER_DOWN_TIMEOUT);
 
 }
 
@@ -771,28 +862,10 @@ void HX711::powerUp() {
         this->setConfig(this->_channel, this->_gain, this->_rate);
     }
 
-    /**
-     * Settling time
-     * Datasheet pg. 3
-     */
-    if(this->_rate == Rate::HZ_10) {
-        _sleepns(duration_cast<nanoseconds>(milliseconds(400)));
-    }
-    else if(this->_rate == Rate::HZ_80) {
-        _sleepns(duration_cast<nanoseconds>(milliseconds(50)));
+    if(this->_rate != Rate::OTHER) {
+        _sleepns(_SETTLING_TIMES.at(this->_rate));
     }
 
 }
-
-/**
- * Used to select to correct number of clock pulses depending on the
- * gain
- * Datasheet pg. 4
- */
-const std::unordered_map<const Gain, const std::uint8_t> HX711::_PULSES({
-    { Gain::GAIN_128, 25 },
-    { Gain::GAIN_32,  26 },
-    { Gain::GAIN_64,  27 }
-});
 
 };
