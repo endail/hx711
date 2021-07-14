@@ -26,6 +26,8 @@
 #include "HX711.h"
 #include <chrono>
 #include <vector>
+#include <pthread.h>
+#include <sched.h>
 
 namespace HX711 {
 class Discovery : public HX711 {
@@ -34,6 +36,20 @@ public:
     Discovery(const int dataPin, const int clockPin) : 
         HX711(dataPin, clockPin) {
             this->begin();
+            this->setThreadMax();
+    }
+
+    void setThreadMax() {
+
+        struct sched_param schParams = {
+            ::sched_get_priority_max(SCHED_FIFO)
+        };
+
+        ::pthread_setschedparam(
+            ::pthread_self(),
+            SCHED_FIFO,
+            &schParams);
+
     }
 
     std::vector<std::chrono::nanoseconds> getTimeToReady(const std::size_t samples) {
@@ -43,7 +59,7 @@ public:
         std::vector<nanoseconds> timings;
         timings.reserve(samples);
 
-        //busy-wait
+        //do an initial read
         while(!this->_isReady()) ;
         this->_readInt();
 

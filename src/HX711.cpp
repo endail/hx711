@@ -295,12 +295,6 @@ void HX711::_delayns(const std::chrono::nanoseconds ns) noexcept {
     
     using namespace std::chrono;
 
-    static const constexpr microseconds THRESHOLD = microseconds(1);
-    
-    if(ns < THRESHOLD) {
-        return;
-    }
-
     /**
      * _delayus is called as microseconds is the highest precision
      * available for a busy-wait loop (at least in userspace)
@@ -343,18 +337,16 @@ void HX711::_delayus(const std::chrono::microseconds us) noexcept {
 
     assert(us.count() <= microseconds(100));
 
+    /**
+     * Can we do a min check here for uselessness?
+     */
+
     struct timeval tNow;
     struct timeval tLong = {0};
     struct timeval tEnd;
 
-    /**
-     * There is no point setting tLong.tv_sec. This function only
-     * delays for - at most - 100us. tv_sec will therefore always
-     * be 0. But, to be on the safe side, when tLong is declared
-     * it is 0-initialised.
-     */
-    tLong.tv_usec = us.count();
-    //tLong.tv_usec = us.count() % microseconds::period::den;
+    tLong.tv_sec = us.count() / microseconds::period::den;
+    tLong.tv_usec = us.count() % microseconds::period::den;
 
     ::gettimeofday(&tNow, nullptr);
     timeradd(&tNow, &tLong, &tEnd);
