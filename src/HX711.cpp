@@ -283,17 +283,7 @@ Value HX711::_readInt() {
 }
 
 void HX711::_sleepns(const std::chrono::nanoseconds ns) noexcept {
-
-    using namespace std::chrono;
-
-    static const constexpr microseconds THRESHOLD = microseconds(1);
-
-    if(ns < THRESHOLD) {
-        std::this_thread::sleep_for(THRESHOLD);
-    }
-
     std::this_thread::sleep_for(ns);
-
 }
 
 void HX711::_sleepus(const std::chrono::microseconds us) noexcept {
@@ -351,6 +341,8 @@ void HX711::_delayus(const std::chrono::microseconds us) noexcept {
 
     using namespace std::chrono;
 
+    assert(us.count() <= microseconds(100));
+
     struct timeval tNow;
     struct timeval tLong = {0};
     struct timeval tEnd;
@@ -361,7 +353,8 @@ void HX711::_delayus(const std::chrono::microseconds us) noexcept {
      * be 0. But, to be on the safe side, when tLong is declared
      * it is 0-initialised.
      */
-    tLong.tv_usec = us.count() % microseconds::period::den;
+    tLong.tv_usec = us.count();
+    //tLong.tv_usec = us.count() % microseconds::period::den;
 
     ::gettimeofday(&tNow, nullptr);
     timeradd(&tNow, &tLong, &tEnd);
@@ -651,8 +644,13 @@ void HX711::begin() {
     }
 
     pthread_t th;
-    ::pthread_create(&th, nullptr, &HX711::_watchPin, this);
-    ::pthread_detach(th);
+
+    if(!(
+        ::pthread_create(&th, nullptr, &HX711::_watchPin, this) == 0 &&
+        ::pthread_detach(th) == 0
+    )) {
+        throw std::runtime_error("unable to watch data pin value");
+    }
 
     this->powerDown();
     this->powerUp();
