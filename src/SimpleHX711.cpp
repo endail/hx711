@@ -80,36 +80,31 @@ double SimpleHX711::_average(const std::vector<Value>* const vals) {
 
 }
 
+/*
 SimpleHX711::SimpleHX711(const SimpleHX711& shx) noexcept :
-    _hx(shx._hx),
     _scaleUnit(shx._scaleUnit),
     _refUnit(shx._refUnit),
     _offset(shx._offset) {
 }
 
 SimpleHX711& SimpleHX711::operator=(const SimpleHX711& shx) noexcept {
-    this->_hx = shx._hx;
     this->_scaleUnit = shx._scaleUnit;
     this->_refUnit = shx._refUnit;
     this->_offset = shx._offset;
     return *this;
 }
+*/
 
 SimpleHX711::SimpleHX711(
     const int dataPin,
     const int clockPin,
     const Value refUnit,
     const Value offset) :
-        _hx(nullptr),
+        HX711(dataPin, clockPin),
         _scaleUnit(Mass::Unit::G),
         _refUnit(refUnit),
         _offset(offset) {
-            this->_hx = new HX711(dataPin, clockPin);
-            this->_hx->begin();
-}
-
-SimpleHX711::~SimpleHX711() {
-    delete this->_hx;
+            this->begin();
 }
 
 void SimpleHX711::setUnit(const Mass::Unit unit) noexcept {
@@ -147,10 +142,6 @@ double SimpleHX711::normalise(const double v) const noexcept {
     return (v - this->_offset) / this->_refUnit;
 }
 
-HX711* const SimpleHX711::getBase() noexcept {
-    return this->_hx;
-}
-
 std::vector<Value> SimpleHX711::readValues(const std::size_t samples) {
     
     if(samples == 0) {
@@ -159,7 +150,7 @@ std::vector<Value> SimpleHX711::readValues(const std::size_t samples) {
     
     std::vector<Value> vals;
     vals.resize(samples);
-    this->_hx->getValues(vals.data(), samples);
+    this->getValues(vals.data(), samples);
     
     return vals;
 

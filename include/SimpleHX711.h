@@ -39,10 +39,9 @@ enum class ReadType {
     Average,
 };
 
-class SimpleHX711 {
+class SimpleHX711 : public HX711 {
     
 protected:
-    HX711* _hx;
     Mass::Unit _scaleUnit;
     Value _refUnit;
     Value _offset;
@@ -50,8 +49,10 @@ protected:
     static double _median(const std::vector<Value>* const vals);
     static double _average(const std::vector<Value>* const vals);
 
+/*
     SimpleHX711(const SimpleHX711& shx) noexcept;
     SimpleHX711& operator=(const SimpleHX711& shx) noexcept;
+*/
 
 public:
 
@@ -60,8 +61,6 @@ public:
         const int clockPin,
         const Value refUnit = 1,
         const Value offset = 0);
-
-    ~SimpleHX711();
 
     void setUnit(const Mass::Unit unit) noexcept;
     Mass::Unit getUnit() const noexcept;
@@ -73,8 +72,6 @@ public:
     void setOffset(const Value offset) noexcept;
 
     double normalise(const double v) const noexcept;
-
-    HX711* const getBase() noexcept;
 
     /**
      * Returns a vector of values from the sensor. This method is useful
