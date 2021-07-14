@@ -1,3 +1,6 @@
+src/Discovery.cpp:56:14: style: Consider using std::transform algorithm instead of a raw loop. [useStlAlgorithm]
+        vals.push_back(static_cast<double>(duration_cast<microseconds>(ns).count()));
+             ^
 src/Mass.cpp:89:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
