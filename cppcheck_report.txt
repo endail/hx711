@@ -1,3 +1,6 @@
+include/Discovery.h:42:10: performance:inconclusive: Technically the member function 'HX711::Discovery::setThreadMax' can be static (but you may consider moving to unnamed namespace). [functionStatic]
+    void setThreadMax() {
+         ^
 src/Discovery.cpp:56:14: style: Consider using std::transform algorithm instead of a raw loop. [useStlAlgorithm]
         vals.push_back(static_cast<double>(duration_cast<microseconds>(ns).count()));
              ^
