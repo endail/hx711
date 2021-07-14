@@ -76,7 +76,8 @@ all: 	dirs \
 		$(BUILDDIR)/static/libhx711.a \
 		$(BUILDDIR)/shared/libhx711.so \
 		hx711calibration \
-		test
+		test \
+		discovery
 
 .PHONY: dirs
 dirs:
@@ -134,6 +135,14 @@ test: $(BUILDDIR)/SimpleHX711Test.o
 		$(BUILDDIR)/SimpleHX711Test.o \
 		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
+
+.PHONY: discovery
+test: $(BUILDDIR)/Discovery.o
+	$(CXX) $(CXXFLAGS) $(INC) \
+		-o $(BINDIR)/discovery \
+		$(BUILDDIR)/Discovery.o \
+		-L $(BUILDDIR)/static \
+		-lhx711 -lgsl $(LIBS)
 
 .PHONY: clean
 clean:
