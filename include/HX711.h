@@ -134,11 +134,17 @@ protected:
     static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
     static const int _PINWATCH_SCHED_POLICY = SCHED_FIFO;
 
+    /**
+     * Datasheet pg. 5
+     */
     static constexpr std::chrono::nanoseconds _T1 = std::chrono::nanoseconds(100);
     static constexpr std::chrono::nanoseconds _T2 = std::chrono::nanoseconds(100);
     static constexpr std::chrono::nanoseconds _T3 = std::chrono::nanoseconds(200);
     static constexpr std::chrono::nanoseconds _T4 = std::chrono::nanoseconds(200);
     
+    /**
+     * Datasheet pg. 5
+     */
     static constexpr std::chrono::microseconds _POWER_DOWN_TIMEOUT =
         std::chrono::microseconds(60);
 

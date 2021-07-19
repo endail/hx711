@@ -121,8 +121,6 @@ void HX711::_writeGpio(const int pin, const GpioLevel lev) {
 
 bool HX711::_isReady() {
 
-    assert(this->_gpioHandle != -1);
-
     /**
      * HX711 will be "ready" when DOUT is low.
      * "Ready" means "data is ready for retrieval".
@@ -145,8 +143,6 @@ bool HX711::_readBit() {
 
     using namespace std::chrono;
 
-    assert(this->_gpioHandle != -1);
-
     //first, clock pin is set high to make DOUT ready to be read from
     this->_writeGpio(this->_clockPin, GpioLevel::HIGH);
 
@@ -168,6 +164,7 @@ bool HX711::_readBit() {
     //
     //NOTE: as before, the delay probably isn't going to matter
     this->_writeGpio(this->_clockPin, GpioLevel::LOW);
+
     _delayns(_T4);
 
     return bit;
@@ -177,6 +174,10 @@ bool HX711::_readBit() {
 BYTE HX711::_readByte() {
 
     BYTE val = 0;
+
+    /**
+     * TODO: is is more efficient to have a loop for each format?
+     */
 
     //8 bits per byte...
     for(std::uint8_t i = 0; i < 8; ++i) {
@@ -222,12 +223,6 @@ void HX711::_readRawBytes(BYTE* const bytes) {
      * The HX711 requires a certain number of "positive clock
      * pulses" depending on the set gain value.
      * Datasheet pg. 4
-     * 
-     * The expression below calculates the number of pulses
-     * after having read the three bytes above. For example,
-     * a gain of 128 requires 25 pulses: 24 pulses were made
-     * when reading the three bytes (3 * 8), so only one
-     * additional pulse is needed.
      */
     const std::uint8_t pulsesNeeded = _calculatePulses(this->_gain);
 
@@ -276,7 +271,7 @@ Value HX711::_readInt() {
      */
     const std::int32_t twosComp = ((       0 << 24) |
                                    (bytes[0] << 16) |
-                                   (bytes[1] << 8)  |
+                                   (bytes[1] <<  8) |
                                     bytes[2]         );
 
     return Value(_convertFromTwosComplement(twosComp));
