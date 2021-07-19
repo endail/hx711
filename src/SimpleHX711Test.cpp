@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT] [OFFSET]";
 
     if(argc != 5) {
-        cout << err << endl;
+        cerr << err << endl;
         return EXIT_FAILURE;
     }
 
@@ -48,79 +48,24 @@ int main(int argc, char** argv) {
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
 
     hx.tare();
-    
-    //int count = 0;
-
-/*
-    auto samples = hx.getBase()->testTiming(50);
-    std::vector<std::chrono::microseconds> diffs;
-
-    for(auto t : samples) {
-        diffs.push_back(t.getTimeToReady());
-    }
-
-    std::sort(diffs.begin(), diffs.end());
-
-    cout << "Time to ready: " << endl;
-    cout << "min: " << diffs.front().count() << endl;
-    cout << "med: " << diffs[ diffs.size() / 2 ] .count() << endl;
-    cout << "max: " << diffs.back().count() << endl;
-
-    diffs.clear();
-
-    for(auto t : samples) {
-        diffs.push_back(t.getTimeBetweenConversions());
-    }
-
-    std::sort(diffs.begin(), diffs.end());
-
-    cout << "Time between conversions: " << endl;
-    cout << "min: " << diffs.front().count() << endl;
-    cout << "med: " << diffs[ diffs.size() / 2 ] .count() << endl;
-    cout << "max: " << diffs.back().count() << endl;
-*/
-
-/*
-    long long unsigned int sum = 0;
-
-    for(int i = 0; i < samples.size(); ++i) {
-        sum += samples[i].getDiff().count();
-    }
-
-    double mean = sum / samples.size();
-
-    cout << "mean: " << mean << endl;
-*/  
-    //for(auto it = samples.begin(); it != samples.end(); ++it) {
-    //    cout << it->count() << endl;
-    //}
-
-    //return EXIT_SUCCESS;
-
-//    this_thread::sleep_for(chrono::seconds(5));
-
 
     for(int i = 0; i < 1000; ++i) {
 
-        //use the median from 5 samples
         const Mass m = hx.weight(ReadType::Median, 1);
-        //count++;
-
-        //cout << "\x1B[2J\x1B[H" << double(count % 80) << endl;
-        //continue;
 
         cout    << "\x1B[2J\x1B[H"
-                << "\t" << m.getValue() << endl
-                << "\t" << m.toString(Mass::Unit::UG) << endl
-                << "\t" << m.toString(Mass::Unit::MG) << endl
-                << "\t" << m.toString(Mass::Unit::G) << endl
-                << "\t" << m.toString(Mass::Unit::KG) << endl
-                << "\t" << m.toString(Mass::Unit::TON) << endl
-                << "\t" << m.toString(Mass::Unit::IMP_TON) << endl
-                << "\t" << m.toString(Mass::Unit::US_TON) << endl
-                << "\t" << m.toString(Mass::Unit::ST) << endl
-                << "\t" << m.toString(Mass::Unit::LB) << endl
-                << "\t" << m.toString(Mass::Unit::OZ) << endl
+                << "\t" << m.getValue() << '\n'
+                << "\t" << m.toString(Mass::Unit::UG) << '\n'
+                << "\t" << m.toString(Mass::Unit::MG) << '\n'
+                << "\t" << m.toString(Mass::Unit::G) << '\n'
+                << "\t" << m.toString(Mass::Unit::KG) << '\n'
+                << "\t" << m.toString(Mass::Unit::TON) << '\n'
+                << "\t" << m.toString(Mass::Unit::IMP_TON) << '\n'
+                << "\t" << m.toString(Mass::Unit::US_TON) << '\n'
+                << "\t" << m.toString(Mass::Unit::ST) << '\n'
+                << "\t" << m.toString(Mass::Unit::LB) << '\n'
+                << "\t" << m.toString(Mass::Unit::OZ) << '\n'
+                << endl
         ;
 
     }

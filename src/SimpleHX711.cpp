@@ -37,6 +37,9 @@ double SimpleHX711::_median(const std::vector<Value>* const vals) {
     assert(vals != nullptr);
     assert(!vals->empty());
 
+    /**
+     * TODO: is this more efficient?
+     */
     if(vals->size() == 1) {
         return static_cast<double>((*vals)[0]);
     }
@@ -74,7 +77,7 @@ double SimpleHX711::_average(const std::vector<Value>* const vals) {
     assert(!vals->empty());
 
     const long long int sum = std::accumulate(
-        vals->begin(), vals->end(), 0);
+        vals->begin(), vals->end(), static_cast<long long int>(0));
 
     return static_cast<double>(sum) / vals->size();
 
