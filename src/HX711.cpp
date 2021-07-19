@@ -331,8 +331,6 @@ void HX711::_delayus(const std::chrono::microseconds us) noexcept {
 
     using namespace std::chrono;
 
-    assert(us.count() <= microseconds(100));
-
     /**
      * Can we do a min check here for uselessness?
      */
@@ -351,6 +349,40 @@ void HX711::_delayus(const std::chrono::microseconds us) noexcept {
     while(timercmp(&tNow, &tEnd, <)) {
         ::gettimeofday(&tNow, nullptr);
     }
+
+}
+
+static void HX711::_setThreadPriority(const int pri, const pthread_t th) noexcept {
+
+    struct sched_param schParams = {
+        pri
+    };
+
+    /**
+     * Leaving this here for future readers.
+     * 
+     * Any processes or threads using SCHED_FIFO or SCHED_RR shall be 
+     * unaffected by a call to setpriority().
+     * https://linux.die.net/man/3/setpriority
+     * 
+     * ::setpriority(PRIO_PROCESS, 0, PRIO_MAX);
+     */
+
+    /**
+     * This may return...
+     * 
+     * EPERM  The caller does not have appropriate privileges to set the
+     * specified scheduling policy and parameters.
+     * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
+     * 
+     * If this occurs, is it still acceptable to continue at a reduced
+     * priority? Yes. Use sudo if needed or calling code can temporarily
+     * elevate permissions.
+     */
+    ::pthread_setschedparam(
+        th >= 0 ? th : ::pthread_self(),
+        _PINWATCH_SCHED_POLICY,
+        &schParams);
 
 }
 
@@ -402,45 +434,6 @@ void* HX711::_watchPin(void* const hx711ptr) {
     std::unique_lock<std::mutex> stateLock(self->_pinWatchLock, std::defer_lock);
     std::unique_lock<std::mutex> dataReadyLock(self->_readyLock, std::defer_lock);
 
-    //scope for sched params to be used and removed from stack 
-    {
-
-        /**
-         * Set the thread's policy to realtime and lower the priority to
-         * minimum. Increase the priority once the thread state changes to normal.
-         */
-        struct sched_param schParams = {
-            ::sched_get_priority_min(_PINWATCH_SCHED_POLICY)
-        };
-
-        /**
-         * This may return...
-         * 
-         * EPERM  The caller does not have appropriate privileges to set the
-         * specified scheduling policy and parameters.
-         * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
-         * 
-         * If this occurs, is it still acceptable to continue at a reduced
-         * priority? Yes. Use sudo if needed or calling code can temporarily
-         * elevate permissions.
-         */
-        ::pthread_setschedparam(
-            threadId,
-            _PINWATCH_SCHED_POLICY,
-            &schParams);
-
-    }
-
-    /**
-     * Leaving this here for future readers.
-     * 
-     * Any processes or threads using SCHED_FIFO or SCHED_RR shall be 
-     * unaffected by a call to setpriority().
-     * https://linux.die.net/man/3/setpriority
-     * 
-     * ::setpriority(PRIO_PROCESS, 0, PRIO_MAX);
-     */
-
     for(;;) {
 
         switch(self->_watchState) {
@@ -450,30 +443,31 @@ void* HX711::_watchPin(void* const hx711ptr) {
             //obtaining sensor data is not interrupted
             stateLock.lock();
 
-            //thread is now in normal state; increase priority to max
-            /**
-             * ISSUE: this will be called even if the priority is already
-             * at max. The question is whether it is more expensive to
-             * call it again versus checking if it NEEDS to be called
-             * again.
-             */
-            ::pthread_setschedprio(
-                threadId,
-                ::sched_get_priority_max(_PINWATCH_SCHED_POLICY));
-
             //it is possible at this point that a lock is already in place
             //eg. if the HX711 was not ready to send data
             if(!dataReadyLock.owns_lock()) {
                 dataReadyLock.lock();
             }
 
-            //check if the sensor is ready to send data
-            //if not, the thread should sleep and check again after
-            //waking up
+            /**
+             * check if the sensor is ready to send data
+             * if not, the thread should delay and check again
+             * 
+             * Note the use of delay here. The wait time for readiness is
+             * very short such that is does not make sense to allow another
+             * thread to take over.
+             * 
+             * Yes, the state is unlocked. But this is to prevent deadlock
+             * (see below).
+             * 
+             * ISSUE: it is possible for this thread to retain a lock over
+             * the data ready lock if the HX711 is never ready, but is this
+             * actually a problem?
+             */
             if(!self->_isReady()) {
                 stateLock.unlock();
                 ::sched_yield();
-                _sleepns(self->_notReadySleep);
+                _delayns(self->_notReadySleep);
                 continue;
             }
 
@@ -516,24 +510,10 @@ void* HX711::_watchPin(void* const hx711ptr) {
 
         case PinWatchState::PAUSE:
             
-            //since state has changed to pause, the thread priority should
-            //be lowered
-            /**
-             * ISSUE: this will be called even if the priority is already
-             * at min. The question is whether it is more expensive to
-             * call it again versus checking if it NEEDS to be called
-             * again.
-             */
-            ::pthread_setschedprio(
-                threadId,
-                ::sched_get_priority_min(_PINWATCH_SCHED_POLICY));
-            
             //documentation recommends sched_yield over pthread_yield
             //https://man7.org/linux/man-pages/man3/pthread_yield.3.html#CONFORMING_TO
             ::sched_yield();
-            
             _sleepns(self->_pauseSleep);
-
             continue;
 
         case PinWatchState::END:
@@ -559,15 +539,22 @@ void* HX711::_watchPin(void* const hx711ptr) {
 }
 
 void HX711::_changeWatchState(const PinWatchState state) {
+    
     std::lock_guard<std::mutex> lck(this->_pinWatchLock);
+    
     this->_watchState = state;
+
+    if(state == PinWatchState::NORMAL) {
+        _setThreadPriority(::sched_get_priority_max(_PINWATCH_SCHED_POLICY), threadId);
+    }
+    else if(state == PinWatchState::PAUSE) {
+        _setThreadPriority(::sched_get_priority_min(_PINWATCH_SCHED_POLICY), threadId);
+    }
+
 }
 
-HX711::HX711(const int dataPin, const int clockPin) noexcept :
-    
-    /**
-     * GPIO defaults
-     */
+HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
+
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
@@ -580,16 +567,12 @@ HX711::HX711(const int dataPin, const int clockPin) noexcept :
      */
     _lastVal(Value()),
     _watchState(PinWatchState::PAUSE),
+    _watchThreadId(-1),
     _pauseSleep(_DEFAULT_PAUSE_SLEEP),
     _notReadySleep(_DEFAULT_NOT_READY_SLEEP),
     _pollSleep(_DEFAULT_POLL_SLEEP),
 
-    /**
-     * The HX711 chip's output rate will be at 10Hz when its X1 pin is
-     * pulled to ground. On boards such as Sparkfun's HX711, this is the
-     * default.
-     */
-    _rate(Rate::HZ_10),
+    _rate(rate),
 
     /**
      * Datasheet pg. 5 describes that after a reset, the HX711 will default
@@ -623,21 +606,25 @@ void HX711::begin() {
      * a separate begin() function as it is.
      */
 
-    if(!(   
-        (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
-        ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
-        ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) == 0
-    )) {
-        throw GpioException("unable to access GPIO");
+    //only permit the setup of gpios if not already setup
+    if(this->_gpioHandle == -1) {
+        if(!(   
+            (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
+            ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
+            ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) == 0
+        )) {
+            throw GpioException("unable to access GPIO");
+        }
     }
 
-    pthread_t th;
-
-    if(!(
-        ::pthread_create(&th, nullptr, &HX711::_watchPin, this) == 0 &&
-        ::pthread_detach(th) == 0
-    )) {
-        throw std::runtime_error("unable to watch data pin value");
+    //only setup a thread if one not already setup
+    if(this->_watchThreadId != -1) {
+        if(!(
+            ::pthread_create(&this->_watchThreadId, nullptr, &HX711::_watchPin, this) == 0 &&
+            ::pthread_detach(this->_watchThreadId) == 0
+        )) {
+            throw std::runtime_error("unable to watch data pin value");
+        }
     }
 
     this->powerDown();
@@ -760,8 +747,6 @@ void HX711::powerDown() {
 
     using namespace std::chrono;
 
-    assert(this->_gpioHandle != -1);
-
     std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
@@ -786,8 +771,6 @@ void HX711::powerDown() {
 void HX711::powerUp() {
 
     using namespace std::chrono;
-
-    assert(this->_gpioHandle != -1);
 
     std::unique_lock<std::mutex> lock(this->_commLock);
 

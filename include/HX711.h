@@ -175,6 +175,7 @@ protected:
 
     Value _lastVal;
     PinWatchState _watchState;
+    pthread_t _watchThreadId;
     std::chrono::nanoseconds _pauseSleep;
     std::chrono::nanoseconds _notReadySleep;
     std::chrono::nanoseconds _pollSleep;
@@ -211,12 +212,19 @@ protected:
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
     static void _delayus(const std::chrono::microseconds us) noexcept;
     
+    static void _setThreadPriority(const int pri, const pthread_t th = -1) noexcept;
+
     static void* _watchPin(void* const hx711ptr);
     void _changeWatchState(const PinWatchState state);
 
 public:
     
-    HX711(const int dataPin, const int clockPin) noexcept;
+    /**
+     * The HX711 chip's output rate will be at 10Hz when its X1 pin is
+     * pulled to ground. On boards such as Sparkfun's HX711, this is the
+     * default.
+     */
+    HX711(const int dataPin, const int clockPin, const Rate rate = Rate::HZ_10) noexcept;
     virtual ~HX711();
 
     void begin();
