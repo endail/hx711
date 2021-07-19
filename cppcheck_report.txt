@@ -7,16 +7,16 @@ src/Discovery.cpp:56:14: style: Consider using std::transform algorithm instead 
 src/Mass.cpp:89:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:132:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:135:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:118:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/SimpleHX711.cpp:121:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:81:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:136:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/SimpleHX711.cpp:139:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
 src/Mass.cpp:85:0: style: The function 'setUnit' is never used. [unusedFunction]
