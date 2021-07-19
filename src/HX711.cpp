@@ -352,7 +352,7 @@ void HX711::_delayus(const std::chrono::microseconds us) noexcept {
 
 }
 
-static void HX711::_setThreadPriority(const int pri, const pthread_t th) noexcept {
+void HX711::_setThreadPriority(const int pri, const pthread_t th) noexcept {
 
     struct sched_param schParams = {
         pri
@@ -426,11 +426,8 @@ void* HX711::_watchPin(void* const hx711ptr) {
      * the state can be modified. Mutex serves that purpose.
      */
 
-    assert(hx711ptr != nullptr);
-
     HX711* const self = static_cast<HX711*>(hx711ptr);
 
-    const pthread_t threadId = ::pthread_self();
     std::unique_lock<std::mutex> stateLock(self->_pinWatchLock, std::defer_lock);
     std::unique_lock<std::mutex> dataReadyLock(self->_readyLock, std::defer_lock);
 
@@ -541,15 +538,27 @@ void* HX711::_watchPin(void* const hx711ptr) {
 void HX711::_changeWatchState(const PinWatchState state) {
     
     std::lock_guard<std::mutex> lck(this->_pinWatchLock);
-    
-    this->_watchState = state;
 
-    if(state == PinWatchState::NORMAL) {
-        _setThreadPriority(::sched_get_priority_max(_PINWATCH_SCHED_POLICY), threadId);
+    //check for a change in state and then whether that change is
+    //to a normal or paused state to adjust thread priority
+    if(state != this->_watchState) {
+        if(state == PinWatchState::NORMAL || state == PinWatchState::PAUSE) {
+
+            int (*priFunc)(int);
+
+            if(state == PinWatchState::NORMAL) {
+                priFunc = &::sched_get_priority_max;
+            }
+            else {
+                priFunc = &::sched_get_priority_min;
+            }
+
+            _setThreadPriority(priFunc(_PINWATCH_SCHED_POLICY), this->_watchThreadId);
+
+        }
     }
-    else if(state == PinWatchState::PAUSE) {
-        _setThreadPriority(::sched_get_priority_min(_PINWATCH_SCHED_POLICY), threadId);
-    }
+
+    this->_watchState = state;
 
 }
 
@@ -606,25 +615,19 @@ void HX711::begin() {
      * a separate begin() function as it is.
      */
 
-    //only permit the setup of gpios if not already setup
-    if(this->_gpioHandle == -1) {
-        if(!(   
-            (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
-            ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
-            ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) == 0
-        )) {
-            throw GpioException("unable to access GPIO");
-        }
+    if(!(   
+        (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
+        ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
+        ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) == 0
+    )) {
+        throw GpioException("unable to access GPIO");
     }
 
-    //only setup a thread if one not already setup
-    if(this->_watchThreadId != -1) {
-        if(!(
-            ::pthread_create(&this->_watchThreadId, nullptr, &HX711::_watchPin, this) == 0 &&
-            ::pthread_detach(this->_watchThreadId) == 0
-        )) {
-            throw std::runtime_error("unable to watch data pin value");
-        }
+    if(!(
+        ::pthread_create(&this->_watchThreadId, nullptr, &HX711::_watchPin, this) == 0 &&
+        ::pthread_detach(this->_watchThreadId) == 0
+    )) {
+        throw std::runtime_error("unable to watch data pin value");
     }
 
     this->powerDown();

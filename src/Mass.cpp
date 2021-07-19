@@ -55,7 +55,7 @@ const std::unordered_map<const Mass::Unit, const char* const> Mass::_NAMES({
 });
 
 Mass::Mass(const double amount, const Unit u) noexcept
-    :   _ug(Mass::convert(amount, u, Unit::UG)),
+    :   _ug(convert(amount, u, Unit::UG)),
         _u(u) {
 }
 
@@ -75,7 +75,7 @@ Mass::operator const double() const noexcept {
 }
 
 double Mass::getValue(Unit u) const noexcept {
-    return Mass::convert(this->_ug, Unit::UG, u);
+    return convert(this->_ug, Unit::UG, u);
 }
 
 Mass::Unit Mass::getUnit() const noexcept {
@@ -242,7 +242,7 @@ double Mass::convert(
             return amount / _RATIOS.at(to);
         }
 
-        return Mass::convert(amount, to, Unit::UG);
+        return convert(amount, to, Unit::UG);
 
 }
 
