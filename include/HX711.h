@@ -110,7 +110,7 @@ public:
      * the sensor.
      */
     bool isValid() const noexcept;
-    operator const _INTERNAL_TYPE&() const noexcept;
+    operator _INTERNAL_TYPE&() const noexcept;
     
     //cppcheck-suppress noExplicitConstructor
     Value(const _INTERNAL_TYPE v) noexcept;

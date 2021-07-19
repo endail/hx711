@@ -69,7 +69,7 @@ const std::unordered_map<const Rate, const std::chrono::nanoseconds>
             std::chrono::milliseconds(50)) }
 });
 
-Value::operator const _INTERNAL_TYPE&() const noexcept {
+Value::operator _INTERNAL_TYPE&() const noexcept {
     return this->_v;
 }
 
