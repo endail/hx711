@@ -78,6 +78,11 @@ enum class Rate {
     OTHER
 };
 
+enum class GpioLevel {
+    LOW = 0,
+    HIGH = 1
+};
+
 class Value {
 
 protected:
@@ -110,40 +115,12 @@ public:
      * the sensor.
      */
     bool isValid() const noexcept;
-    operator _INTERNAL_TYPE&() const noexcept;
+    operator _INTERNAL_TYPE() const noexcept;
     
     //cppcheck-suppress noExplicitConstructor
     Value(const _INTERNAL_TYPE v) noexcept;
     Value() noexcept;
     Value& operator=(const Value& v2) noexcept;
-
-};
-
-struct Timing {
-    std::chrono::high_resolution_clock::time_point begin;
-    std::chrono::high_resolution_clock::time_point ready;
-    std::chrono::high_resolution_clock::time_point end;
-    std::chrono::high_resolution_clock::time_point nextbegin;
-
-    std::chrono::microseconds getTimeToReady() {
-        return std::chrono::duration_cast<std::chrono::microseconds>(
-            this->ready - this->begin);
-    }
-
-    std::chrono::microseconds getTimeToConvert() {
-        return std::chrono::duration_cast<std::chrono::microseconds>(
-            this->end - this->ready);
-    }
-
-    std::chrono::microseconds getTimeBetweenConversions() {
-        return std::chrono::duration_cast<std::chrono::microseconds>(
-            this->nextbegin - this->end);
-    }
-
-    std::chrono::microseconds getTotalTime() {
-        return std::chrono::duration_cast<std::chrono::microseconds>(
-            this->ready - this->begin);
-    }
 
 };
 
@@ -204,8 +181,8 @@ protected:
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     static std::uint8_t _calculatePulses(const Gain g) noexcept;
-    bool _readGpio(const int pin);
-    void _writeGpio(const int pin, const bool val);
+    GpioLevel _readGpio(const int pin);
+    void _writeGpio(const int pin, const GpioLevel lev);
     bool _isReady();
     bool _readBit();
     BYTE _readByte();

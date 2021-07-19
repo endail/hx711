@@ -69,7 +69,7 @@ const std::unordered_map<const Rate, const std::chrono::nanoseconds>
             std::chrono::milliseconds(50)) }
 });
 
-Value::operator _INTERNAL_TYPE&() const noexcept {
+Value::operator _INTERNAL_TYPE() const noexcept {
     return this->_v;
 }
 
@@ -100,7 +100,7 @@ std::uint8_t HX711::_calculatePulses(const Gain g) noexcept {
     return _PULSES.at(g) - (8 * _BYTES_PER_CONVERSION_PERIOD);
 }
 
-bool HX711::_readGpio(const int pin) {
+GpioLevel HX711::_readGpio(const int pin) {
 
     const int code = ::lgGpioRead(this->_gpioHandle, pin);
 
@@ -108,12 +108,13 @@ bool HX711::_readGpio(const int pin) {
         throw GpioException("GPIO read failure");
     }
 
-    return static_cast<bool>(code);
+    //lgGpioRead returns 0 for low and 1 for high
+    return static_cast<GpioLevel>(code);
 
 }
 
-void HX711::_writeGpio(const int pin, const bool val) {
-    if(::lgGpioWrite(this->_gpioHandle, pin, val) < 0) {
+void HX711::_writeGpio(const int pin, const GpioLevel lev) {
+    if(::lgGpioWrite(this->_gpioHandle, pin, static_cast<int>(lev)) < 0) {
         throw GpioException("GPIO write failure");
     }
 }
@@ -132,7 +133,7 @@ bool HX711::_isReady() {
      * over time can/should be done by other calling code
      */
     try {
-        return !this->_readGpio(this->_dataPin);
+        return this->_readGpio(this->_dataPin) == GpioLevel::LOW;
     }
     catch(const GpioException& ex) {
         return false;
@@ -147,7 +148,7 @@ bool HX711::_readBit() {
     assert(this->_gpioHandle != -1);
 
     //first, clock pin is set high to make DOUT ready to be read from
-    this->_writeGpio(this->_clockPin, true);
+    this->_writeGpio(this->_clockPin, GpioLevel::HIGH);
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
     //this will also permit a sufficient amount of time for the clock
@@ -160,13 +161,13 @@ bool HX711::_readBit() {
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
-    const bool bit = this->_readGpio(this->_dataPin);
+    const bool bit = static_cast<bool>(this->_readGpio(this->_dataPin));
 
     //the clock pin then needs to be held for at least 0.2us before
     //the next bit can be read
     //
     //NOTE: as before, the delay probably isn't going to matter
-    this->_writeGpio(this->_clockPin, false);
+    this->_writeGpio(this->_clockPin, GpioLevel::LOW);
     _delayns(_T4);
 
     return bit;
@@ -663,7 +664,6 @@ void HX711::getValues(
         std::unique_lock<std::mutex> ready(this->_readyLock, std::defer_lock);
 
         this->_changeWatchState(PinWatchState::NORMAL);
-        assert(this->_watchState == PinWatchState::NORMAL);
 
         for(size_t i = 0; i < len; ++i) {
             
@@ -677,12 +677,12 @@ void HX711::getValues(
             }
 
             arr[i] = this->_lastVal;
+
             ready.unlock();
 
         }
 
         this->_changeWatchState(PinWatchState::PAUSE);
-        assert(this->_watchState == PinWatchState::PAUSE);
 
 }
 
@@ -774,9 +774,9 @@ void HX711::powerDown() {
      * should help to keep the underlying code from optimising it away -
      * if does at all.
      */
-    this->_writeGpio(this->_clockPin, false);
+    this->_writeGpio(this->_clockPin, GpioLevel::LOW);
     _delayus(microseconds(1));
-    this->_writeGpio(this->_clockPin, true);
+    this->_writeGpio(this->_clockPin, GpioLevel::HIGH);
 
     /**
      * "When PD_SCK pin changes from low to high
@@ -796,7 +796,7 @@ void HX711::powerUp() {
 
     std::unique_lock<std::mutex> lock(this->_commLock);
 
-    this->_writeGpio(this->_clockPin, false);
+    this->_writeGpio(this->_clockPin, GpioLevel::LOW);
 
     /**
      * "When PD_SCK returns to low,
