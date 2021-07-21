@@ -156,9 +156,13 @@ protected:
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::milliseconds(100));
 
+    /**
+     * About 10 milliseconds seems to work well for obtaining 80Hz
+     * ISSUE: lowering this to micro/nano seems to indefinitely sleep the thread?
+     */
     static constexpr std::chrono::nanoseconds _DEFAULT_POLL_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds(57));
+            std::chrono::milliseconds(10));
 
     static constexpr std::chrono::nanoseconds _DEFAULT_NOT_READY_SLEEP =
         std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -212,7 +216,7 @@ protected:
     static void _delayns(const std::chrono::nanoseconds ns) noexcept;
     static void _delayus(const std::chrono::microseconds us) noexcept;
     
-    static void _setThreadPriority(const int pri, const pthread_t th = -1) noexcept;
+    static void _setThreadPriority(const int pri, const pthread_t th) noexcept;
 
     static void* _watchPin(void* const hx711ptr);
     void _changeWatchState(const PinWatchState state);

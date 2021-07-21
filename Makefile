@@ -8,7 +8,7 @@ SRCEXT := cpp
 LIBS := -llgpio -pthread
 INC := -I $(INCDIR)
 CFLAGS :=	-O2 \
-			-pg \
+			-fomit-frame-pointer \
 			-pipe \
 			-Wall \
 			-Wfatal-errors \
@@ -21,8 +21,6 @@ CFLAGS :=	-O2 \
 			-D_FORTIFY_SOURCE=2 \
 			-fstack-clash-protection \
 			-DNDEBUG=1
-
-#			-fomit-frame-pointer \
 
 ########################################################################
 
@@ -76,8 +74,8 @@ all: 	dirs \
 		$(BUILDDIR)/static/libhx711.a \
 		$(BUILDDIR)/shared/libhx711.so \
 		hx711calibration \
-		test \
-		discovery
+		discovery \
+		test
 
 .PHONY: dirs
 dirs:
@@ -137,10 +135,10 @@ test: $(BUILDDIR)/SimpleHX711Test.o
 		-lhx711 $(LIBS)
 
 .PHONY: discovery
-test: $(BUILDDIR)/Discovery.o
+discovery: $(BUILDDIR)/DiscoverTiming.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/discovery \
-		$(BUILDDIR)/Discovery.o \
+		$(BUILDDIR)/DiscoverTiming.o \
 		-L $(BUILDDIR)/static \
 		-lhx711 -lgsl $(LIBS)
 

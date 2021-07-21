@@ -28,10 +28,124 @@
 #include <vector>
 #include <pthread.h>
 #include <sched.h>
+#include <thread>
+#include <algorithm>
+#include <cmath>
+#include <gsl/gsl_statistics.h>
 
 namespace HX711 {
-class Discovery : public HX711 {
 
+using namespace std::chrono;
+
+struct TimingResult {
+public:
+    Value v;
+    high_resolution_clock::time_point start;
+    high_resolution_clock::time_point waitStart;
+    high_resolution_clock::time_point waitEnd;
+    high_resolution_clock::time_point convertStart;
+    high_resolution_clock::time_point convertEnd;
+    high_resolution_clock::time_point end;
+
+    std::chrono::microseconds getWaitTime() const noexcept {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->waitEnd - this->waitStart);
+    }
+
+    std::chrono::microseconds getConversionTime() const noexcept {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->convertEnd - this->convertStart);
+    }
+
+    std::chrono::microseconds getTotalTime() const noexcept {
+        return std::chrono::duration_cast<std::chrono::microseconds>(
+            this->end - this->start);
+    }
+
+};
+
+class TimingCollection : public std::vector<TimingResult> {
+public:
+
+    struct Stats {
+        double min;
+        double max;
+        double med;
+        double mad;
+    };
+
+    Stats getWaitTimeStats() const noexcept {
+
+        Stats s;
+
+        std::vector<double> vec;
+
+        for(auto it = this->begin(); it != this->end(); ++it) {
+            vec.push_back(static_cast<double>(it->getWaitTime().count()));
+        }
+
+        std::sort(vec.begin(), vec.end());
+
+        s.min = gsl_stats_min(vec.data(), 1, vec.size());
+        s.max = gsl_stats_max(vec.data(), 1, vec.size());
+        s.med = gsl_stats_median_from_sorted_data(vec.data(), 1, vec.size());
+
+        double work[vec.size()];
+        s.mad = gsl_stats_mad(vec.data(), 1, vec.size(), work);
+
+        return s;
+
+    }
+
+    Stats getConversionTimeStats() const noexcept {
+
+        Stats s;
+
+        std::vector<double> vec;
+
+        for(auto it = this->begin(); it != this->end(); ++it) {
+            vec.push_back(static_cast<double>(it->getConversionTime().count()));
+        }
+
+        std::sort(vec.begin(), vec.end());
+
+        s.min = gsl_stats_min(vec.data(), 1, vec.size());
+        s.max = gsl_stats_max(vec.data(), 1, vec.size());
+        s.med = gsl_stats_median_from_sorted_data(vec.data(), 1, vec.size());
+
+        double work[vec.size()];
+        s.mad = gsl_stats_mad(vec.data(), 1, vec.size(), work);
+
+        return s;
+
+    }
+
+    Stats getTotalTimeStats() const noexcept {
+
+        Stats s;
+
+        std::vector<double> vec;
+
+        for(auto it = this->begin(); it != this->end(); ++it) {
+            vec.push_back(static_cast<double>(it->getTotalTime().count()));
+        }
+
+        std::sort(vec.begin(), vec.end());
+
+        s.min = gsl_stats_min(vec.data(), 1, vec.size());
+        s.max = gsl_stats_max(vec.data(), 1, vec.size());
+        s.med = gsl_stats_median_from_sorted_data(vec.data(), 1, vec.size());
+
+        double work[vec.size()];
+        s.mad = gsl_stats_mad(vec.data(), 1, vec.size(), work);
+
+        return s;
+
+    }
+
+};
+
+class Discovery : public HX711 {
 public:
     Discovery(const int dataPin, const int clockPin) : 
         HX711(dataPin, clockPin) {
@@ -51,6 +165,40 @@ public:
             &schParams);
 
     }
+
+    TimingCollection getTimings(const std::size_t samples) {
+
+        using namespace std::chrono;
+
+        this->setThreadMax();
+
+        TimingCollection vec;
+        vec.reserve(samples);
+
+        for(size_t i = 0; i < samples; ++i) {
+
+            TimingResult tr;
+
+            tr.start = high_resolution_clock::now();
+
+            tr.waitStart = high_resolution_clock::now();
+            while(!this->_isReady()) ;
+            tr.waitEnd = high_resolution_clock::now();
+
+            tr.convertStart = high_resolution_clock::now();
+            tr.v = this->_readInt();
+            tr.convertEnd = high_resolution_clock::now();
+
+            tr.end = high_resolution_clock::now();
+
+            vec.push_back(tr);
+
+        }
+
+        return vec;
+
+    }
+
 
     std::vector<std::chrono::nanoseconds> getTimeToReady(const std::size_t samples) {
 

@@ -380,7 +380,7 @@ void HX711::_setThreadPriority(const int pri, const pthread_t th) noexcept {
      * elevate permissions.
      */
     ::pthread_setschedparam(
-        th >= 0 ? th : ::pthread_self(),
+        th,
         _PINWATCH_SCHED_POLICY,
         &schParams);
 

@@ -26,11 +26,15 @@
 #include <string>
 #include <algorithm>
 #include <thread>
+#include <chrono>
+#include <iomanip>
+#include <cmath>
 #include "../include/HX711.h"
 
 int main(int argc, char** argv) {
 
     using namespace std;
+    using namespace std::chrono;
     using namespace HX711;
 
     const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT] [OFFSET]";
@@ -47,7 +51,18 @@ int main(int argc, char** argv) {
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
 
-    hx.tare();
+    const size_t samples = 1000;
+    Value arr[samples];
+    const high_resolution_clock::time_point start = high_resolution_clock::now();
+    //hx.getValues(arr, samples);
+    hx.readValues(samples);
+    const high_resolution_clock::time_point end = high_resolution_clock::now();
+    const duration<double> dur = duration_cast<duration<double>>(end - start);
+    const double rate = static_cast<double>(samples) / dur.count();
+    
+    cout << fixed << setprecision(2) << rate << " Hz" << endl;
+
+    cin.get();
 
     for(int i = 0; i < 1000; ++i) {
 
