@@ -71,6 +71,13 @@ public:
         double max;
         double med;
         double std;
+
+        bool inRange(const double n) const noexcept {
+            const double minDev = this->med - this->std;
+            const double maxDev = this->med + this->std;
+            return n >= minDev && n <= maxDev;
+        }
+
     };
 
 protected:

@@ -95,11 +95,21 @@ int main(int argc, char** argv) {
     cout << "Total,Wait,Conversion,Value" << endl;
 
     for(const auto& tr : timings) {
-        cout    << duration_cast<microseconds>(tr.getTotalTime()).count()
-                << "," << duration_cast<microseconds>(tr.getWaitTime()).count()
-                << "," << duration_cast<microseconds>(tr.getConversionTime()).count()
-                << "," << tr.v
-                << endl;
+
+        const double totalTime = duration_cast<microseconds>(tr.getTotalTime()).count();
+        const double waitTime = duration_cast<microseconds>(tr.getWaitTime()).count();
+        const double convTime = duration_cast<microseconds>(tr.getConversionTime()).count();
+
+        cout    
+            << totalTime
+            << "," << waitTime
+            << "," << convTime
+            << "," << tr.v
+            << (waitTimes.inRange(waitTime) ? "" : "*")
+            << (convTimes.inRange(convTime) ? "" : "#")
+            << endl
+            ;
+
     }
 
     return EXIT_SUCCESS;
