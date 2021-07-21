@@ -1,9 +1,6 @@
-include/Discovery.h:42:10: performance:inconclusive: Technically the member function 'HX711::Discovery::setThreadMax' can be static (but you may consider moving to unnamed namespace). [functionStatic]
+include/Discovery.h:156:10: performance:inconclusive: Technically the member function 'HX711::Discovery::setThreadMax' can be static (but you may consider moving to unnamed namespace). [functionStatic]
     void setThreadMax() {
          ^
-src/Discovery.cpp:56:14: style: Consider using std::transform algorithm instead of a raw loop. [useStlAlgorithm]
-        vals.push_back(static_cast<double>(duration_cast<microseconds>(ns).count()));
-             ^
 src/Mass.cpp:89:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
@@ -20,6 +17,9 @@ src/SimpleHX711.cpp:139:0: style: The function 'setOffset' is never used. [unuse
 
 ^
 src/Mass.cpp:85:0: style: The function 'setUnit' is never used. [unusedFunction]
+
+^
+src/SimpleHX711.cpp:162:0: style: The function 'tare' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
