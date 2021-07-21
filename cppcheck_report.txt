@@ -1,6 +1,3 @@
-include/Discovery.h:156:10: performance:inconclusive: Technically the member function 'HX711::Discovery::setThreadMax' can be static (but you may consider moving to unnamed namespace). [functionStatic]
-    void setThreadMax() {
-         ^
 src/Mass.cpp:89:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
