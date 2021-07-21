@@ -66,23 +66,18 @@ public:
 
 class TimingCollection : public std::vector<TimingResult> {
 public:
-
     struct Stats {
         double min;
         double max;
         double med;
-        double mad;
+        double std;
     };
 
-    Stats getWaitTimeStats() const noexcept {
+protected:
+
+    Stats _statsFromVector(std::vector<double>& vec) const noexcept {
 
         Stats s;
-
-        std::vector<double> vec;
-
-        for(auto it = this->begin(); it != this->end(); ++it) {
-            vec.push_back(static_cast<double>(it->getWaitTime().count()));
-        }
 
         std::sort(vec.begin(), vec.end());
 
@@ -90,56 +85,51 @@ public:
         s.max = gsl_stats_max(vec.data(), 1, vec.size());
         s.med = gsl_stats_median_from_sorted_data(vec.data(), 1, vec.size());
 
-        double work[vec.size()];
-        s.mad = gsl_stats_mad(vec.data(), 1, vec.size(), work);
+        //double work[vec.size()];
+        s.std = gsl_stats_sd(vec.data(), 1, vec.size());
 
         return s;
+
+    }
+
+public:
+
+    Stats getWaitTimeStats() const noexcept {
+
+        std::vector<double> vec;
+        vec.reserve(this->size());
+
+        for(auto it = this->cbegin(); it != this->cend(); ++it) {
+            vec.push_back(static_cast<double>(it->getWaitTime().count()));
+        }
+
+        return _statsFromVector(vec);
 
     }
 
     Stats getConversionTimeStats() const noexcept {
 
-        Stats s;
-
         std::vector<double> vec;
+        vec.reserve(this->size());
 
-        for(auto it = this->begin(); it != this->end(); ++it) {
+        for(auto it = this->cbegin(); it != this->cend(); ++it) {
             vec.push_back(static_cast<double>(it->getConversionTime().count()));
         }
 
-        std::sort(vec.begin(), vec.end());
-
-        s.min = gsl_stats_min(vec.data(), 1, vec.size());
-        s.max = gsl_stats_max(vec.data(), 1, vec.size());
-        s.med = gsl_stats_median_from_sorted_data(vec.data(), 1, vec.size());
-
-        double work[vec.size()];
-        s.mad = gsl_stats_mad(vec.data(), 1, vec.size(), work);
-
-        return s;
+        return _statsFromVector(vec);
 
     }
 
     Stats getTotalTimeStats() const noexcept {
 
-        Stats s;
-
         std::vector<double> vec;
+        vec.reserve(this->size());
 
-        for(auto it = this->begin(); it != this->end(); ++it) {
+        for(auto it = this->cbegin(); it != this->cend(); ++it) {
             vec.push_back(static_cast<double>(it->getTotalTime().count()));
         }
 
-        std::sort(vec.begin(), vec.end());
-
-        s.min = gsl_stats_min(vec.data(), 1, vec.size());
-        s.max = gsl_stats_max(vec.data(), 1, vec.size());
-        s.med = gsl_stats_median_from_sorted_data(vec.data(), 1, vec.size());
-
-        double work[vec.size()];
-        s.mad = gsl_stats_mad(vec.data(), 1, vec.size(), work);
-
-        return s;
+        return _statsFromVector(vec);
 
     }
 
@@ -147,30 +137,15 @@ public:
 
 class Discovery : public HX711 {
 public:
-    Discovery(const int dataPin, const int clockPin) : 
-        HX711(dataPin, clockPin) {
+
+    Discovery(const int dataPin, const int clockPin, const Rate rate) : 
+        HX711(dataPin, clockPin, rate) {
             this->begin();
-            this->setThreadMax();
-    }
-
-    void setThreadMax() {
-
-        struct sched_param schParams = {
-            ::sched_get_priority_max(SCHED_FIFO)
-        };
-
-        ::pthread_setschedparam(
-            ::pthread_self(),
-            SCHED_FIFO,
-            &schParams);
-
     }
 
     TimingCollection getTimings(const std::size_t samples) {
 
         using namespace std::chrono;
-
-        this->setThreadMax();
 
         TimingCollection vec;
         vec.reserve(samples);

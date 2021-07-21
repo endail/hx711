@@ -50,7 +50,6 @@ int main(int argc, char** argv) {
     const int clockPin = stoi(argv[2]);
     const int samples = stoi(argv[3]);
 
-    
     struct sched_param schParams = {
         sched_get_priority_max(SCHED_FIFO)
     };
@@ -60,10 +59,7 @@ int main(int argc, char** argv) {
         SCHED_FIFO,
         &schParams);
 
-
-    Discovery dx(dataPin, clockPin);
-
-    std::this_thread::sleep_for(seconds(1));
+    Discovery dx(dataPin, clockPin, Rate::HZ_80);
 
     const TimingCollection timings = dx.getTimings(samples);
     const TimingCollection::Stats waitTimes = timings.getWaitTimeStats();
@@ -77,49 +73,34 @@ int main(int argc, char** argv) {
     cout << "Min: " << waitTimes.min << " us" << endl;
     cout << "Max: " << waitTimes.max << " us" << endl;
     cout << "Med: " << waitTimes.med << " us" << endl;
-    cout << "MAD: " << waitTimes.mad << " us" << endl;
+    cout << "Std: " << waitTimes.std << " us" << endl;
     cout << endl;
 
     cout << "Conversion Times" << endl;
     cout << "Min: " << convTimes.min << " us" << endl;
     cout << "Max: " << convTimes.max << " us" << endl;
     cout << "Med: " << convTimes.med << " us" << endl;
-    cout << "MAD: " << convTimes.mad << " us" << endl;
+    cout << "Std: " << convTimes.std << " us" << endl;
     cout << endl;
 
     cout << "Total Times" << endl;
     cout << "Min: " << totalTimes.min << " us" << endl;
     cout << "Max: " << totalTimes.max << " us" << endl;
     cout << "Med: " << totalTimes.med << " us" << endl;
-    cout << "MAD: " << totalTimes.mad << " us" << endl;
+    cout << "Std: " << totalTimes.std << " us" << endl;
     cout << endl;
 
-/*
-    std::vector<TimingResult> timings = dx.getTimings(samples);
+    cout << endl;
 
     cout << "Total,Wait,Conversion,Value" << endl;
 
-    for(auto tr : timings) {
+    for(const auto& tr : timings) {
         cout    << duration_cast<microseconds>(tr.getTotalTime()).count()
                 << "," << duration_cast<microseconds>(tr.getWaitTime()).count()
                 << "," << duration_cast<microseconds>(tr.getConversionTime()).count()
                 << "," << tr.v
                 << endl;
     }
-*/
-
-//    std::sort(vals.begin(), vals.end());
-
-//    cout.setf(ios::fixed, ios::floatfield);
-//    cout.precision(0);
-
-/*
-    cout    << "Min: " << setw(20) << right << gsl_stats_min(vals.data(), 1, vals.size()) << endl
-            << "Max: " << setw(20) << right << gsl_stats_max(vals.data(), 1, vals.size()) << endl
-            << "Med: " << setw(20) << right << gsl_stats_median_from_sorted_data(vals.data(), 1, vals.size()) << endl
-            << endl
-            ;
-*/
 
     return EXIT_SUCCESS;
 
