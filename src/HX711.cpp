@@ -145,7 +145,7 @@ bool HX711::_readBit() const {
         Utility::timespec_to_nanos(&startTime);
 
     //...and if the threshold was exceeded, raise the exception
-    if(diff >= _POWER_DOWN_TIMEOUT) {
+    if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
         throw IntegrityException("bit integrity failure");
     }
 
@@ -192,7 +192,9 @@ HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
      * to channel A and a gain of 128.
      */
     _channel(Channel::A),
-    _gain(Gain::GAIN_128) {
+    _gain(Gain::GAIN_128),
+    
+    _strictTiming(false) {
 
 }
 
@@ -211,6 +213,11 @@ void HX711::begin() {
     this->powerDown();
     this->powerUp();
 
+}
+
+void HX711::setStrictTiming(const bool ok) noexcept {
+    std::lock_guard<std::mutex> lock(this->_commLock);
+    this->_strictTiming = ok;
 }
 
 int HX711::getDataPin() const noexcept {

@@ -80,6 +80,7 @@ protected:
     Rate _rate;
     Channel _channel;
     Gain _gain;
+    bool _strictTiming;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     static std::uint8_t _calculatePulses(const Gain g) noexcept;
@@ -101,6 +102,8 @@ public:
     virtual ~HX711();
 
     void begin();
+
+    void setStrictTiming(const bool ok) noexcept;
 
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
