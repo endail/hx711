@@ -64,6 +64,7 @@
         "typeindex": "cpp",
         "variant": "cpp",
         "*.ipp": "cpp",
-        "cerrno": "cpp"
+        "cerrno": "cpp",
+        "ios": "cpp"
     }
 }

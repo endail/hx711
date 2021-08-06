@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2021 Daniel Robertson
+// Copyright (c) 2020 Daniel Robertson
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-#define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
+#ifndef HX711_INTEGRITYEXCEPTION_H_1C3B9E19_80A6_40EF_BD7D_9E6600006E64
+#define HX711_INTEGRITYEXCEPTION_H_1C3B9E19_80A6_40EF_BD7D_9E6600006E64
 
-#include <cstdint>
-#include <vector>
-#include "AbstractScale.h"
-#include "HX711.h"
-#include "Value.h"
+#include <stdexcept>
 
 namespace HX711 {
-class SimpleHX711 : public AbstractScale, public HX711 {
+class IntegrityException : public std::runtime_error {
 public:
-
-    SimpleHX711(
-        const int dataPin,
-        const int clockPin,
-        const Value refUnit = 1,
-        const Value offset = 0);
-
-    virtual std::vector<Value> getValues(const std::size_t samples);
-
+    explicit IntegrityException(const char* what_arg)
+        : std::runtime_error(what_arg) { }
 };
 };
 #endif

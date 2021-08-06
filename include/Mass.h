@@ -23,9 +23,9 @@
 #ifndef HX711_MASS_H_2FFE3D59_FB56_4C50_87F6_08F5AD88A303
 #define HX711_MASS_H_2FFE3D59_FB56_4C50_87F6_08F5AD88A303
 
-#include <unordered_map>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 
 namespace HX711 {
 class Mass {
@@ -46,7 +46,7 @@ enum class Unit {
 
 protected:
     static const std::unordered_map<const Unit, const double> _RATIOS;
-    static const std::unordered_map<const Unit, const char* const> _NAMES;
+    static const std::unordered_map<const Unit, const char* const> _UNIT_NAMES;
 
     //deal with mass internally as micrograms
     double _ug;
@@ -60,7 +60,7 @@ public:
 
     Mass& operator=(const Mass& rhs) noexcept;
     
-    operator const double() const noexcept;
+    operator double() const noexcept;
     double getValue(const Unit u = Unit::UG) const noexcept;
 
     Unit getUnit() const noexcept;

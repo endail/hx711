@@ -20,26 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-#define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
+#ifndef HX711_VALUESTACK_H_609AB3D7_0D6C_45EE_8864_5A1D5E866ACA
+#define HX711_VALUESTACK_H_609AB3D7_0D6C_45EE_8864_5A1D5E866ACA
 
+#include <chrono>
 #include <cstdint>
-#include <vector>
-#include "AbstractScale.h"
-#include "HX711.h"
+#include <list>
 #include "Value.h"
 
 namespace HX711 {
-class SimpleHX711 : public AbstractScale, public HX711 {
+class ValueStack {
+protected:
+
+    struct StackEntry {
+        Value val;
+        std::chrono::high_resolution_clock::time_point when;
+    };
+
+    static const size_t _DEFAULT_MAX_SIZE = 50;
+    static constexpr auto _DEFAULT_MAX_AGE = std::chrono::duration_cast
+        <std::chrono::nanoseconds>(std::chrono::milliseconds(250));
+
+    void _update();
+
+    std::list<StackEntry> _container;
+    std::size_t _maxSize;
+    std::chrono::nanoseconds _maxAge;
+
 public:
 
-    SimpleHX711(
-        const int dataPin,
-        const int clockPin,
-        const Value refUnit = 1,
-        const Value offset = 0);
+    ValueStack(
+        const std::size_t maxSize = _DEFAULT_MAX_SIZE,
+        const std::chrono::nanoseconds maxAge = _DEFAULT_MAX_AGE) noexcept;
 
-    virtual std::vector<Value> getValues(const std::size_t samples);
+    void push(const Value val) noexcept;
+    Value pop() noexcept;
+    std::size_t size() const noexcept;
+    bool empty() const noexcept;
+    bool full() const noexcept;
 
 };
 };

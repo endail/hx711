@@ -20,26 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-#define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
+#ifndef HX711_SCALE_H_5E9DF993_BC93_4934_A844_98355F4F8062
+#define HX711_SCALE_H_5E9DF993_BC93_4934_A844_98355F4F8062
 
 #include <cstdint>
 #include <vector>
-#include "AbstractScale.h"
-#include "HX711.h"
+#include "Mass.h"
 #include "Value.h"
 
 namespace HX711 {
-class SimpleHX711 : public AbstractScale, public HX711 {
+
+enum class ReadType {
+    Median,
+    Average
+};
+
+class AbstractScale {
+
+protected:
+    Mass::Unit _massUnit;
+    Value _refUnit;
+    Value _offset;
+
 public:
+    AbstractScale(
+        const Mass::Unit massUnit,
+        const Value refUnit,
+        const Value offset) noexcept;
 
-    SimpleHX711(
-        const int dataPin,
-        const int clockPin,
-        const Value refUnit = 1,
-        const Value offset = 0);
+    void setUnit(const Mass::Unit unit) noexcept;
+    Mass::Unit getUnit() const noexcept;
 
-    virtual std::vector<Value> getValues(const std::size_t samples);
+    Value getReferenceUnit() const noexcept;
+    void setReferenceUnit(const Value refUnit);
+
+    Value getOffset() const noexcept;
+    void setOffset(const Value offset) noexcept;
+
+    double normalise(const double v) const noexcept;
+
+    virtual std::vector<Value> getValues(const std::size_t samples) = 0;
+
+    double read(const ReadType rt = ReadType::Median, const std::size_t samples = 3);
+    void zero(const ReadType rt = ReadType::Median, const std::size_t samples = 3);
+    Mass weight(const ReadType rt = ReadType::Median, const std::size_t samples = 3);
 
 };
 };

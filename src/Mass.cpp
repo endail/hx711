@@ -20,11 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../include/Mass.h"
 #include <cmath>
+#include <cstdio>
 #include <iomanip>
+#include <ios>
+#include <ostream>
 #include <sstream>
+#include <string>
 #include <stdexcept>
+#include <unordered_map>
+#include "../include/Mass.h"
 
 namespace HX711 {
 
@@ -41,7 +46,7 @@ const std::unordered_map<const Mass::Unit, const double> Mass::_RATIOS({
     { Unit::OZ,         28349523.125 }
 });
 
-const std::unordered_map<const Mass::Unit, const char* const> Mass::_NAMES({
+const std::unordered_map<const Mass::Unit, const char* const> Mass::_UNIT_NAMES({
     { Unit::UG,         "μg" },
     { Unit::MG,         "mg" },
     { Unit::G,          "g" },
@@ -70,7 +75,7 @@ Mass& Mass::operator=(const Mass& rhs) noexcept {
     return *this;
 }
 
-Mass::operator const double() const noexcept {
+Mass::operator double() const noexcept {
     return this->getValue(this->_u);
 }
 
@@ -183,7 +188,7 @@ std::string Mass::toString(const Unit u) const noexcept {
     std::stringstream ss;
     
     double n; //mass as a double converted to u
-    double i; //integer (discard; don't use)
+    double i; //integer
     double f; //fractional
     int d = 0; //decimals
 
@@ -204,6 +209,29 @@ std::string Mass::toString(const Unit u) const noexcept {
         d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
+    //test
+
+/*
+    //integer.decimals unitname
+    const std::string format("%d.0%c%f0. %s" + std::to_string(d));
+    const int len = 128;
+    char buff[len]{0};
+
+    //uses <cstdio>
+    ::snprintf(
+        buff,
+        len,
+        format.c_str(),
+        i,
+        d > 0 ? "." : "",
+        f,
+        d,
+        _UNIT_NAMES.at(u));
+
+    return std::string(buff);
+*/
+    //test
+
     /**
      * At this point d may be 1 even if the only decimal is 0. I
      * do not know why this is.
@@ -218,7 +246,7 @@ std::string Mass::toString(const Unit u) const noexcept {
         << std::noshowpoint
         << n
         << ' '
-        << _NAMES.at(u);
+        << _UNIT_NAMES.at(u);
     
     return ss.str();
 

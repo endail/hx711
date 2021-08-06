@@ -73,8 +73,6 @@ CXXFLAGS := -std=c++11 \
 all: 	dirs \
 		$(BUILDDIR)/static/libhx711.a \
 		$(BUILDDIR)/shared/libhx711.so \
-		hx711calibration \
-		discovery \
 		test
 
 .PHONY: dirs
@@ -100,18 +98,37 @@ $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c -o $@ $<
 
 # Build static library
-$(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/HX711.o \
+$(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/AbstractScale.o \
+								$(BUILDDIR)/static/AdvancedHX711.o \
+								$(BUILDDIR)/static/HX711.o \
 								$(BUILDDIR)/static/Mass.o \
-								$(BUILDDIR)/static/SimpleHX711.o
-	$(AR) rcs 	$(BUILDDIR)/static/libhx711.a \
-				$(BUILDDIR)/static/HX711.o \
-				$(BUILDDIR)/static/Mass.o \
-				$(BUILDDIR)/static/SimpleHX711.o
+								$(BUILDDIR)/static/SimpleHX711.o \
+								$(BUILDDIR)/static/Utility.o \
+								$(BUILDDIR)/static/Value.o \
+								$(BUILDDIR)/static/ValueStack.o \
+								$(BUILDDIR)/static/Watcher.o
+
+	$(AR) rcs 					$(BUILDDIR)/static/libhx711.a \
+								$(BUILDDIR)/static/AbstractScale.o \
+								$(BUILDDIR)/static/AdvancedHX711.o \
+								$(BUILDDIR)/static/HX711.o \
+								$(BUILDDIR)/static/Mass.o \
+								$(BUILDDIR)/static/SimpleHX711.o \
+								$(BUILDDIR)/static/Utility.o \
+								$(BUILDDIR)/static/Value.o \
+								$(BUILDDIR)/static/ValueStack.o \
+								$(BUILDDIR)/static/Watcher.o
 
 # Build shared library
-$(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/HX711.o \
-								$(BUILDDIR)/shared/Mass.o \
-								$(BUILDDIR)/shared/SimpleHX711.o
+$(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/static/AbstractScale.o \
+								$(BUILDDIR)/static/AdvancedHX711.o \
+								$(BUILDDIR)/static/HX711.o \
+								$(BUILDDIR)/static/Mass.o \
+								$(BUILDDIR)/static/SimpleHX711.o \
+								$(BUILDDIR)/static/Utility.o \
+								$(BUILDDIR)/static/Value.o \
+								$(BUILDDIR)/static/ValueStack.o \
+								$(BUILDDIR)/static/Watcher.o
 	$(CXX)	-shared \
 			$(CXXFLAGS) \
 			$(INC) \
@@ -127,12 +144,18 @@ hx711calibration: $(BUILDDIR)/Calibration.o
 		-lhx711 $(LIBS)
 
 .PHONY: test
-test: $(BUILDDIR)/SimpleHX711Test.o
+test: $(BUILDDIR)/SimpleHX711Test.o $(BUILDDIR)/AdvancedHX711Test.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
 		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INC) \
+		-o $(BINDIR)/advancedhx711test \
+		$(BUILDDIR)/AdvancedHX711Test.o \
+		-L $(BUILDDIR)/static \
+		-lhx711 $(LIBS)
+	
 
 .PHONY: discovery
 discovery: $(BUILDDIR)/DiscoverTiming.o

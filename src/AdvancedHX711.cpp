@@ -20,39 +20,85 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <chrono>
 #include <cstdint>
-#include <stdexcept>
+#include <thread>
 #include <vector>
+#include "../include/AdvancedHX711.h"
 #include "../include/HX711.h"
 #include "../include/Mass.h"
-#include "../include/SimpleHX711.h"
+#include "../include/Utility.h"
 #include "../include/Value.h"
+#include "../include/Watcher.h"
 
 namespace HX711 {
 
-SimpleHX711::SimpleHX711(
+AdvancedHX711::AdvancedHX711(
     const int dataPin,
     const int clockPin,
     const Value refUnit,
-    const Value offset) :
+    const Value offset) : 
         AbstractScale(Mass::Unit::G, refUnit, offset),
         HX711(dataPin, clockPin) {
+            this->_wx = new Watcher(this);
+            this->_wx->begin();
 }
 
-std::vector<Value> SimpleHX711::getValues(const std::size_t samples) {
+AdvancedHX711::~AdvancedHX711() {
+    delete this->_wx;
+}
+
+Value AdvancedHX711::readValue() {
     
-    if(samples == 0) {
-        throw std::range_error("samples must be at least 1");
+    std::int32_t v = 0;
+    this->_readBits(&v);
+
+    if(this->_bitFormat == Format::LSB) {
+        v = Utility::reverse(v);
     }
-    
+
+    return Value(_convertFromTwosComplement(v));
+
+}
+
+std::vector<Value> AdvancedHX711::getValues(const std::size_t samples) {
+
+    using namespace std::chrono;
+
+    this->_wx->watch();
+
+    /**
+     * TODO: is lowering this thread's priority feasible?
+     * ie. in favour of increasing the watcher's priority
+     */
+
     std::vector<Value> vals;
     vals.reserve(samples);
-    
-    for(std::size_t i = 0; i < samples; ++i) {
-        while(!this->isReady());
-        vals.push_back(this->readValue());
+
+    //while not filled
+    while(vals.size() < samples) {
+
+        //while empty, defer exec to other threads
+        while(this->_wx->values.empty()) {
+            std::this_thread::yield();
+            Utility::sleepus(std::chrono::milliseconds(1));
+        }
+
+        //not empty; data available!
+        this->_wx->valuesLock.lock();
+
+        //now, take as many values as which are available
+        //up to however many are left to fill the array
+        while(!this->_wx->values.empty() && vals.size() < samples) {
+            vals.push_back(this->_wx->values.pop());
+        }
+
+        this->_wx->valuesLock.unlock();
+
     }
-    
+
+    this->_wx->pause();
+
     return vals;
 
 }

@@ -164,11 +164,11 @@ public:
             tr.start = high_resolution_clock::now();
 
             tr.waitStart = high_resolution_clock::now();
-            while(!this->_isReady()) ;
+            while(!this->isReady()) ;
             tr.waitEnd = high_resolution_clock::now();
 
             tr.convertStart = high_resolution_clock::now();
-            tr.v = this->_readInt();
+            tr.v = this->readValue();
             tr.convertEnd = high_resolution_clock::now();
 
             tr.end = high_resolution_clock::now();
@@ -190,18 +190,18 @@ public:
         timings.reserve(samples);
 
         //do an initial read
-        while(!this->_isReady()) ;
-        this->_readInt();
+        while(!this->isReady()) ;
+        this->readValue();
 
         for(std::size_t i = 0; i < samples; ++i) {
 
             high_resolution_clock::time_point start = high_resolution_clock::now();
-            while(!this->_isReady()) ;
+            while(!this->isReady()) ;
             high_resolution_clock::time_point end = high_resolution_clock::now();
 
             timings.push_back(end - start);
 
-            this->_readInt();
+            this->readValue();
 
         }
 
