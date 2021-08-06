@@ -28,7 +28,7 @@ src/ValueStack.cpp:43:10: warning: Return value of function std::remove_if() is 
 src/ValueStack.cpp:43:5: warning: Return value of std::remove_if() ignored. Elements remain in container. [uselessCallsRemove]
     std::remove_if(this->_container.begin(), this->_container.end(),
     ^
-src/Mass.cpp:94:0: style: The function 'convertTo' is never used. [unusedFunction]
+src/Mass.cpp:95:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:231:0: style: The function 'getChannel' is never used. [unusedFunction]
