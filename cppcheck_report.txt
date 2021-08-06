@@ -31,16 +31,16 @@ src/ValueStack.cpp:43:5: warning: Return value of std::remove_if() ignored. Elem
 src/Mass.cpp:94:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:224:0: style: The function 'getChannel' is never used. [unusedFunction]
+src/HX711.cpp:231:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:220:0: style: The function 'getClockPin' is never used. [unusedFunction]
+src/HX711.cpp:227:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:216:0: style: The function 'getDataPin' is never used. [unusedFunction]
+src/HX711.cpp:223:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:228:0: style: The function 'getGain' is never used. [unusedFunction]
+src/HX711.cpp:235:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:66:0: style: The function 'getOffset' is never used. [unusedFunction]
@@ -59,6 +59,9 @@ src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction
 
 ^
 src/AbstractScale.cpp:70:0: style: The function 'setOffset' is never used. [unusedFunction]
+
+^
+src/HX711.cpp:218:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:44:0: style: The function 'setUnit' is never used. [unusedFunction]
