@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 #include <iomanip>
 #include <ios>
 #include <ostream>
@@ -185,7 +186,7 @@ std::string Mass::toString() const noexcept {
 
 std::string Mass::toString(const Unit u) const noexcept {
     
-    std::stringstream ss;
+    //std::stringstream ss;
     
     double n; //mass as a double converted to u
     double i; //integer
@@ -211,25 +212,20 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     //test
 
-/*
-    //integer.decimals unitname
-    const std::string format("%d.0%c%f0. %s" + std::to_string(d));
-    const int len = 128;
+    const std::size_t len = 128;
     char buff[len]{0};
 
     //uses <cstdio>
     ::snprintf(
         buff,
         len,
-        format.c_str(),
-        i,
-        d > 0 ? "." : "",
-        f,
+        "%01.*f %s",
         d,
+        n,
         _UNIT_NAMES.at(u));
 
     return std::string(buff);
-*/
+
     //test
 
     /**
@@ -241,6 +237,7 @@ std::string Mass::toString(const Unit u) const noexcept {
      * TODO: can printf be used instead?
      */
 
+/*
     ss  << std::fixed
         << std::setprecision(d)
         << std::noshowpoint
@@ -249,6 +246,7 @@ std::string Mass::toString(const Unit u) const noexcept {
         << _UNIT_NAMES.at(u);
     
     return ss.str();
+*/
 
 }
 
