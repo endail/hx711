@@ -32,6 +32,8 @@ constexpr std::chrono::nanoseconds ValueStack::_DEFAULT_MAX_AGE;
 
 void ValueStack::_update() {
 
+    //TODO: this needs optimisation!!!
+
     using namespace std::chrono;
 
     while(this->_container.size() > this->_maxSize) {
@@ -71,6 +73,7 @@ void ValueStack::push(const Value val) noexcept {
 }
 
 Value ValueStack::pop() noexcept {
+    this->_update();
     const Value v = this->_container.front().val;
     this->_container.pop_front();
     return v;

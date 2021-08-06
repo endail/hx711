@@ -22,19 +22,12 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <numeric>
 #include <string>
-#include <algorithm>
-#include <thread>
-#include <chrono>
-#include <iomanip>
-#include <cmath>
 #include "../include/SimpleHX711.h"
 
 int main(int argc, char** argv) {
 
     using namespace std;
-    using namespace std::chrono;
     using namespace HX711;
 
     const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT] [OFFSET]";

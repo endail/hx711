@@ -22,19 +22,12 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <numeric>
 #include <string>
-#include <algorithm>
-#include <thread>
-#include <chrono>
-#include <iomanip>
-#include <cmath>
 #include "../include/AdvancedHX711.h"
 
 int main(int argc, char** argv) {
 
     using namespace std;
-    using namespace std::chrono;
     using namespace HX711;
 
     const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT] [OFFSET]";
@@ -54,7 +47,7 @@ int main(int argc, char** argv) {
 
     for(int i = 0; i < 1000; ++i) {
 
-        const Mass m = hx.weight(ReadType::Median, 3);
+        const Mass m = hx.weight(ReadType::Median, 80);
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << '\n'

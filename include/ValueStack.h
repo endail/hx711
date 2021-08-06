@@ -37,9 +37,9 @@ protected:
         std::chrono::high_resolution_clock::time_point when;
     };
 
-    static const size_t _DEFAULT_MAX_SIZE = 50;
+    static const size_t _DEFAULT_MAX_SIZE = 80;
     static constexpr auto _DEFAULT_MAX_AGE = std::chrono::duration_cast
-        <std::chrono::nanoseconds>(std::chrono::milliseconds(250));
+        <std::chrono::nanoseconds>(std::chrono::seconds(1));
 
     void _update();
 
