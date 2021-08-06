@@ -188,13 +188,15 @@ std::string Mass::toString(const Unit u) const noexcept {
     
     //std::stringstream ss;
     
-    double n; //mass as a double converted to u
-    double i; //integer
-    double f; //fractional
-    int d = 0; //decimals
+    //double n; //mass as a double converted to u
+    //double i; //integer
+    //double f; //fractional
+    //int d = 0; //decimals
 
-    n = Mass::convert(this->_ug, Unit::UG, u);
-    f = std::modf(n, &i);
+    const double n = Mass::convert(this->_ug, Unit::UG, u);
+    double i;
+    const double f = std::modf(n, &i);
+    int d = 0;
 
     /**
      * Credit: https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
@@ -210,12 +212,19 @@ std::string Mass::toString(const Unit u) const noexcept {
         d = static_cast<int>(1 - std::log10(std::abs(f)));
     }
 
-    //test
+    /**
+     * At this point d may be 1 even if the only decimal is 0. I
+     * do not know why this is.
+     */
 
+    //A bit arbitrary and magic number-y, but sufficient to hold a float
+    //and unit name
     const std::size_t len = 128;
-    char buff[len]{0};
+    char buff[len];
 
-    //uses <cstdio>
+    /**
+     * TODO: is snprintf faster than sstream?
+     */
     ::snprintf(
         buff,
         len,
@@ -224,18 +233,8 @@ std::string Mass::toString(const Unit u) const noexcept {
         n,
         _UNIT_NAMES.at(u));
 
+    //std::string will automatically limit chars to first \0
     return std::string(buff);
-
-    //test
-
-    /**
-     * At this point d may be 1 even if the only decimal is 0. I
-     * do not know why this is.
-     */
-
-    /**
-     * TODO: can printf be used instead?
-     */
 
 /*
     ss  << std::fixed
