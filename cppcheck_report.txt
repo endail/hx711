@@ -1,22 +1,70 @@
-src/Mass.cpp:89:0: style: The function 'convertTo' is never used. [unusedFunction]
+src/AdvancedHX711.cpp:36:16: warning: Member variable 'AdvancedHX711::_bitFormat' is not initialized in the constructor. [uninitMemberVar]
+AdvancedHX711::AdvancedHX711(
+               ^
+include/Watcher.h:75:5: style: Class 'Watcher' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+    Watcher(HX711* const hx) noexcept;
+    ^
+include/AdvancedHX711.h:57:32: style: The function 'getValues' overrides a function in a base class but is not marked with a 'override' specifier. [missingOverride]
+    virtual std::vector<Value> getValues(const std::size_t samples);
+                               ^
+include/AbstractScale.h:62:32: note: Virtual function in base class
+    virtual std::vector<Value> getValues(const std::size_t samples) = 0;
+                               ^
+include/AdvancedHX711.h:57:32: note: Function in derived class
+    virtual std::vector<Value> getValues(const std::size_t samples);
+                               ^
+include/SimpleHX711.h:42:32: style: The function 'getValues' overrides a function in a base class but is not marked with a 'override' specifier. [missingOverride]
+    virtual std::vector<Value> getValues(const std::size_t samples);
+                               ^
+include/AbstractScale.h:62:32: note: Virtual function in base class
+    virtual std::vector<Value> getValues(const std::size_t samples) = 0;
+                               ^
+include/SimpleHX711.h:42:32: note: Function in derived class
+    virtual std::vector<Value> getValues(const std::size_t samples);
+                               ^
+src/ValueStack.cpp:43:10: warning: Return value of function std::remove_if() is not used. [ignoredReturnValue]
+    std::remove_if(this->_container.begin(), this->_container.end(),
+         ^
+src/ValueStack.cpp:43:5: warning: Return value of std::remove_if() ignored. Elements remain in container. [uselessCallsRemove]
+    std::remove_if(this->_container.begin(), this->_container.end(),
+    ^
+src/Mass.cpp:94:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:135:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/HX711.cpp:224:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:121:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/HX711.cpp:220:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/Mass.cpp:81:0: style: The function 'getUnit' is never used. [unusedFunction]
+src/HX711.cpp:216:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:139:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/HX711.cpp:228:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
-src/Mass.cpp:85:0: style: The function 'setUnit' is never used. [unusedFunction]
+src/AbstractScale.cpp:66:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/SimpleHX711.cpp:162:0: style: The function 'tare' is never used. [unusedFunction]
+src/AbstractScale.cpp:52:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+
+^
+src/AbstractScale.cpp:48:0: style: The function 'getUnit' is never used. [unusedFunction]
+
+^
+src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunction]
+
+^
+src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction]
+
+^
+src/AbstractScale.cpp:70:0: style: The function 'setOffset' is never used. [unusedFunction]
+
+^
+src/AbstractScale.cpp:44:0: style: The function 'setUnit' is never used. [unusedFunction]
+
+^
+src/AbstractScale.cpp:104:0: style: The function 'zero' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
