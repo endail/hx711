@@ -34,7 +34,7 @@
 namespace HX711 {
 
 Options::Options() noexcept
-    : Options(3) { } //default options
+    : Options(3) { } //default constructor delegated to another
 
 Options::Options(const std::size_t s) noexcept
     :   stratType(StrategyType::Samples),
@@ -47,15 +47,6 @@ Options::Options(const std::chrono::nanoseconds t) noexcept
         readType(ReadType::Median),
         samples(0),
         timeout(t) { }
-
-Options::Options(const std::chrono::microseconds t) noexcept
-    : Options(std::chrono::duration_cast<std::chrono::nanoseconds>(t)) { }
-
-Options::Options(const std::chrono::milliseconds t) noexcept
-    : Options(std::chrono::duration_cast<std::chrono::nanoseconds>(t)) { }
-
-Options::Options(const std::chrono::seconds t) noexcept
-    : Options(std::chrono::duration_cast<std::chrono::nanoseconds>(t)) { }
 
 AbstractScale::AbstractScale(
     const Mass::Unit massUnit,
@@ -166,6 +157,29 @@ void AbstractScale::zero(const Options o) {
 
 Mass AbstractScale::weight(const Options o) {
     return Mass(this->read(o), this->_massUnit);
+}
+
+Mass AbstractScale::weight(const std::chrono::nanoseconds timeout) {
+    return this->weight(Options(timeout));
+}
+
+Mass AbstractScale::weight(const std::chrono::microseconds timeout) {
+    using namespace std::chrono;
+    return this->weight(Options(duration_cast<nanoseconds>(timeout)));
+}
+
+Mass AbstractScale::weight(const std::chrono::milliseconds timeout) {
+    using namespace std::chrono;
+    return this->weight(Options(duration_cast<nanoseconds>(timeout)));
+}
+
+Mass AbstractScale::weight(const std::chrono::seconds timeout) {
+    using namespace std::chrono;
+    return this->weight(Options(duration_cast<nanoseconds>(timeout)));
+}
+
+Mass AbstractScale::weight(const std::size_t samples) {
+    return this->weight(Options(samples));
 }
 
 };

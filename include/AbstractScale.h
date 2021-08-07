@@ -48,12 +48,9 @@ public:
     std::size_t samples;
     std::chrono::nanoseconds timeout;
 
-    Options() noexcept; //default options
+    Options() noexcept;
     Options(const std::size_t s) noexcept;
     Options(const std::chrono::nanoseconds t) noexcept;
-    Options(const std::chrono::microseconds t) noexcept;
-    Options(const std::chrono::milliseconds t) noexcept;
-    Options(const std::chrono::seconds t) noexcept;
 
 };
 
@@ -87,6 +84,13 @@ public:
     double read(const Options o = Options());
     void zero(const Options o = Options());
     Mass weight(const Options o = Options());
+
+    Mass weight(const std::chrono::nanoseconds timeout);
+    Mass weight(const std::chrono::microseconds timeout);
+    Mass weight(const std::chrono::milliseconds timeout);
+    Mass weight(const std::chrono::seconds timeout);
+
+    Mass weight(const std::size_t samples);
 
 };
 };

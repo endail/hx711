@@ -97,7 +97,7 @@ You will notice in the functions above there is an `Options` parameter. This det
   hx.setUnit(Mass::Unit::OZ);
 
   // constantly output weights using the median of 35 samples
-  for(;;) cout << hx.weight(Options(35)) << endl; //eg. 1.08 oz
+  for(;;) cout << hx.weight(35) << endl; //eg. 1.08 oz
 ```
 
 
