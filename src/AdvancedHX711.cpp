@@ -52,6 +52,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeo
 
     using namespace std::chrono;
 
+    this->_wx->values.clear();
     this->_wx->watch();
 
     std::vector<Value> vals;
@@ -80,6 +81,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::size_t samples) {
 
     using namespace std::chrono;
 
+    this->_wx->values.clear();
     this->_wx->watch();
 
     /**

@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <stdexcept>
@@ -32,14 +33,37 @@
 
 namespace HX711 {
 
+Options::Options() noexcept
+    : Options(3) { } //default options
+
+Options::Options(const std::size_t s) noexcept
+    :   stratType(StrategyType::Samples),
+        readType(ReadType::Median),
+        samples(s),
+        timeout(0) { }
+
+Options::Options(const std::chrono::nanoseconds t) noexcept
+    :   stratType(StrategyType::Time),
+        readType(ReadType::Median),
+        samples(0),
+        timeout(t) { }
+
+Options::Options(const std::chrono::microseconds t) noexcept
+    : Options(std::chrono::duration_cast<std::chrono::nanoseconds>(t)) { }
+
+Options::Options(const std::chrono::milliseconds t) noexcept
+    : Options(std::chrono::duration_cast<std::chrono::nanoseconds>(t)) { }
+
+Options::Options(const std::chrono::seconds t) noexcept
+    : Options(std::chrono::duration_cast<std::chrono::nanoseconds>(t)) { }
+
 AbstractScale::AbstractScale(
     const Mass::Unit massUnit,
     const Value refUnit,
     const Value offset) noexcept : 
         _massUnit(massUnit),
         _refUnit(refUnit),
-        _offset(offset),
-        _strategy(StrategyType::Samples) {
+        _offset(offset) {
 }
 
 void AbstractScale::setUnit(const Mass::Unit unit) noexcept {
@@ -81,7 +105,7 @@ double AbstractScale::read(const Options o) {
 
     std::vector<Value> vals;
 
-    switch(o.st) {
+    switch(o.stratType) {
         case StrategyType::Samples:
 
             if(o.samples == 0) {
@@ -99,9 +123,13 @@ double AbstractScale::read(const Options o) {
             throw std::invalid_argument("unknown strategy type");
     }
 
+    if(vals.empty()) {
+        throw std::runtime_error("no samples obtained");
+    }
+
     double val;
 
-    switch(o.rt) {
+    switch(o.readType) {
         case ReadType::Median:
             val = Utility::median(&vals);
             break;

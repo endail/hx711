@@ -42,19 +42,19 @@ enum class ReadType {
 };
 
 struct Options {
-    StrategyType st;
-    ReadType rt;
+public:
+
+    StrategyType stratType;
+    ReadType readType;
     std::size_t samples;
     std::chrono::nanoseconds timeout;
 
-public:
-    Options() : Options(3) { } //default
-
-    Options(const std::size_t s)
-        : st(StrategyType::Samples), rt(ReadType::Median), samples(s), timeout(0) { }
-
-    Options(const std::chrono::nanoseconds t)
-        : st(StrategyType::Time), rt(ReadType::Median), samples(0), timeout(t) { }
+    Options() noexcept; //default options
+    Options(const std::size_t s) noexcept;
+    Options(const std::chrono::nanoseconds t) noexcept;
+    Options(const std::chrono::microseconds t) noexcept;
+    Options(const std::chrono::milliseconds t) noexcept;
+    Options(const std::chrono::seconds t) noexcept;
 
 };
 
@@ -64,7 +64,6 @@ protected:
     Mass::Unit _massUnit;
     Value _refUnit;
     Value _offset;
-    StrategyType _strategy;
 
 public:
     AbstractScale(
@@ -86,9 +85,9 @@ public:
     virtual std::vector<Value> getValues(const std::size_t samples) = 0;
     virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) = 0;
 
-    double read(const Options o);
-    void zero(const Options o);
-    Mass weight(const Options o);
+    double read(const Options o = Options());
+    void zero(const Options o = Options());
+    Mass weight(const Options o = Options());
 
 };
 };

@@ -74,15 +74,19 @@ Value ValueStack::pop() noexcept {
     return v;
 }
 
-std::size_t ValueStack::size() noexcept {
+std::size_t ValueStack::size() const noexcept {
     return this->_container.size();
 }
 
-bool ValueStack::empty() noexcept {
+void ValueStack::clear() noexcept {
+    this->_container.clear();
+}
+
+bool ValueStack::empty() const noexcept {
     return this->_container.empty();
 }
 
-bool ValueStack::full() noexcept {
+bool ValueStack::full() const noexcept {
     return this->_container.size() >= this->_maxSize;
 }
 

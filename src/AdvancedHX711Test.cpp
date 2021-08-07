@@ -46,10 +46,11 @@ int main(int argc, char** argv) {
 
     AdvancedHX711 hx(dataPin, clockPin, refUnit, offset);
     hx.begin();
+    hx.zero();
 
     for(int i = 0; i < 1000; ++i) {
 
-        const Mass m = hx.weight(duration_cast<nanoseconds>(milliseconds(50)));
+        const Mass m = hx.weight(milliseconds(250));
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << '\n'
