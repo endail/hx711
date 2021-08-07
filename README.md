@@ -27,11 +27,11 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 ### SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin (also referred to as DOUT).
+- **dataPin**: Raspberry Pi pin which connects to the HX711 chip's data pin (also referred to as DOUT).
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin (also referred to as PD_SCK).
+- **clockPin**: Raspberry Pi pin which connects to the HX711 chip's clock pin (also referred to as PD_SCK).
 
-- **reference unit**: load cell's reference unit. Find this value with the calibration program, otherwise set it to 1.
+- **refUnit**: load cell's reference unit. Find this value with the calibration program, otherwise set it to 1.
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program, otherwise set it to 0.
 
