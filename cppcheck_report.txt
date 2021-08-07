@@ -22,10 +22,10 @@ include/AbstractScale.h:62:32: note: Virtual function in base class
 include/SimpleHX711.h:42:32: note: Function in derived class
     virtual std::vector<Value> getValues(const std::size_t samples);
                                ^
-src/ValueStack.cpp:43:10: warning: Return value of function std::remove_if() is not used. [ignoredReturnValue]
+src/ValueStack.cpp:45:10: warning: Return value of function std::remove_if() is not used. [ignoredReturnValue]
     std::remove_if(this->_container.begin(), this->_container.end(),
          ^
-src/ValueStack.cpp:43:5: warning: Return value of std::remove_if() ignored. Elements remain in container. [uselessCallsRemove]
+src/ValueStack.cpp:45:5: warning: Return value of std::remove_if() ignored. Elements remain in container. [uselessCallsRemove]
     std::remove_if(this->_container.begin(), this->_container.end(),
     ^
 src/Mass.cpp:95:0: style: The function 'convertTo' is never used. [unusedFunction]
