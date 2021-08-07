@@ -29,13 +29,13 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
 
-- **rate**: HX711 module's data rate. On module's such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct settling time.
+- **rate**: HX711 module's data rate. On module's such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct data settling time.
 
-As the name implies, this is a simple interface to the HX711 module. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU time.
+As the name implies, this is a simple interface to the HX711 module. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
 
-### `AdvancedHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )`
+### AdvancedHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
-Parameters are identical to `SimpleHX711`.
+Arguments are identical to `SimpleHX711`.
 
 The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data, thereby minimising CPU time.
 
