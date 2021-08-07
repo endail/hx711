@@ -37,7 +37,8 @@ public:
         const int dataPin,
         const int clockPin,
         const Value refUnit = 1,
-        const Value offset = 0);
+        const Value offset = 0,
+        const Rate rate = Rate::HZ_10);
 
     virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
     virtual std::vector<Value> getValues(const std::size_t samples) override;

@@ -35,9 +35,10 @@ SimpleHX711::SimpleHX711(
     const int dataPin,
     const int clockPin,
     const Value refUnit,
-    const Value offset) :
+    const Value offset,
+    const Rate rate) :
         AbstractScale(Mass::Unit::G, refUnit, offset),
-        HX711(dataPin, clockPin) {
+        HX711(dataPin, clockPin, rate) {
             this->begin();
 }
 
