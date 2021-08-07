@@ -81,9 +81,9 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 You will notice in the functions above there is an `Options` parameter. This determines _how_ data is collected and interpreted according to a `StrategyType` and `ReadType`.
 
-- `StrategyType::Samples` instructs the scale to collect `Options.samples` number of samples.
+- `StrategyType::Samples` instructs the scale to collect `Options.samples (std::size_t)` number of samples.
 
-- `StrategyType::Time` instructs the scale to collect as many samples as possible within the time period `Options.timeout`.
+- `StrategyType::Time` instructs the scale to collect as many samples as possible within the time period `Options.timeout (std::chrono::nanoseconds)`.
 
 - `ReadType::Median` instructs the scale to use the median value from the collected samples.
 
@@ -127,13 +127,13 @@ pi@raspberrypi~/hx711 $ make && sudo make install
 
 ## Calibrate
 
-`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Run it as follows and follow the prompts:
+`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Run it as follows and follow the prompts. Arguments are as follows:
 
 - **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
 
 - **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
 
-Example using GPIO pin 2 for data and pin 3 for clock.
+Example using GPIO pin 2 for data and GPIO pin 3 for clock.
 
 ```shell
 pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
@@ -150,7 +150,7 @@ pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
 - **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
-`
+
 Example using GPIO pin 2 for data, GPIO pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
 
 ```shell
