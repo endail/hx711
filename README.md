@@ -21,9 +21,9 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 ### SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. Any pin capable of input may be used.
+- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input may be used.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. Any pin capable of output may be used.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of output may be used.
 
 - **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
 
@@ -123,9 +123,9 @@ pi@raspberrypi~/hx711 $ make && sudo make install
 
 `make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 module. Run it as follows and follow the prompts:
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. Any pin capable of input may be used.
+- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input may be used.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. Any pin capable of output may be used.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of output may be used.
 
 Example using GPIO pin 2 for data and pin 3 for clock.
 
@@ -137,9 +137,9 @@ pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
 
 `make` will create the executables `bin/simplehx711test` and `bin/advancedhx711test` in the project directory. You can use these programs to test your load cell and HX711 module. Arguments are as follows:
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering.
+- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input may be used.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [GPIO](https://pinout.xyz/) pin numbering.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of output may be used.
 
 - **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
 
