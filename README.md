@@ -17,6 +17,8 @@ The .gif above illustrates the output of the test code where I applied pressure 
 
 ## Documentation
 
+Datasheet: https://cdn.sparkfun.com/assets/b/f/5/a/e/hx711F_EN.pdf
+
 ### Pins
 
 Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated SPI or I2C pins. The HX711 is **not** an I2C device. Any pin capable of input and output may be used.
@@ -33,7 +35,7 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program, otherwise set it to 0.
 
-- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct data settling time.
+- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the data sheet for more information.
 
 As the name implies, this is a simple interface to the HX711 chip. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
 
