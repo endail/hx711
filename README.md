@@ -13,25 +13,29 @@ See: [`src/SimpleHX711Test.cpp`](https://github.com/endail/hx711/blob/master/src
 
 ![hx711.gif](hx711.gif)
 
-The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 module was operating at 80Hz. However, note from the code that the value being used is [the median of five samples](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp#L50) from the sensor.
+The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is [the median of five samples](https://github.com/endail/hx711/blob/master/src/SimpleHX711Test.cpp#L50) from the sensor.
 
 ## Documentation
+
+### Pins
+
+Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input and output may be used.
 
 There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `AdvancedHX711`.
 
 ### SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input may be used.
+- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin (also referred to as DOUT).
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of output may be used.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin (also referred to as PD_SCK).
 
-- **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
+- **reference unit**: load cell's reference unit. Find this value with the calibration program, otherwise set it to 1.
 
-- **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
+- **offset**: load cell's offset from zero. Find this value with the calibration program, otherwise set it to 0.
 
-- **rate**: HX711 module's data rate. On module's such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct data settling time.
+- **rate**: HX711 chip's data rate. On module's such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct data settling time.
 
-As the name implies, this is a simple interface to the HX711 module. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
+As the name implies, this is a simple interface to the HX711 chip. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
 
 ### AdvancedHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
@@ -45,7 +49,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS, this in itself is unreliable and therefore disabled by default. Use at your own risk.
 
-- `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 module. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
+- `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
 - `void powerUp()`
 
@@ -55,7 +59,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 ### AbstractScale
 
-`SimpleHX711` and `AdvancedHX711` also both inherit from the `AbstractScale` class. This is the interface between raw data values from the HX711 module and scale functionality.
+`SimpleHX711` and `AdvancedHX711` also both inherit from the `AbstractScale` class. This is the interface between raw data values from the HX711 chip and scale functionality.
 
 - `Mass::Unit getUnit()` and `void setUnit( Mass::Unit unit )`. Gets and sets the default unit the scale will return weights in. For example, if set to `Mass::Unit::KG`, the scale will output a weight in kilograms.
 
@@ -75,7 +79,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 You will notice in the functions above there is an `Options` parameter. This determines _how_ data is collected and interpreted according to a `StrategyType` and `ReadType`.
 
-- `StrategyType::Samples` instructs the scale to collect `Options.samples` number of samples before.
+- `StrategyType::Samples` instructs the scale to collect `Options.samples` number of samples.
 
 - `StrategyType::Time` instructs the scale to collect as many samples as possible within the time period `Options.timeout`.
 
@@ -121,11 +125,11 @@ pi@raspberrypi~/hx711 $ make && sudo make install
 
 ## Calibrate
 
-`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 module. Run it as follows and follow the prompts:
+`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Run it as follows and follow the prompts:
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input may be used.
+- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 module's clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of output may be used.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
 
 Example using GPIO pin 2 for data and pin 3 for clock.
 
@@ -137,15 +141,15 @@ pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
 
 `make` will create the executables `bin/simplehx711test` and `bin/advancedhx711test` in the project directory. You can use these programs to test your load cell and HX711 module. Arguments are as follows:
 
-- **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of input may be used.
+- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
 
-- **clock pin**: Raspberry Pi pin which connects to the HX711 modules' clock interface. Use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the I2C or SPI pins. Any pin capable of output may be used.
+- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
 
 - **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
 `
-Example using GPIO pin 2 for data, pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
+Example using GPIO pin 2 for data, GPIO pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
 
 ```shell
 pi@raspberrypi~/hx711 $ bin/simplehx711test 2 3 -377 -363712
