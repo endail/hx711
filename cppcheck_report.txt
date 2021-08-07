@@ -1,36 +1,18 @@
 include/AbstractScale.h:53:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::size_t s)
+    Options(const std::size_t s) noexcept;
+    ^
+include/AbstractScale.h:54:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+    Options(const std::chrono::nanoseconds t) noexcept;
+    ^
+include/AbstractScale.h:55:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+    Options(const std::chrono::microseconds t) noexcept;
     ^
 include/AbstractScale.h:56:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::chrono::nanoseconds t)
+    Options(const std::chrono::milliseconds t) noexcept;
     ^
-include/ValueStack.h:58:17: style:inconclusive: Technically the member function 'HX711::ValueStack::size' can be const. [functionConst]
-    std::size_t size() noexcept;
-                ^
-src/ValueStack.cpp:77:25: note: Technically the member function 'HX711::ValueStack::size' can be const.
-std::size_t ValueStack::size() noexcept {
-                        ^
-include/ValueStack.h:58:17: note: Technically the member function 'HX711::ValueStack::size' can be const.
-    std::size_t size() noexcept;
-                ^
-include/ValueStack.h:59:10: style:inconclusive: Technically the member function 'HX711::ValueStack::empty' can be const. [functionConst]
-    bool empty() noexcept;
-         ^
-src/ValueStack.cpp:81:18: note: Technically the member function 'HX711::ValueStack::empty' can be const.
-bool ValueStack::empty() noexcept {
-                 ^
-include/ValueStack.h:59:10: note: Technically the member function 'HX711::ValueStack::empty' can be const.
-    bool empty() noexcept;
-         ^
-include/ValueStack.h:60:10: style:inconclusive: Technically the member function 'HX711::ValueStack::full' can be const. [functionConst]
-    bool full() noexcept;
-         ^
-src/ValueStack.cpp:85:18: note: Technically the member function 'HX711::ValueStack::full' can be const.
-bool ValueStack::full() noexcept {
-                 ^
-include/ValueStack.h:60:10: note: Technically the member function 'HX711::ValueStack::full' can be const.
-    bool full() noexcept;
-         ^
+include/AbstractScale.h:57:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+    Options(const std::chrono::seconds t) noexcept;
+    ^
 src/Mass.cpp:95:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
@@ -46,13 +28,13 @@ src/HX711.cpp:228:0: style: The function 'getDataPin' is never used. [unusedFunc
 src/HX711.cpp:240:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:67:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/AbstractScale.cpp:91:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:53:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/AbstractScale.cpp:77:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:49:0: style: The function 'getUnit' is never used. [unusedFunction]
+src/AbstractScale.cpp:73:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
 src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunction]
@@ -64,16 +46,13 @@ src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction
 src/HX711.cpp:223:0: style: The function 'setFormat' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:71:0: style: The function 'setOffset' is never used. [unusedFunction]
+src/AbstractScale.cpp:95:0: style: The function 'setOffset' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:218:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:45:0: style: The function 'setUnit' is never used. [unusedFunction]
-
-^
-src/AbstractScale.cpp:121:0: style: The function 'zero' is never used. [unusedFunction]
+src/AbstractScale.cpp:69:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
