@@ -19,7 +19,7 @@ The .gif above illustrates the output of the test code where I applied pressure 
 
 ### Pins
 
-Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated SPI or I2C pins. The HX711 is **not** an I2C device. Any pin capable of input and output may be used.
+Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated SPI or I2C pins. <ins>The HX711 is **not** an I2C device.</ins> Any pin capable of input and output may be used.
 
 There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `AdvancedHX711`.
 
