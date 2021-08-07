@@ -4,15 +4,6 @@ include/AbstractScale.h:52:5: style: Struct 'Options' has a constructor with 1 a
 include/AbstractScale.h:53:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
     Options(const std::chrono::nanoseconds t) noexcept;
     ^
-include/AbstractScale.h:54:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::chrono::microseconds t) noexcept;
-    ^
-include/AbstractScale.h:55:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::chrono::milliseconds t) noexcept;
-    ^
-include/AbstractScale.h:56:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::chrono::seconds t) noexcept;
-    ^
 src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
@@ -28,13 +19,13 @@ src/HX711.cpp:220:0: style: The function 'getDataPin' is never used. [unusedFunc
 src/HX711.cpp:232:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:91:0: style: The function 'getOffset' is never used. [unusedFunction]
+src/AbstractScale.cpp:82:0: style: The function 'getOffset' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:77:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
+src/AbstractScale.cpp:68:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:73:0: style: The function 'getUnit' is never used. [unusedFunction]
+src/AbstractScale.cpp:64:0: style: The function 'getUnit' is never used. [unusedFunction]
 
 ^
 src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunction]
@@ -49,10 +40,10 @@ src/HX711.cpp:215:0: style: The function 'setFormat' is never used. [unusedFunct
 src/HX711.cpp:210:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:69:0: style: The function 'setUnit' is never used. [unusedFunction]
+src/AbstractScale.cpp:60:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:149:0: style: The function 'zero' is never used. [unusedFunction]
+src/AbstractScale.cpp:140:0: style: The function 'zero' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
