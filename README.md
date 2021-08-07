@@ -33,7 +33,7 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program, otherwise set it to 0.
 
-- **rate**: HX711 chip's data rate. On module's such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct data settling time.
+- **rate**: HX711 chip's data rate. On breakout boards such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but is used to determine the correct data settling time.
 
 As the name implies, this is a simple interface to the HX711 chip. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
 
