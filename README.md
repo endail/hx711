@@ -19,7 +19,7 @@ The .gif above illustrates the output of the test code where I applied pressure 
 
 There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `AdvancedHX711`.
 
-### `SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )`
+### SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
 - **data pin**: Raspberry Pi pin which connects to the HX711 module's data interface. Use [GPIO](https://pinout.xyz/) pin numbering. Any pin capable of input may be used.
 
