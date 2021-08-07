@@ -36,9 +36,9 @@
 
 namespace HX711 {
 
-enum class GpioLevel {
-    LOW = 0,
-    HIGH = 1
+enum class GpioLevel : bool {
+    LOW = false,
+    HIGH = true
 };
 
 class Utility {
@@ -63,12 +63,6 @@ public:
      */
     static void sleepns(const std::chrono::nanoseconds ns) noexcept;
     static void sleepus(const std::chrono::microseconds us) noexcept;
-    
-    /**
-     * Delay for ns nanoseconds. The _sleepns/_delayns functions are
-     * an attempt to be analogous to usleep/udelay in the kernel.
-     * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
-     */
     static void delayns(const std::chrono::nanoseconds ns) noexcept;
     static void delayus(const std::chrono::microseconds us) noexcept;
     

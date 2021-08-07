@@ -42,6 +42,7 @@ AdvancedHX711::AdvancedHX711(
         HX711(dataPin, clockPin) {
             this->_wx = new Watcher(this);
             this->_wx->begin();
+            this->begin();
 }
 
 AdvancedHX711::~AdvancedHX711() {

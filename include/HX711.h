@@ -36,7 +36,7 @@ namespace HX711 {
  * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
  */
 
-enum class Channel {
+enum class Channel : unsigned char {
     A,
     B
 };
@@ -44,7 +44,7 @@ enum class Channel {
 /**
  * Datasheet pg. 4
  */
-enum class Gain {
+enum class Gain : unsigned char {
     GAIN_128,
     GAIN_32,
     GAIN_64
@@ -54,13 +54,13 @@ enum class Gain {
  * Datasheet pg. 3
  * OTHER is to be used when an external clock (ie. crystal is used)
  */
-enum class Rate {
+enum class Rate : unsigned char {
     HZ_10,
     HZ_80,
     OTHER
 };
 
-enum class Format {
+enum class Format : unsigned char {
     MSB,
     LSB
 };
@@ -68,8 +68,8 @@ enum class Format {
 class HX711 {
 protected:
 
-    static const std::uint8_t _BITS_PER_CONVERSION_PERIOD = 24;
-    static const std::unordered_map<const Gain, const std::uint8_t> _PULSES;
+    static const unsigned char _BITS_PER_CONVERSION_PERIOD = 24;
+    static const std::unordered_map<const Gain, const unsigned char> _PULSES;
     static constexpr auto _T1 = std::chrono::nanoseconds(100);
     static constexpr auto _T2 = std::chrono::nanoseconds(100);
     static constexpr auto _T3 = std::chrono::nanoseconds(200);
@@ -88,7 +88,7 @@ protected:
     Format _bitFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
-    static std::uint8_t _calculatePulses(const Gain g) noexcept;
+    static unsigned char _calculatePulses(const Gain g) noexcept;
     void _setInputGainSelection();
     bool _readBit() const;
     void _readBits(std::int32_t* const v);

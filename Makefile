@@ -73,6 +73,7 @@ CXXFLAGS := -std=c++11 \
 all: 	dirs \
 		$(BUILDDIR)/static/libhx711.a \
 		$(BUILDDIR)/shared/libhx711.so \
+		hx711calibration \
 		test
 
 .PHONY: dirs

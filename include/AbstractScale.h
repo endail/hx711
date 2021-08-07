@@ -31,19 +31,18 @@
 
 namespace HX711 {
 
-enum class StrategyType {
+enum class StrategyType : unsigned char {
     Samples,
     Time
 };
 
-enum class ReadType {
+enum class ReadType : unsigned char {
     Median,
     Average
 };
 
 struct Options {
 public:
-
     StrategyType stratType;
     ReadType readType;
     std::size_t samples;

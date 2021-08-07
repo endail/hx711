@@ -43,7 +43,6 @@ int main(int argc, char** argv) {
     const int offset = stoi(argv[4]);
 
     SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
-    hx.begin();
 
     for(int i = 0; i < 1000; ++i) {
 

@@ -31,7 +31,7 @@ namespace HX711 {
 class Mass {
 public:
 
-enum class Unit {
+enum class Unit : unsigned char {
     UG,
     MG,
     G,

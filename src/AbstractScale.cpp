@@ -147,10 +147,21 @@ double AbstractScale::read(const Options o) {
 }
 
 void AbstractScale::zero(const Options o) {
-    const Value backup = this->_refUnit;
-    this->setReferenceUnit(1);
-    this->_offset = static_cast<Value>(std::round(this->read(o)));
-    this->setReferenceUnit(backup);
+
+    const Value refBackup = this->_refUnit;
+    const Value offsetBackup = this->_offset;
+
+    try {
+        this->setReferenceUnit(1);
+        this->_offset = static_cast<Value>(std::round(this->read(o)));
+        this->setReferenceUnit(refBackup);
+    }
+    catch(const std::exception& ex) {
+        this->setReferenceUnit(refBackup);
+        this->setOffset(offsetBackup);
+        throw;
+    }
+
 }
 
 Mass AbstractScale::weight(const Options o) {

@@ -24,7 +24,6 @@
 #define HX711_WATCHER_H_CFBFD856_ADA7_4F6A_9D3E_B7F6D39527D5
 
 #include <chrono>
-#include <condition_variable>
 #include <mutex>
 #include <pthread.h>
 #include <sched.h>
@@ -34,7 +33,7 @@
 
 namespace HX711 {
 
-enum class WatchState {
+enum class WatchState : unsigned char {
     NONE,
     NORMAL,
     PAUSE,
@@ -56,7 +55,7 @@ protected:
     static constexpr auto _DEFAULT_NOT_READY_SLEEP = std::chrono::duration_cast
         <std::chrono::nanoseconds>(std::chrono::microseconds(7));
 
-    HX711* _hx;
+    HX711* const _hx;
     WatchState _watchState;
     std::mutex _pinWatchLock;
     pthread_t _watchThreadId;

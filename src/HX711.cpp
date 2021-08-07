@@ -47,7 +47,7 @@ constexpr std::chrono::microseconds HX711::_POWER_DOWN_TIMEOUT;
  * gain
  * Datasheet pg. 4
  */
-const std::unordered_map<const Gain, const std::uint8_t> HX711::_PULSES({
+const std::unordered_map<const Gain, const unsigned char> HX711::_PULSES({
     { Gain::GAIN_128,       25 },
     { Gain::GAIN_32,        26 },
     { Gain::GAIN_64,        27 }
@@ -69,15 +69,15 @@ std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept 
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
-std::uint8_t HX711::_calculatePulses(const Gain g) noexcept {
+unsigned char HX711::_calculatePulses(const Gain g) noexcept {
     return _PULSES.at(g) - _BITS_PER_CONVERSION_PERIOD;
 }
 
 void HX711::_setInputGainSelection() {
 
-    const auto pulses = _calculatePulses(this->_gain);
+    const unsigned char pulses = _calculatePulses(this->_gain);
 
-    for(std::uint8_t i = 0; i < pulses; ++i) {
+    for(unsigned char i = 0; i < pulses; ++i) {
         this->_readBit();
     }
 
@@ -170,7 +170,7 @@ void HX711::_readBits(std::int32_t* const v) {
     //Utility::delayns(_T1);
 
     //msb first
-    for(std::uint8_t i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
+    for(unsigned char i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
         *v <<= 1;
         *v |= this->_readBit();
     }
@@ -180,20 +180,12 @@ void HX711::_readBits(std::int32_t* const v) {
 }
 
 HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
-
     _gpioHandle(-1),
     _dataPin(dataPin),
     _clockPin(clockPin),
-
     _rate(rate),
-
-    /**
-     * Datasheet pg. 5 describes that after a reset, the HX711 will default
-     * to channel A and a gain of 128.
-     */
     _channel(Channel::A),
     _gain(Gain::GAIN_128),
-    
     _strictTiming(false),
     _bitFormat(Format::MSB) {
 }

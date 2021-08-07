@@ -33,26 +33,40 @@
 
 namespace HX711 {
 
-//TODO: these need exception handling
-
 int Utility::openGpioHandle(const int chip) {
-    return ::lgGpiochipOpen(chip);
+
+    const int handle = ::lgGpiochipOpen(chip);
+    
+    if(handle < 0) {
+        throw GpioException("failed to open gpio chip");
+    }
+
+    return handle;
+
 }
 
 void Utility::closeGpioHandle(const int chip) {
-    ::lgGpiochipClose(chip);
+    if(::lgGpiochipClose(chip) < 0) {
+        throw GpioException("failed to close gpio chip");
+    }
 }
 
 void Utility::openGpioInput(const int handle, const int pin) {
-    ::lgGpioClaimInput(handle, 0, pin);
+    if(::lgGpioClaimInput(handle, 0, pin) < 0) {
+        throw GpioException("failed to open gpio input pin");
+    }
 }
 
 void Utility::openGpioOutput(const int handle, const int pin) {
-    ::lgGpioClaimOutput(handle, 0, pin, 0);
+    if(::lgGpioClaimOutput(handle, 0, pin, 0) < 0) {
+        throw GpioException("failed to open gpio output pin");
+    }
 }
 
 void Utility::closeGpioPin(const int handle, const int pin) {
-    ::lgGpioFree(handle, pin);
+    if(::lgGpioFree(handle, pin) < 0) {
+        throw GpioException("failed to close gpio pin");
+    }
 }
 
 GpioLevel Utility::readGpio(const int handle, const int pin) {

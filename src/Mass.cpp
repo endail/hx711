@@ -22,11 +22,7 @@
 
 #include <cmath>
 #include <cstdio>
-#include <cstring>
-#include <iomanip>
-#include <ios>
 #include <ostream>
-#include <sstream>
 #include <string>
 #include <stdexcept>
 #include <unordered_map>
@@ -219,7 +215,7 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     //A bit arbitrary and magic number-y, but sufficient to hold a float
     //and unit name
-    const std::size_t len = 128;
+    const std::size_t len = 64;
     char buff[len];
 
     /**

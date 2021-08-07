@@ -45,8 +45,6 @@ int main(int argc, char** argv) {
     const int offset = stoi(argv[4]);
 
     AdvancedHX711 hx(dataPin, clockPin, refUnit, offset);
-    hx.begin();
-    hx.zero();
 
     for(int i = 0; i < 1000; ++i) {
 

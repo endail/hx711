@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../include/HX711.h"
+#include "../include/Common.h"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -31,10 +31,10 @@
 using namespace HX711;
 using namespace std;
 
-std::uint32_t samples;
+std::size_t samples;
 std::string unit;
 double knownWeight;
-double zeroValue;
+Value zeroValue;
 SimpleHX711* hx;
 
 void setupHx(const int dataPin, const int clockPin) {
@@ -93,14 +93,14 @@ int main(int argc, char** argv) {
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    zeroValue = hx->read(ReadType::Median, samples);
+    zeroValue = hx->read(Options(samples));
 
     //weigh prompt
     cout    << endl << endl << "5. Place object on the scale and then press enter.";
     cin.ignore();
     cout    << endl << "Working..." << flush;
 
-    const double raw = hx->read(ReadType::Median, samples);
+    const double raw = hx->read(Options(samples));
     const double refUnitFloat = (raw - zeroValue) / knownWeight;
     const Value refUnit = static_cast<Value>(round(refUnitFloat));
     delete hx;

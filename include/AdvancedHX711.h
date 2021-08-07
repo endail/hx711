@@ -25,7 +25,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <sched.h>
 #include "AbstractScale.h"
 #include "HX711.h"
 #include "Value.h"
