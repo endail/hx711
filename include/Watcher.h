@@ -72,7 +72,7 @@ protected:
 public:
     ValueStack values;
     std::mutex valuesLock;
-    Watcher(HX711* const hx) noexcept;
+    explicit Watcher(HX711* const hx) noexcept;
     ~Watcher();
     void begin();
     void watch();

@@ -32,17 +32,10 @@
 #include "Watcher.h"
 
 namespace HX711 {
-
-enum class Format {
-    MSB,
-    LSB
-};
-
 class AdvancedHX711 : public AbstractScale, public HX711 {
 
 protected:
     Watcher* _wx;
-    Format _bitFormat;
 
 public:
     AdvancedHX711(
@@ -50,11 +43,11 @@ public:
         const int clockPin,
         const Value refUnit = 1,
         const Value offset = 0);
-    
+
     virtual ~AdvancedHX711();
 
-    Value readValue();
-    virtual std::vector<Value> getValues(const std::size_t samples);
+    virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
+    virtual std::vector<Value> getValues(const std::size_t samples) override;
 
 };
 };

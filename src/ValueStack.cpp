@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include "../include/ValueStack.h"
@@ -32,8 +31,6 @@ constexpr std::chrono::nanoseconds ValueStack::_DEFAULT_MAX_AGE;
 
 void ValueStack::_update() {
 
-    //TODO: this needs optimisation!!!
-
     using namespace std::chrono;
 
     while(this->_container.size() > this->_maxSize) {
@@ -42,10 +39,9 @@ void ValueStack::_update() {
 
     const auto now = high_resolution_clock::now();
 
-    std::remove_if(this->_container.begin(), this->_container.end(), 
-        [this, &now](const StackEntry& e) {
-            return (e.when + this->_maxAge) > now;
-        });
+    this->_container.remove_if([this, &now](const StackEntry& e) {
+        return (e.when + this->_maxAge) > now;
+    });
 
 }
 
@@ -73,21 +69,20 @@ void ValueStack::push(const Value val) noexcept {
 }
 
 Value ValueStack::pop() noexcept {
-    this->_update();
     const Value v = this->_container.front().val;
     this->_container.pop_front();
     return v;
 }
 
-std::size_t ValueStack::size() const noexcept {
+std::size_t ValueStack::size() noexcept {
     return this->_container.size();
 }
 
-bool ValueStack::empty() const noexcept {
+bool ValueStack::empty() noexcept {
     return this->_container.empty();
 }
 
-bool ValueStack::full() const noexcept {
+bool ValueStack::full() noexcept {
     return this->_container.size() >= this->_maxSize;
 }
 

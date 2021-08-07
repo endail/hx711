@@ -38,7 +38,8 @@ AbstractScale::AbstractScale(
     const Value offset) noexcept : 
         _massUnit(massUnit),
         _refUnit(refUnit),
-        _offset(offset) {
+        _offset(offset),
+        _strategy(StrategyType::Samples) {
 }
 
 void AbstractScale::setUnit(const Mass::Unit unit) noexcept {
@@ -76,23 +77,39 @@ double AbstractScale::normalise(const double v) const noexcept {
     return (v - this->_offset) / this->_refUnit;
 }
 
-double AbstractScale::read(const ReadType rt, const std::size_t samples) {
+double AbstractScale::read(const Options o) {
 
-    if(samples == 0) {
-        throw std::range_error("samples must be at least 1");
+    std::vector<Value> vals;
+
+    switch(o.st) {
+        case StrategyType::Samples:
+
+            if(o.samples == 0) {
+                throw std::range_error("samples must be at least 1");
+            }
+
+            vals = this->getValues(o.samples);
+            break;
+
+        case StrategyType::Time:
+            vals = this->getValues(o.timeout);
+            break;
+
+        default:
+            throw std::invalid_argument("unknown strategy type");
     }
-
-    std::vector<Value> vals = this->getValues(samples);
 
     double val;
 
-    switch(rt) {
+    switch(o.rt) {
         case ReadType::Median:
             val = Utility::median(&vals);
             break;
+
         case ReadType::Average:
             val = Utility::average(&vals);
             break;
+
         default:
             throw std::invalid_argument("unknown read type");
     }
@@ -101,21 +118,15 @@ double AbstractScale::read(const ReadType rt, const std::size_t samples) {
 
 }
 
-void AbstractScale::zero(const ReadType rt, const std::size_t samples) {
-
-    if(samples == 0) {
-        throw std::range_error("samples must be at least 1");
-    }
-    
+void AbstractScale::zero(const Options o) {
     const Value backup = this->_refUnit;
     this->setReferenceUnit(1);
-    this->_offset = static_cast<Value>(std::round(this->read(rt, samples)));
+    this->_offset = static_cast<Value>(std::round(this->read(o)));
     this->setReferenceUnit(backup);
-
 }
 
-Mass AbstractScale::weight(const ReadType rt, const std::size_t samples) {
-    return Mass(this->read(rt, samples), this->_massUnit);
+Mass AbstractScale::weight(const Options o) {
+    return Mass(this->read(o), this->_massUnit);
 }
 
 };

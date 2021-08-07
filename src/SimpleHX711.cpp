@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <chrono>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
@@ -37,6 +38,10 @@ SimpleHX711::SimpleHX711(
     const Value offset) :
         AbstractScale(Mass::Unit::G, refUnit, offset),
         HX711(dataPin, clockPin) {
+}
+
+std::vector<Value> SimpleHX711::getValues(const std::chrono::nanoseconds timeout) {
+    throw std::logic_error("not implemented");
 }
 
 std::vector<Value> SimpleHX711::getValues(const std::size_t samples) {

@@ -55,9 +55,9 @@ public:
 
     void push(const Value val) noexcept;
     Value pop() noexcept;
-    std::size_t size() const noexcept;
-    bool empty() const noexcept;
-    bool full() const noexcept;
+    std::size_t size() noexcept;
+    bool empty() noexcept;
+    bool full() noexcept;
 
 };
 };

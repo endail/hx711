@@ -23,6 +23,7 @@
 #ifndef HX711_SCALE_H_5E9DF993_BC93_4934_A844_98355F4F8062
 #define HX711_SCALE_H_5E9DF993_BC93_4934_A844_98355F4F8062
 
+#include <chrono>
 #include <cstdint>
 #include <vector>
 #include "Mass.h"
@@ -30,9 +31,31 @@
 
 namespace HX711 {
 
+enum class StrategyType {
+    Samples,
+    Time
+};
+
 enum class ReadType {
     Median,
     Average
+};
+
+struct Options {
+    StrategyType st;
+    ReadType rt;
+    std::size_t samples;
+    std::chrono::nanoseconds timeout;
+
+public:
+    Options() : Options(3) { } //default
+
+    Options(const std::size_t s)
+        : st(StrategyType::Samples), rt(ReadType::Median), samples(s), timeout(0) { }
+
+    Options(const std::chrono::nanoseconds t)
+        : st(StrategyType::Time), rt(ReadType::Median), samples(0), timeout(t) { }
+
 };
 
 class AbstractScale {
@@ -41,6 +64,7 @@ protected:
     Mass::Unit _massUnit;
     Value _refUnit;
     Value _offset;
+    StrategyType _strategy;
 
 public:
     AbstractScale(
@@ -60,10 +84,11 @@ public:
     double normalise(const double v) const noexcept;
 
     virtual std::vector<Value> getValues(const std::size_t samples) = 0;
+    virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) = 0;
 
-    double read(const ReadType rt = ReadType::Median, const std::size_t samples = 3);
-    void zero(const ReadType rt = ReadType::Median, const std::size_t samples = 3);
-    Mass weight(const ReadType rt = ReadType::Median, const std::size_t samples = 3);
+    double read(const Options o);
+    void zero(const Options o);
+    Mass weight(const Options o);
 
 };
 };

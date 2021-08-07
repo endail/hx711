@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
     for(int i = 0; i < 1000; ++i) {
 
-        const Mass m = hx.weight(ReadType::Median, 3);
+        const Mass m = hx.weight(3);
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << '\n'

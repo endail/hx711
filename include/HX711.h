@@ -23,7 +23,6 @@
 #ifndef HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 #define HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 
-#include <bitset>
 #include <chrono>
 #include <cstdint>
 #include <mutex>
@@ -61,9 +60,14 @@ enum class Rate {
     OTHER
 };
 
+enum class Format {
+    MSB,
+    LSB
+};
+
 class HX711 {
 protected:
-    
+
     static const std::uint8_t _BITS_PER_CONVERSION_PERIOD = 24;
     static const std::unordered_map<const Gain, const std::uint8_t> _PULSES;
     static constexpr auto _T1 = std::chrono::nanoseconds(100);
@@ -81,6 +85,7 @@ protected:
     Channel _channel;
     Gain _gain;
     bool _strictTiming;
+    Format _bitFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
     static std::uint8_t _calculatePulses(const Gain g) noexcept;
@@ -90,7 +95,7 @@ protected:
 
 
 public:
-    
+
     HX711(
         const int dataPin,
         const int clockPin,
@@ -103,7 +108,8 @@ public:
 
     void begin();
 
-    void setStrictTiming(const bool ok) noexcept;
+    void setStrictTiming(const bool strict) noexcept;
+    void setFormat(const Format bitFormat) noexcept;
 
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;

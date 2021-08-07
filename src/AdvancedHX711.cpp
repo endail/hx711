@@ -48,16 +48,31 @@ AdvancedHX711::~AdvancedHX711() {
     delete this->_wx;
 }
 
-Value AdvancedHX711::readValue() {
-    
-    std::int32_t v = 0;
-    this->_readBits(&v);
+std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeout) {
 
-    if(this->_bitFormat == Format::LSB) {
-        v = Utility::reverse(v);
+    using namespace std::chrono;
+
+    this->_wx->watch();
+
+    std::vector<Value> vals;
+    const auto endTime = high_resolution_clock::now() + timeout;
+
+    while(high_resolution_clock::now() < endTime) {
+
+        while(this->_wx->values.empty()) {
+            std::this_thread::yield();
+            Utility::sleepus(std::chrono::milliseconds(1));
+        }
+
+        this->_wx->valuesLock.lock();
+        while(!this->_wx->values.empty()) {
+            vals.push_back(this->_wx->values.pop());
+        }
+        this->_wx->valuesLock.unlock();
+
     }
 
-    return Value(_convertFromTwosComplement(v));
+    return vals;
 
 }
 

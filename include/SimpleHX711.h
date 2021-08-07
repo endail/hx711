@@ -39,7 +39,8 @@ public:
         const Value refUnit = 1,
         const Value offset = 0);
 
-    virtual std::vector<Value> getValues(const std::size_t samples);
+    virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
+    virtual std::vector<Value> getValues(const std::size_t samples) override;
 
 };
 };

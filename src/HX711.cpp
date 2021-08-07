@@ -194,8 +194,8 @@ HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
     _channel(Channel::A),
     _gain(Gain::GAIN_128),
     
-    _strictTiming(false) {
-
+    _strictTiming(false),
+    _bitFormat(Format::MSB) {
 }
 
 HX711::~HX711() {
@@ -215,9 +215,14 @@ void HX711::begin() {
 
 }
 
-void HX711::setStrictTiming(const bool ok) noexcept {
+void HX711::setStrictTiming(const bool strict) noexcept {
     std::lock_guard<std::mutex> lock(this->_commLock);
-    this->_strictTiming = ok;
+    this->_strictTiming = strict;
+}
+
+void HX711::setFormat(const Format bitFormat) noexcept {
+    std::lock_guard<std::mutex> lock(this->_commLock);
+    this->_bitFormat = bitFormat;
 }
 
 int HX711::getDataPin() const noexcept {
@@ -277,9 +282,17 @@ void HX711::setConfig(const Channel c, const Gain g) {
 }
 
 Value HX711::readValue() {
+
     std::int32_t v = 0;
+
     this->_readBits(&v);
+
+    if(this->_bitFormat == Format::LSB) {
+        v = Utility::reverse(v);
+    }
+
     return Value(_convertFromTwosComplement(v));
+    
 }
 
 void HX711::powerDown() {
