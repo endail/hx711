@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include "../include/AdvancedHX711.h"
+#include "../include/common.h"
 
 int main(int argc, char** argv) {
 

@@ -23,7 +23,7 @@ Datasheet: [revision 2.0](resources/hx711F_EN.pdf)
 
 ### Pins
 
-Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated SPI or I2C pins. The HX711 is **not** an I2C device. Any pin capable of input and output may be used.
+Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated [SPI](https://pinout.xyz/pinout/spi) or [I2C](https://pinout.xyz/pinout/i2c) pins. The HX711 is **not** an I2C device. Any pin capable of input and output may be used.
 
 There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `AdvancedHX711`.
 
@@ -37,7 +37,7 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program, otherwise set it to 0.
 
-- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as Sparkfun's HX711, this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the data sheet for more information.
+- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as [Sparkfun's HX711](https://www.sparkfun.com/products/13879), this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the datasheet for more information.
 
 As the name implies, this is a simple interface to the HX711 chip. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
 
@@ -45,7 +45,7 @@ As the name implies, this is a simple interface to the HX711 chip. Its core oper
 
 Arguments are identical to `SimpleHX711`.
 
-The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data, thereby minimising CPU time.
+The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data.
 
 ### HX711
 
@@ -96,6 +96,13 @@ You will notice in the functions above there is an `Options` parameter. This det
 ### SimpleHX711 Example
 
 ```c++
+#include <iostream>
+#include <hx711/common.h>
+
+int main() {
+
+  using namespace HX711;
+
   // create a SimpleHX711 object using GPIO pin 2 as the data pin,
   // GPIO pin 3 as a the clock pin, -370 as the reference unit, and
   // -367471 as the offset.
@@ -105,18 +112,33 @@ You will notice in the functions above there is an `Options` parameter. This det
   hx.setUnit(Mass::Unit::OZ);
 
   // constantly output weights using the median of 35 samples
-  for(;;) cout << hx.weight(35) << endl; //eg. 1.08 oz
-```
+  for(;;) std::cout << hx.weight(35) << std::endl; //eg. 1.08 oz
 
+  return 0;
+
+}
+```
 
 ### AdvancedHX711 Example
 
 ```c++
-  AdvancedHX711 hx(2, 3);
+#include <chrono>
+#include <iostream>
+#include <hx711/common.h>
+
+int main() {
+
+  using std::chrono::seconds;
+
+  HX711::AdvancedHX711 hx(2, 3);
 
   // constantly output weights using the median of all samples
   // obtained within 1 second
-  for(;;) cout << hx.weight(seconds(1)) << endl; //eg. 0.03 g
+  for(;;) std::cout << hx.weight(seconds(1)) << std::endl; //eg. 0.03 g
+
+  return 0;
+
+}
 ```
 
 ## Build and Install

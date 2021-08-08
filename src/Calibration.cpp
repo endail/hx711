@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../include/Common.h"
+#include "../include/common.h"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
