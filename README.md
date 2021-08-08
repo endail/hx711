@@ -143,7 +143,7 @@ int main() {
 
 ## Build and Install
 
-```shell
+```console
 pi@raspberrypi~ $ git clone https://github.com/endail/hx711
 pi@raspberrypi~ $ cd hx711
 pi@raspberrypi~/hx711 $ make && sudo make install
@@ -159,7 +159,7 @@ pi@raspberrypi~/hx711 $ make && sudo make install
 
 Example using GPIO pin 2 for data and GPIO pin 3 for clock.
 
-```shell
+```console
 pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
 ```
 
@@ -177,7 +177,7 @@ pi@raspberrypi~/hx711 $ bin/hx711calibration 2 3
 
 Example using GPIO pin 2 for data, GPIO pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
 
-```shell
+```console
 pi@raspberrypi~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 ```
 
@@ -185,6 +185,6 @@ pi@raspberrypi~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 
 After writing your own code (eg. main.cpp), compile with the HX711 and lgpio libraries as follows:
 
-```shell
+```console
 g++ -Wall -o prog main.cpp -lhx711 -llgpio
 ```
