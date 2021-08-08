@@ -19,7 +19,9 @@ The .gif above illustrates the output of the test code where I applied pressure 
 
 ## Documentation
 
-Datasheet: [revision 2.0](resources/hx711F_EN.pdf)
+### Datasheet
+
+[revision 2.0](resources/hx711F_EN.pdf)
 
 ### Pins
 
@@ -90,6 +92,14 @@ You will notice in the functions above there is an `Options` parameter. This det
 - `ReadType::Median` instructs the scale to use the median value from the collected samples.
 
 - `ReadType::Average` instructs the scale to use the average value from the collected samples.
+
+### Other Notes
+
+- All code exists within the `::HX711` namespace
+
+- After building and installing the library (see below), you can `#include <hx711/common.h>` to include everything
+
+- `sudo make uninstall` to remove the library
 
 ## Examples
 
