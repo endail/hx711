@@ -30,6 +30,7 @@ jobs:
           inline_suppression: enable
           platform: unix32
           std: c++11
+          output_file: resources/cppcheck_report.txt
 
       - name: Publish report    
         uses: mikeal/publish-to-github-action@master
