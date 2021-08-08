@@ -30,7 +30,7 @@ Value::operator _INTERNAL_TYPE() const noexcept {
 }
 
 bool Value::isSaturated() const noexcept {
-    return this->_v == _MIN || this->_v == _MAX;
+    return this->_v == SATURATION_MIN || this->_v == SATURATION_MAX;
 }
 
 bool Value::isValid() const noexcept {

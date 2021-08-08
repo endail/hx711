@@ -23,6 +23,7 @@
 #ifndef HX711_VALUE_H_48F704C7_6B2D_4BEC_9599_62045594695B
 #define HX711_VALUE_H_48F704C7_6B2D_4BEC_9599_62045594695B
 
+#include <cmath>
 #include <cstdint>
 
 namespace HX711 {
@@ -43,11 +44,17 @@ protected:
      * Datasheet pg. 3
      * But also a consequence of the sensor being 24 bits
      */
-    static const _INTERNAL_TYPE _MIN = -0x800000;
-    static const _INTERNAL_TYPE _MAX = 0x7FFFFF;
+    static constexpr _INTERNAL_TYPE _MIN = -static_cast<_INTERNAL_TYPE>(std::pow(2, 24 - 1));
+    static constexpr _INTERNAL_TYPE _MAX = static_cast<_INTERNAL_TYPE>(std::pow(2, 24 - 1)) - 1;
 
 
 public:
+
+    /**
+     * Saturation values
+     */
+    static const _INTERNAL_TYPE SATURATION_MIN = 0x800000;
+    static const _INTERNAL_TYPE SATURATION_MAX = 0x7FFFFF;
 
     /**
      * When input differential signal goes out of

@@ -64,7 +64,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeo
 
         while(this->_wx->values.empty()) {
             std::this_thread::yield();
-            Utility::sleepus(std::chrono::milliseconds(1));
+            Utility::sleepus(milliseconds(1));
         }
 
         this->_wx->valuesLock.lock();
@@ -100,7 +100,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::size_t samples) {
         //while empty, defer exec to other threads
         while(this->_wx->values.empty()) {
             std::this_thread::yield();
-            Utility::sleepus(std::chrono::milliseconds(1));
+            Utility::sleepus(milliseconds(1));
         }
 
         //not empty; data available!
