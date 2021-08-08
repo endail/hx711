@@ -1,5 +1,7 @@
 # Raspberry Pi HX711 C++ Library
 
+![license](https://img.shields.io/github/license/endail/hx711) ![code size](https://img.shields.io/github/languages/code-size/endail/hx711)
+
 [![Build Status](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/buildcheck.yml)
 [![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/cppcheck.yml)
 [![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml)
