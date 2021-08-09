@@ -43,7 +43,8 @@ enum class GpioLevel : bool {
 
 class Utility {
 protected:
-	Utility();
+    static void _throwGpioExIfErr(const int code);
+    Utility();
 
 
 public:
@@ -56,13 +57,12 @@ public:
     static GpioLevel readGpio(const int handle, const int pin);
     static void writeGpio(const int handle, const int pin, const GpioLevel lev);
 
-	/**
+    /**
      * Sleep for ns nanoseconds. The _sleepns/_delayns functions are
      * an attempt to be analogous to usleep/udelay in the kernel.
      * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
      */
     static void sleepns(const std::chrono::nanoseconds ns) noexcept;
-    static void sleepus(const std::chrono::microseconds us) noexcept;
     static void delayns(const std::chrono::nanoseconds ns) noexcept;
     static void delayus(const std::chrono::microseconds us) noexcept;
     

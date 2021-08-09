@@ -33,77 +33,52 @@
 
 namespace HX711 {
 
-int Utility::openGpioHandle(const int chip) {
-
-    const int handle = ::lgGpiochipOpen(chip);
-    
-    if(handle < 0) {
-        throw GpioException("failed to open gpio chip");
+void Utility::_throwGpioExIfErr(const int code) {
+    if(code < 0) {
+        throw GpioException(::lguErrorText(code));
     }
+}
 
-    return handle;
-
+int Utility::openGpioHandle(const int chip) {
+    const int code = ::lgGpiochipOpen(chip);
+    _throwGpioExIfErr(code);
+    return code;
 }
 
 void Utility::closeGpioHandle(const int chip) {
-    if(::lgGpiochipClose(chip) < 0) {
-        throw GpioException("failed to close gpio chip");
-    }
+    _throwGpioExIfErr(::lgGpiochipClose(chip));
 }
 
 void Utility::openGpioInput(const int handle, const int pin) {
-    if(::lgGpioClaimInput(handle, 0, pin) < 0) {
-        throw GpioException("failed to open gpio input pin");
-    }
+    _throwGpioExIfErr(::lgGpioClaimInput(handle, 0, pin));
 }
 
 void Utility::openGpioOutput(const int handle, const int pin) {
-    if(::lgGpioClaimOutput(handle, 0, pin, 0) < 0) {
-        throw GpioException("failed to open gpio output pin");
-    }
+    _throwGpioExIfErr(::lgGpioClaimOutput(handle, 0, pin, 0));
 }
 
 void Utility::closeGpioPin(const int handle, const int pin) {
-    if(::lgGpioFree(handle, pin) < 0) {
-        throw GpioException("failed to close gpio pin");
-    }
+    _throwGpioExIfErr(::lgGpioFree(handle, pin));
 }
 
 GpioLevel Utility::readGpio(const int handle, const int pin) {
-
     const int code = ::lgGpioRead(handle, pin);
-
-    if(code < 0) {
-        throw GpioException("GPIO read failure");
-    }
-
+    _throwGpioExIfErr(code);
     //lgGpioRead returns 0 for low and 1 for high
     return static_cast<GpioLevel>(code);
-
 }
 
 void Utility::writeGpio(const int handle, const int pin, const GpioLevel lev) {
-    if(::lgGpioWrite(handle, pin, static_cast<int>(lev)) < 0) {
-        throw GpioException("GPIO write failure");
-    }
+    _throwGpioExIfErr(::lgGpioWrite(handle, pin, static_cast<int>(lev)));
 }
 
 void Utility::sleepns(const std::chrono::nanoseconds ns) noexcept {
     std::this_thread::sleep_for(ns);
 }
 
-void Utility::sleepus(const std::chrono::microseconds us) noexcept {
-    using namespace std::chrono;
-    sleepns(duration_cast<nanoseconds>(us));
-}
-
 void Utility::delayns(const std::chrono::nanoseconds ns) noexcept {
-    
-    using namespace std::chrono;
 
-    if(ns <= microseconds(1)) {
-        return;
-    }
+    using namespace std::chrono;
 
     /**
      * _delayus is called as microseconds is the highest precision
@@ -143,10 +118,11 @@ void Utility::delayus(const std::chrono::microseconds us) noexcept {
      * In short, use this function for delays under 100us.
      */
 
-    using namespace std::chrono;
+    using std::chrono::microseconds;
 
     /**
-     * Can we do a min check here for uselessness?
+     * TODO: Can we do a min check here for uselessness?
+     * ie. what is the overhead of calling this function with 0us delay?
      */
 
     struct timeval tNow;

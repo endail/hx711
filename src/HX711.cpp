@@ -306,7 +306,7 @@ void HX711::powerDown() {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    Utility::sleepus(_POWER_DOWN_TIMEOUT);
+    Utility::sleepns(_POWER_DOWN_TIMEOUT);
 
 }
 

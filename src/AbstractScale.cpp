@@ -133,7 +133,7 @@ double AbstractScale::read(const Options o) {
             throw std::invalid_argument("unknown read type");
     }
 
-    return this->normalise(val);
+    return val;
 
 }
 
@@ -144,7 +144,8 @@ void AbstractScale::zero(const Options o) {
 
     try {
         this->setReferenceUnit(1);
-        this->_offset = static_cast<Value>(std::round(this->read(o)));
+        this->_offset = static_cast<Value>(
+            std::round(this->normalise(this->read(o))));
         this->setReferenceUnit(refBackup);
     }
     catch(const std::exception& ex) {
@@ -156,26 +157,11 @@ void AbstractScale::zero(const Options o) {
 }
 
 Mass AbstractScale::weight(const Options o) {
-    return Mass(this->read(o), this->_massUnit);
+    return Mass(this->normalise(this->read(o)), this->_massUnit);
 }
 
 Mass AbstractScale::weight(const std::chrono::nanoseconds timeout) {
     return this->weight(Options(timeout));
-}
-
-Mass AbstractScale::weight(const std::chrono::microseconds timeout) {
-    using namespace std::chrono;
-    return this->weight(Options(duration_cast<nanoseconds>(timeout)));
-}
-
-Mass AbstractScale::weight(const std::chrono::milliseconds timeout) {
-    using namespace std::chrono;
-    return this->weight(Options(duration_cast<nanoseconds>(timeout)));
-}
-
-Mass AbstractScale::weight(const std::chrono::seconds timeout) {
-    using namespace std::chrono;
-    return this->weight(Options(duration_cast<nanoseconds>(timeout)));
 }
 
 Mass AbstractScale::weight(const std::size_t samples) {

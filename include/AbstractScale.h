@@ -86,10 +86,6 @@ public:
     Mass weight(const Options o = Options());
 
     Mass weight(const std::chrono::nanoseconds timeout);
-    Mass weight(const std::chrono::microseconds timeout);
-    Mass weight(const std::chrono::milliseconds timeout);
-    Mass weight(const std::chrono::seconds timeout);
-
     Mass weight(const std::size_t samples);
 
 };

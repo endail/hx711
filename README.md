@@ -1,7 +1,5 @@
 # Raspberry Pi HX711 C++ Library
 
-![license](https://img.shields.io/github/license/endail/hx711) ![code size](https://img.shields.io/github/languages/code-size/endail/hx711)
-
 [![Build Status](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/buildcheck.yml)
 [![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/cppcheck.yml)
 [![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml)
@@ -16,6 +14,56 @@ See: [`src/SimpleHX711Test.cpp`](src/SimpleHX711Test.cpp)
 ![hx711.gif](resources/hx711.gif)
 
 The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is [the median of five samples](src/SimpleHX711Test.cpp#L50) from the sensor.
+
+## Examples
+
+### SimpleHX711 Example
+
+```c++
+#include <iostream>
+#include <hx711/common.h>
+
+int main() {
+
+  using namespace HX711;
+
+  // create a SimpleHX711 object using GPIO pin 2 as the data pin,
+  // GPIO pin 3 as a the clock pin, -370 as the reference unit, and
+  // -367471 as the offset.
+  SimpleHX711 hx(2, 3, -370, -367471);
+
+  // set the scale to output weights in ounces
+  hx.setUnit(Mass::Unit::OZ);
+
+  // constantly output weights using the median of 35 samples
+  for(;;) std::cout << hx.weight(35) << std::endl; //eg. 1.08 oz
+
+  return 0;
+
+}
+```
+
+### AdvancedHX711 Example
+
+```c++
+#include <chrono>
+#include <iostream>
+#include <hx711/common.h>
+
+int main() {
+
+  using std::chrono::seconds;
+
+  HX711::AdvancedHX711 hx(2, 3);
+
+  // constantly output weights using the median of all samples
+  // obtained within 1 second
+  for(;;) std::cout << hx.weight(seconds(1)) << std::endl; //eg. 0.03 g
+
+  return 0;
+
+}
+```
 
 ## Documentation
 
@@ -75,81 +123,35 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `double normalise( double v )`. Given a raw value from HX711, returns a "normalised" value according to the scale's reference unit and offset.
 
-- `double read( Options o = Options() )`. Obtains values from the HX711 according to given `Options` and performs normalisation.
+- `double read( Options o = Options() )`. Obtains values from the HX711 according to given `Options`. You should call this method if you want to deal with the numeric values from the scale rather than `.weight()` which converts the numeric value to a `Mass` object.
 
 - `void zero( Options o = Options() )`. Zeros the scale.
 
-- `Mass weight( Options o = Options() )`. Returns the current weight on the scale.
+- `Mass weight( Options o = Options() )`. Returns the current weight on the scale according to the given `Options`.
+
+- `Mass weight( std::size_t samples )`. Returns the current weight on the scale using the median value from `samples` number of samples.
+
+- `Mass weight( std::chrono::nanoseconds timeout )`. Returns the current weight on the scale using the median value from all samples collected within the `timeout` period.
 
 ### Options
 
 You will notice in the functions above there is an `Options` parameter. This determines _how_ data is collected and interpreted according to a `StrategyType` and `ReadType`.
 
-- `StrategyType::Samples` instructs the scale to collect `Options.samples (std::size_t)` number of samples.
+- `StrategyType::Samples` instructs the scale to collect `Options.samples (std::size_t)` number of samples. This is the default.
 
 - `StrategyType::Time` instructs the scale to collect as many samples as possible within the time period `Options.timeout (std::chrono::nanoseconds)`.
 
-- `ReadType::Median` instructs the scale to use the median value from the collected samples.
+- `ReadType::Median` instructs the scale to use the median value from the collected samples. This is the default.
 
 - `ReadType::Average` instructs the scale to use the average value from the collected samples.
 
 ### Other Notes
 
-- All code exists within the `::HX711` namespace
+- All code exists within the `HX711` namespace
 
 - After building and installing the library (see below), you can `#include <hx711/common.h>` to include everything
 
 - `sudo make uninstall` to remove the library
-
-## Examples
-
-### SimpleHX711 Example
-
-```c++
-#include <iostream>
-#include <hx711/common.h>
-
-int main() {
-
-  using namespace HX711;
-
-  // create a SimpleHX711 object using GPIO pin 2 as the data pin,
-  // GPIO pin 3 as a the clock pin, -370 as the reference unit, and
-  // -367471 as the offset.
-  SimpleHX711 hx(2, 3, -370, -367471);
-
-  // set the scale to output weights in ounces
-  hx.setUnit(Mass::Unit::OZ);
-
-  // constantly output weights using the median of 35 samples
-  for(;;) std::cout << hx.weight(35) << std::endl; //eg. 1.08 oz
-
-  return 0;
-
-}
-```
-
-### AdvancedHX711 Example
-
-```c++
-#include <chrono>
-#include <iostream>
-#include <hx711/common.h>
-
-int main() {
-
-  using std::chrono::seconds;
-
-  HX711::AdvancedHX711 hx(2, 3);
-
-  // constantly output weights using the median of all samples
-  // obtained within 1 second
-  for(;;) std::cout << hx.weight(seconds(1)) << std::endl; //eg. 0.03 g
-
-  return 0;
-
-}
-```
 
 ## Build and Install
 
@@ -161,7 +163,7 @@ pi@raspberrypi:~/hx711 $ make && sudo make install
 
 ## Calibrate
 
-`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Run it as follows and follow the prompts. Arguments are as follows:
+`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Arguments are as follows:
 
 - **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
 
@@ -193,7 +195,7 @@ pi@raspberrypi:~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 
 ## Use
 
-After writing your own code (eg. main.cpp), compile with the HX711 and lgpio libraries as follows:
+After writing your own code (eg. main.cpp), compile and link with the HX711 and lgpio libraries as follows:
 
 ```console
 pi@raspberrypi:~ $ g++ -Wall -o prog main.cpp -lhx711 -llgpio
