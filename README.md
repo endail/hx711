@@ -89,9 +89,9 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **clockPin**: Raspberry Pi pin which connects to the HX711 chip's clock pin (also referred to as PD_SCK).
 
-- **refUnit**: load cell's reference unit. Find this value with the calibration program, otherwise set it to 1.
+- **refUnit**: load cell's reference unit. Find this value with the calibration program described below, otherwise set it to 1.
 
-- **offset**: load cell's offset from zero. Find this value with the calibration program, otherwise set it to 0.
+- **offset**: load cell's offset from zero. Find this value with the calibration program described below, otherwise set it to 0.
 
 - **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as [Sparkfun's HX711](https://www.sparkfun.com/products/13879), this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the datasheet for more information.
 
