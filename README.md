@@ -69,11 +69,17 @@ int main() {
 
 ### Datasheet
 
-[revision 2.0](resources/hx711F_EN.pdf)
+[Revision 2.0](resources/hx711F_EN.pdf)
 
-### Pins
+### Wiring and Pins
+
+The Sparkfun website has a [tutorial](https://learn.sparkfun.com/tutorials/load-cell-amplifier-hx711-breakout-hookup-guide) on how to connect a HX711 breakout board to a load cell and to a microcontroller such as an Arduino.
+
+When connecting to a Raspberry Pi, the only significant difference is to connect the breakout board's `VCC` pin to a Raspberry Pi [5v pin](https://pinout.xyz/pinout/5v_power), and the `VDD` pin to a Raspberry Pi [3.3v pin](https://pinout.xyz/pinout/3v3_power). **Be very careful not to confuse the two or you could damage your Raspberry Pi**.
 
 Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated [SPI](https://pinout.xyz/pinout/spi) or [I2C](https://pinout.xyz/pinout/i2c) pins. The HX711 is **not** an I2C device. Any pin capable of input and output may be used.
+
+---
 
 There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `AdvancedHX711`.
 
@@ -89,13 +95,17 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as [Sparkfun's HX711](https://www.sparkfun.com/products/13879), this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the datasheet for more information.
 
-As the name implies, this is a simple interface to the HX711 chip. Its core operation is busy-waiting. It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
+As the name implies, this is a simple interface to the HX711 chip. Its core operation is [busy-waiting](https://en.wikipedia.org/wiki/Busy_waiting). It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
+
+---
 
 ### AdvancedHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
 
 Arguments are identical to `SimpleHX711`.
 
-The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data.
+The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data when available.
+
+---
 
 ### HX711
 
@@ -110,6 +120,8 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 - `void powerDown()`
 
 - `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` exception will be thrown if the channel and gain combination is invalid as per the datasheet.
+
+---
 
 ### AbstractScale
 
@@ -133,6 +145,8 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `Mass weight( std::chrono::nanoseconds timeout )`. Returns the current weight on the scale using the median value from all samples collected within the `timeout` period.
 
+---
+
 ### Options
 
 You will notice in the functions above there is an `Options` parameter. This determines _how_ data is collected and interpreted according to a `StrategyType` and `ReadType`.
@@ -144,6 +158,8 @@ You will notice in the functions above there is an `Options` parameter. This det
 - `ReadType::Median` instructs the scale to use the median value from the collected samples. This is the default.
 
 - `ReadType::Average` instructs the scale to use the average value from the collected samples.
+
+---
 
 ### Other Notes
 
