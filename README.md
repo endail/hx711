@@ -95,7 +95,7 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as [Sparkfun's HX711](https://www.sparkfun.com/products/13879), this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the datasheet for more information.
 
-As the name implies, this is a simple interface to the HX711 chip. Its core operation is [busy-waiting](https://en.wikipedia.org/wiki/Busy_waiting). It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is _fast_, but uses more of the CPU.
+As the name implies, this is a simple interface to the HX711 chip. Its core operation is [busy-waiting](https://en.wikipedia.org/wiki/Busy_waiting). It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is as fast as possible, but uses more of the CPU's time.
 
 ---
 
