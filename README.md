@@ -28,7 +28,7 @@ int main() {
   using namespace HX711;
 
   // create a SimpleHX711 object using GPIO pin 2 as the data pin,
-  // GPIO pin 3 as a the clock pin, -370 as the reference unit, and
+  // GPIO pin 3 as the clock pin, -370 as the reference unit, and
   // -367471 as the offset.
   SimpleHX711 hx(2, 3, -370, -367471);
 
