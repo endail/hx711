@@ -93,7 +93,15 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program described below, otherwise set it to 0.
 
-- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data. On breakout boards such as [Sparkfun's HX711](https://www.sparkfun.com/products/13879), this will likely be 10Hz by default. It is not necessary for this to be accurate, but it is used to determine the correct data settling time. Please see the datasheet for more information.
+- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data, but it is used to determine the correct data settling time. Changing the data rate requires modification of the hardware. On Sparkfun's HX711 breakout board, there is a jumper on the bottom of the board labelled `RATE`. By default, the jumper is closed, which sets the data rate to 10Hz.
+
+<div style="text-align: center; width: 100%;">
+
+  <img src="resources/13879-SparkFun_Load_Cell_Amplifier_-_HX711-03.jpg" style="width: 300px; height: 300px;">
+
+  See also: `SJ2` in the [schematic](resources/SparkFun_HX711_Load_Cell.pdf).
+  
+</div>
 
 As the name implies, this is a simple interface to the HX711 chip. Its core operation is [busy-waiting](https://en.wikipedia.org/wiki/Busy_waiting). It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is as fast as possible, but uses more of the CPU's time.
 
@@ -149,7 +157,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 ### Options
 
-You will notice in the functions above there is an `Options` parameter. This determines _how_ data is collected and interpreted according to a `StrategyType` and `ReadType`.
+You will notice in the functions above there is an `Options` parameter. This determines how data is collected and interpreted according to a `StrategyType` and `ReadType`.
 
 - `StrategyType::Samples` instructs the scale to collect `Options.samples (std::size_t)` number of samples. This is the default.
 
@@ -163,11 +171,13 @@ You will notice in the functions above there is an `Options` parameter. This det
 
 ### Other Notes
 
-- All code exists within the `HX711` namespace
+- All HX711 library code exists within the `HX711` namespace
 
 - After building and installing the library (see below), you can `#include <hx711/common.h>` to include everything
 
-- `sudo make uninstall` to remove the library
+- `sudo make uninstall` from the project directory to remove the library
+
+- If you are looking for a version of this library which uses wiringPi rather than lgpio, [v1.1 is available](https://github.com/endail/hx711/releases/tag/1.1). However, given that [wiringPi is deprecated](http://wiringpi.com/wiringpi-deprecated/), I have chosen to use lgpio going forward.
 
 ## Build and Install
 
