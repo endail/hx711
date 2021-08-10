@@ -93,14 +93,14 @@ There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `
 
 - **offset**: load cell's offset from zero. Find this value with the calibration program described below, otherwise set it to 0.
 
-- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data, but it is used to determine the correct data settling time. Changing the data rate requires modification of the hardware. On Sparkfun's HX711 breakout board, there is a jumper on the bottom of the board labelled `RATE`. By default, the jumper is closed, which sets the data rate to 10Hz.
+- **rate**: HX711 chip's data rate. Changing this does **not** alter the rate at which the HX711 chip outputs data, but it is used to determine the correct data settling time. Changing the data rate requires modification of the hardware. On [Sparkfun's HX711 breakout board](https://www.sparkfun.com/products/13879), there is a jumper on the bottom of the board labelled `RATE`. By default, the jumper is closed, which sets the data rate to 10Hz.
 
 <div style="text-align: center; width: 100%;">
 
   <img src="resources/13879-SparkFun_Load_Cell_Amplifier_-_HX711-03.jpg" style="width: 300px; height: 300px;">
 
   See also: `SJ2` in the [schematic](resources/SparkFun_HX711_Load_Cell.pdf).
-  
+
 </div>
 
 As the name implies, this is a simple interface to the HX711 chip. Its core operation is [busy-waiting](https://en.wikipedia.org/wiki/Busy_waiting). It will continually check - as fast as possible - whether data is ready to be obtained from the HX711 module. This is both its advantage and disadvantage. It is as fast as possible, but uses more of the CPU's time.
