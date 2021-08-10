@@ -27,7 +27,7 @@ int main() {
 
   // create a SimpleHX711 object using GPIO pin 2 as the data pin,
   // GPIO pin 3 as the clock pin, -370 as the reference unit, and
-  // -367471 as the offset.
+  // -367471 as the offset
   SimpleHX711 hx(2, 3, -370, -367471);
 
   // set the scale to output weights in ounces
@@ -99,7 +99,7 @@ As the name implies, this is a simple interface to the HX711 chip. Its core oper
 
 Arguments are identical to `SimpleHX711`.
 
-The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data when it is available.
+The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data when it is available.
 
 ---
 
@@ -115,7 +115,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `void powerDown()`
 
-- `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` exception will be thrown if the given channel and gain are incompatible. See the datasheet for more information.
+- `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` will be thrown if the given channel and gain are incompatible. See the datasheet for more information.
 
 ---
 
@@ -123,7 +123,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 `SimpleHX711` and `AdvancedHX711` also both inherit from the `AbstractScale` class. This is the interface between raw data values from the HX711 chip and the functionality of a scale.
 
-- `Mass::Unit getUnit()` and `void setUnit( Mass::Unit unit )`. Gets and sets the default unit the scale will return weights in. For example, if set to `Mass::Unit::KG`, the scale will output a weight in kilograms.
+- `Mass::Unit getUnit()` and `void setUnit( Mass::Unit unit )`. Gets and sets the unit the scale will return weights in. For example, if set to `Mass::Unit::KG`, the scale will output a weight in kilograms. The default unit is grams (`Mass::Unit::G`).
 
 - `Value getReferenceUnit()` and `void setReferenceUnit( Value refUnit )`. See calibration program.
 
@@ -131,7 +131,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `double normalise( double v )`. Given a raw value from HX711, returns a "normalised" value according to the scale's reference unit and offset.
 
-- `double read( Options o = Options() )`. Obtains values from the HX711 according to given `Options`. You should call this method if you want to deal with the numeric values from the scale rather than `.weight()` which converts the numeric value to a `Mass` object.
+- `double read( Options o = Options() )`. Obtains values from the HX711 according to given `Options`. You should call this method if you want to deal with the numeric values from the scale rather than `.weight()` which returns the numeric value as a `Mass` object.
 
 - `void zero( Options o = Options() )`. Zeros the scale.
 
