@@ -1,8 +1,6 @@
 # Raspberry Pi HX711 C++ Library
 
-[![Build Status](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/buildcheck.yml)
-[![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/cppcheck.yml)
-[![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml)
+[![Build Status](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/buildcheck.yml) [![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/cppcheck.yml) [![CodeQL](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/codeql-analysis.yml)
 
 - Use with Raspberry Pi
 - Requires [lgpio](http://abyz.me.uk/lg/index.html)
@@ -73,9 +71,7 @@ int main() {
 
 ### Wiring and Pins
 
-The Sparkfun website has a [tutorial](https://learn.sparkfun.com/tutorials/load-cell-amplifier-hx711-breakout-hookup-guide) on how to connect a HX711 breakout board to a load cell and to a microcontroller such as an Arduino.
-
-When connecting to a Raspberry Pi, the only significant difference is to connect the breakout board's `VCC` pin to a Raspberry Pi [5v pin](https://pinout.xyz/pinout/5v_power), and the `VDD` pin to a Raspberry Pi [3.3v pin](https://pinout.xyz/pinout/3v3_power). **Be very careful not to confuse the two or you could damage your Raspberry Pi**.
+The Sparkfun website has a [tutorial](https://learn.sparkfun.com/tutorials/load-cell-amplifier-hx711-breakout-hookup-guide) on how to connect a HX711 breakout board to a load cell and to a microcontroller such as an Arduino. When connecting to a Raspberry Pi, the only significant difference is to connect the breakout board's `VCC` pin to a Raspberry Pi [5v pin](https://pinout.xyz/pinout/5v_power), and the `VDD` pin to a Raspberry Pi [3.3v pin](https://pinout.xyz/pinout/3v3_power). **Be very careful not to confuse the two or you could damage your Raspberry Pi**.
 
 Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do not need to use the dedicated Raspberry Pi [SPI](https://pinout.xyz/pinout/spi) or [I2C](https://pinout.xyz/pinout/i2c) pins. The HX711 is **not** an I2C device. Any pin capable of input and output may be used.
 
@@ -103,7 +99,7 @@ As the name implies, this is a simple interface to the HX711 chip. Its core oper
 
 Arguments are identical to `SimpleHX711`.
 
-The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data when available.
+The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module, while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data when it is available.
 
 ---
 
@@ -111,7 +107,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 `SimpleHX711` and `AdvancedHX711` both inherit from the `HX711` class and provide these additional functions.
 
-- `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS, this in itself is unreliable and therefore disabled by default. Use at your own risk.
+- `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS (such as Raspbian on a Raspberry Pi), this in itself is unreliable and therefore disabled by default. Use at your own risk.
 
 - `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
@@ -119,13 +115,13 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `void powerDown()`
 
-- `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` exception will be thrown if the channel and gain combination is invalid as per the datasheet.
+- `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` exception will be thrown if the given channel and gain are incompatible. See the datasheet for more information.
 
 ---
 
 ### AbstractScale
 
-`SimpleHX711` and `AdvancedHX711` also both inherit from the `AbstractScale` class. This is the interface between raw data values from the HX711 chip and scale functionality.
+`SimpleHX711` and `AdvancedHX711` also both inherit from the `AbstractScale` class. This is the interface between raw data values from the HX711 chip and the functionality of a scale.
 
 - `Mass::Unit getUnit()` and `void setUnit( Mass::Unit unit )`. Gets and sets the default unit the scale will return weights in. For example, if set to `Mass::Unit::KG`, the scale will output a weight in kilograms.
 
@@ -160,6 +156,25 @@ You will notice in the functions above there is an `Options` parameter. This det
 - `ReadType::Average` instructs the scale to use the average value from the collected samples.
 
 ---
+
+### Mass
+
+`Mass` is a self-contained class to easily convert between units of mass. A `Mass` object contains a value stored as a `double` and a `Mass::Unit` representing the unit of that value. Methods of the `Mass` class you may find particularly useful include:
+
+- `Unit getUnit()` and `setUnit( Unit u )` to find and change the unit of mass.
+
+- `Mass convertTo( Unit to )` to return a new `Mass` object with the given `to` unit.
+
+- `std::string toString()` which returns a formatted string containing the value of the `Mass` object in the accompanying unit of mass, followed the unit name. eg. "1.03 kg".
+
+- `std::string toString( Unit u )` which performs the same function as above, except according to the given `Unit` `u`.
+
+- `std::ostream& operator<<( std::ostream& os, Mass& m )` to send the output of `toString()` to the `ostream`. For example:
+
+```c++
+Mass m(1.03, Mass::Unit::KG);
+std::cout << m; //1.03 kg
+```
 
 ### Other Notes
 
