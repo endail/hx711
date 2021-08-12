@@ -46,7 +46,7 @@ src/AbstractScale.cpp:60:0: style: The function 'setUnit' is never used. [unused
 src/AbstractScale.cpp:140:0: style: The function 'zero' is never used. [unusedFunction]
 
 ^
-src/Utility.cpp:190:0: information: Unmatched suppression: syntaxError [unmatchedSuppression]
+src/Utility.cpp:197:0: information: Unmatched suppression: syntaxError [unmatchedSuppression]
     while(timespeccmp(&tNow, &tEnd, <)) {
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
