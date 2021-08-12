@@ -7,16 +7,16 @@ include/AbstractScale.h:53:5: style: Struct 'Options' has a constructor with 1 a
 src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:227:0: style: The function 'getChannel' is never used. [unusedFunction]
+src/HX711.cpp:225:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:223:0: style: The function 'getClockPin' is never used. [unusedFunction]
+src/HX711.cpp:221:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:219:0: style: The function 'getDataPin' is never used. [unusedFunction]
+src/HX711.cpp:217:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:231:0: style: The function 'getGain' is never used. [unusedFunction]
+src/HX711.cpp:229:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:82:0: style: The function 'getOffset' is never used. [unusedFunction]
@@ -34,10 +34,10 @@ src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunc
 src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:214:0: style: The function 'setFormat' is never used. [unusedFunction]
+src/HX711.cpp:212:0: style: The function 'setFormat' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:209:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
+src/HX711.cpp:207:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:60:0: style: The function 'setUnit' is never used. [unusedFunction]
