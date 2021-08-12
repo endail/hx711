@@ -34,7 +34,7 @@
 namespace HX711 {
 
 Options::Options() noexcept
-    : Options(3) { } //default constructor delegated to another
+    : Options(_DEFAULT_SAMPLE_COUNT) { } //default constructor delegated to another
 
 Options::Options(const std::size_t s) noexcept
     :   stratType(StrategyType::Samples),
