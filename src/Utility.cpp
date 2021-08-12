@@ -31,6 +31,35 @@
 #include "../include/GpioException.h"
 #include "../include/Utility.h"
 
+//Taken from https://github.com/openbsd/src/blob/master/sys/sys/time.h#L84
+/* Operations on timespecs. */
+#define	timespecclear(tsp)		(tsp)->tv_sec = (tsp)->tv_nsec = 0
+#define	timespecisset(tsp)		((tsp)->tv_sec || (tsp)->tv_nsec)
+#define	timespecisvalid(tsp)						\
+	((tsp)->tv_nsec >= 0 && (tsp)->tv_nsec < 1000000000L)
+#define	timespeccmp(tsp, usp, cmp)					\
+	(((tsp)->tv_sec == (usp)->tv_sec) ?				\
+	    ((tsp)->tv_nsec cmp (usp)->tv_nsec) :			\
+	    ((tsp)->tv_sec cmp (usp)->tv_sec))
+#define	timespecadd(tsp, usp, vsp)					\
+	do {								\
+		(vsp)->tv_sec = (tsp)->tv_sec + (usp)->tv_sec;		\
+		(vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec;	\
+		if ((vsp)->tv_nsec >= 1000000000L) {			\
+			(vsp)->tv_sec++;				\
+			(vsp)->tv_nsec -= 1000000000L;			\
+		}							\
+	} while (0)
+#define	timespecsub(tsp, usp, vsp)					\
+	do {								\
+		(vsp)->tv_sec = (tsp)->tv_sec - (usp)->tv_sec;		\
+		(vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec;	\
+		if ((vsp)->tv_nsec < 0) {				\
+			(vsp)->tv_sec--;				\
+			(vsp)->tv_nsec += 1000000000L;			\
+		}							\
+	} while (0)
+
 namespace HX711 {
 
 void Utility::_throwGpioExIfErr(const int code) {
@@ -65,6 +94,7 @@ GpioLevel Utility::readGpio(const int handle, const int pin) {
     const int code = ::lgGpioRead(handle, pin);
     _throwGpioExIfErr(code);
     //lgGpioRead returns 0 for low and 1 for high
+    //underlying GpioLevel is bool type
     return static_cast<GpioLevel>(code);
 }
 
@@ -126,7 +156,7 @@ void Utility::delayus(const std::chrono::microseconds us) noexcept {
      */
 
     struct timeval tNow;
-    struct timeval tLong = {0};
+    struct timeval tLong;
     struct timeval tEnd;
 
     tLong.tv_sec = us.count() / microseconds::period::den;
@@ -138,6 +168,27 @@ void Utility::delayus(const std::chrono::microseconds us) noexcept {
     //cppcheck-suppress syntaxError
     while(timercmp(&tNow, &tEnd, <)) {
         ::gettimeofday(&tNow, nullptr);
+    }
+
+}
+
+void Utility::delayns_2(const std::chrono::nanoseconds ns) noexcept {
+
+    using namespace std::chrono;
+
+    struct timespec tNow;
+    struct timespec tLong;
+    struct timespec tEnd;
+
+    tLong.tv_sec = ns.count() / nanoseconds::period::den;
+    tLong.tv_nsec = ns.count() % nanoseconds::period::den;
+
+    ::clock_gettime(CLOCK_REALTIME, &tNow);
+    timespecadd(&tNow, &tLong, &tEnd);
+
+    //cppcheck-suppress syntaxError
+    while(timespeccmp(&tNow, &tEnd, <)) {
+        ::clock_gettime(CLOCK_REALTIME, &tNow);
     }
 
 }

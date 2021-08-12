@@ -65,6 +65,7 @@ public:
     static void sleepns(const std::chrono::nanoseconds ns) noexcept;
     static void delayns(const std::chrono::nanoseconds ns) noexcept;
     static void delayus(const std::chrono::microseconds us) noexcept;
+    static void delayns_2(const std::chrono::nanoseconds ns) noexcept;
     
     static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts);
 
