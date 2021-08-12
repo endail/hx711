@@ -176,6 +176,13 @@ void Utility::delayns_2(const std::chrono::nanoseconds ns) noexcept {
 
     using namespace std::chrono;
 
+    /**
+     * TODO: figure out if this function performs better than
+     * delayns.
+     * 
+     * TODO: figure out the overhead in calling this function
+     */
+
     struct timespec tNow;
     struct timespec tLong;
     struct timespec tEnd;
