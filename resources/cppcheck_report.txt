@@ -1,7 +1,7 @@
-include/AbstractScale.h:52:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+include/AbstractScale.h:55:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
     Options(const std::size_t s) noexcept;
     ^
-include/AbstractScale.h:53:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+include/AbstractScale.h:56:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
     Options(const std::chrono::nanoseconds t) noexcept;
     ^
 src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
