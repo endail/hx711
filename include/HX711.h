@@ -75,7 +75,7 @@ protected:
     static constexpr auto _T3 = std::chrono::nanoseconds(200);
     static constexpr auto _T4 = std::chrono::nanoseconds(200);
     static constexpr auto _POWER_DOWN_TIMEOUT = std::chrono::microseconds(60);
-    static const std::unordered_map<const Rate, const std::chrono::nanoseconds> _SETTLING_TIMES;
+    static const std::unordered_map<const Rate, const std::chrono::milliseconds> _SETTLING_TIMES;
 
     int _gpioHandle;
     const int _dataPin;

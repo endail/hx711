@@ -57,12 +57,10 @@ const std::unordered_map<const Gain, const unsigned char> HX711::_PULSES({
  * Used to select the correct settling time depending on rate
  * Datasheet pg. 3
  */
-const std::unordered_map<const Rate, const std::chrono::nanoseconds> 
+const std::unordered_map<const Rate, const std::chrono::milliseconds> 
     HX711::_SETTLING_TIMES({
-        { Rate::HZ_10, std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds(400)) },
-        { Rate::HZ_80, std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::milliseconds(50)) }
+        { Rate::HZ_10, std::chrono::milliseconds(400) },
+        { Rate::HZ_80, std::chrono::milliseconds(50) }
 });
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
