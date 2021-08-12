@@ -52,7 +52,11 @@ public:
     std::chrono::nanoseconds timeout;
 
     Options() noexcept;
+
+    //cppcheck-suppress noExplicitConstructor
     Options(const std::size_t s) noexcept;
+
+    //cppcheck-suppress noExplicitConstructor
     Options(const std::chrono::nanoseconds t) noexcept;
 
 };
