@@ -193,7 +193,6 @@ void Utility::delayns_2(const std::chrono::nanoseconds ns) noexcept {
     ::clock_gettime(CLOCK_REALTIME, &tNow);
     timespecadd(&tNow, &tLong, &tEnd);
 
-    //cppcheck-suppress syntaxError
     while(timespeccmp(&tNow, &tEnd, <)) {
         ::clock_gettime(CLOCK_REALTIME, &tNow);
     }
