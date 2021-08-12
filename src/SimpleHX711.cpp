@@ -43,7 +43,19 @@ SimpleHX711::SimpleHX711(
 }
 
 std::vector<Value> SimpleHX711::getValues(const std::chrono::nanoseconds timeout) {
-    throw std::logic_error("not implemented");
+
+    using namespace std::chrono;
+
+    std::vector<Value> vals;
+    const auto endTime = high_resolution_clock::now() + timeout;
+
+    while(high_resolution_clock::now() < endTime) {
+        while(!this->isReady());
+        vals.push_back(this->readValue());
+    }
+
+    return vals;
+
 }
 
 std::vector<Value> SimpleHX711::getValues(const std::size_t samples) {
