@@ -161,7 +161,7 @@ bool HX711::_readBit() const {
 
 void HX711::_readBits(std::int32_t* const v) {
 
-    std::lock_guard<std::mutex> lck(this->_commLock);
+    std::lock_guard<std::mutex> lock(this->_commLock);
 
     //The datasheet notes a tiny delay between DOUT going low and the
     //initial clock pin change. But, as for the reasons previously
@@ -202,8 +202,7 @@ void HX711::begin() {
     Utility::openGpioInput(this->_gpioHandle, this->_dataPin);
     Utility::openGpioOutput(this->_gpioHandle, this->_clockPin);
 
-    this->powerDown();
-    this->powerUp();
+    this->setConfig(this->_channel, this->_gain);
 
 }
 
@@ -253,17 +252,29 @@ void HX711::setConfig(const Channel c, const Gain g) {
      * revert back to whatever it was before
      */
     try {
-        
+
         /**
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
          */
-
-        //TODO: not sure about this
         while(!this->isReady());
         this->readValue();
-        
+
+        /**
+         * If PD_SCK pulse number is changed during
+         * the current conversion period, power down should
+         * be executed after current conversion period is
+         * completed. This is to ensure that the change is
+         * saved. When chip returns back to normal
+         * operation from power down, it will return to the
+         * set up conditions of the last change.
+         * 
+         * Datasheet pg. 5
+         */
+        this->powerDown();
+        this->powerUp();
+
     }
     catch(const TimeoutException& e) {
         this->_channel = backupChannel;
@@ -312,7 +323,7 @@ void HX711::powerDown() {
 
 void HX711::powerUp() {
 
-    std::unique_lock<std::mutex> lock(this->_commLock);
+    std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
      * "When PD_SCK returns to low,
@@ -320,21 +331,6 @@ void HX711::powerUp() {
      * Datasheet pg. 5
      */
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-
-    lock.unlock();
-
-    /**
-     * "After a reset or power-down event, input
-     * selection is default to Channel A with a gain of
-     * 128."
-     * Datasheet pg. 5
-     * 
-     * This means the following statement to set the gain
-     * is needed ONLY IF the current gain isn't 128
-     */
-    if(this->_gain != Gain::GAIN_128) {
-        this->setConfig(this->_channel, this->_gain);
-    }
 
     if(this->_rate != Rate::OTHER) {
         Utility::sleepns(_SETTLING_TIMES.at(this->_rate));
