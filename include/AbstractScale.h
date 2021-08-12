@@ -43,7 +43,7 @@ enum class ReadType : unsigned char {
 
 struct Options {
 protected:
-    std::size_t _DEFAULT_SAMPLE_COUNT = 3;
+    static const std::size_t _DEFAULT_SAMPLE_COUNT = 3;
 
 public:
     StrategyType stratType;
