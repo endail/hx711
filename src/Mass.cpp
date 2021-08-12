@@ -181,18 +181,11 @@ std::string Mass::toString() const noexcept {
 }
 
 std::string Mass::toString(const Unit u) const noexcept {
-    
-    //std::stringstream ss;
-    
-    //double n; //mass as a double converted to u
-    //double i; //integer
-    //double f; //fractional
-    //int d = 0; //decimals
 
-    const double n = Mass::convert(this->_ug, Unit::UG, u);
-    double i;
-    const double f = std::modf(n, &i);
-    int d = 0;
+    const double n = Mass::convert(this->_ug, Unit::UG, u); //mass as double converted to u
+    double i; //integer; don't use
+    const double f = std::modf(n, &i); //fractional
+    int d = 0; //decimal count
 
     /**
      * Credit: https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
@@ -213,35 +206,19 @@ std::string Mass::toString(const Unit u) const noexcept {
      * do not know why this is.
      */
 
-    //A bit arbitrary and magic number-y, but sufficient to hold a float
-    //and unit name
-    const std::size_t len = 64;
-    char buff[len];
+    char buff[_TOSTRING_BUFF_SIZE];
 
-    /**
-     * TODO: is snprintf faster than sstream?
-     */
     ::snprintf(
         buff,
-        len,
+        _TOSTRING_BUFF_SIZE,
         "%01.*f %s",
         d,
         n,
         _UNIT_NAMES.at(u));
 
     //std::string will automatically limit chars to first \0
+    //so no need to trim
     return std::string(buff);
-
-/*
-    ss  << std::fixed
-        << std::setprecision(d)
-        << std::noshowpoint
-        << n
-        << ' '
-        << _UNIT_NAMES.at(u);
-    
-    return ss.str();
-*/
 
 }
 

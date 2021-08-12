@@ -23,6 +23,7 @@
 #ifndef HX711_MASS_H_2FFE3D59_FB56_4C50_87F6_08F5AD88A303
 #define HX711_MASS_H_2FFE3D59_FB56_4C50_87F6_08F5AD88A303
 
+#include <cstdint>
 #include <ostream>
 #include <string>
 #include <unordered_map>
@@ -45,6 +46,15 @@ enum class Unit : unsigned char {
 };
 
 protected:
+
+    /**
+     * This needs to be a sufficient size to contain a floating point
+     * number, space, and unit name. eg.
+     * 
+     * "39823.3801 ton (IMP)"
+     */
+    static const std::size_t _TOSTRING_BUFF_SIZE = 64;
+
     static const std::unordered_map<const Unit, const double> _RATIOS;
     static const std::unordered_map<const Unit, const char* const> _UNIT_NAMES;
 
@@ -53,6 +63,7 @@ protected:
 
     //unit the calling code has chosen to represent this Mass
     Unit _u;
+
 
 public:
     Mass(const double amount = 0.0, const Unit u = Unit::UG) noexcept;
