@@ -79,7 +79,7 @@ Unless otherwise stated, use [GPIO](https://pinout.xyz/) pin numbering. You do n
 
 There are two relevant classes for interfacing with a HX711: `SimpleHX711` and `AdvancedHX711`.
 
-### SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
+### [SimpleHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )](include/SimpleHX711.h)
 
 - **dataPin**: Raspberry Pi pin which connects to the HX711 chip's data pin (also referred to as DOUT).
 
@@ -95,7 +95,7 @@ As the name implies, this is a simple interface to the HX711 chip. Its core oper
 
 ---
 
-### AdvancedHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )
+### [AdvancedHX711( int dataPin, int clockPin, Value refUnit = 1, Value offset = 0, Rate rate = Rate::HZ_10 )](include/AdvancedHX711.h)
 
 Arguments are identical to `SimpleHX711`.
 
@@ -103,23 +103,23 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 ---
 
-### HX711
+### [HX711](include/HX711.h)
 
 `SimpleHX711` and `AdvancedHX711` both inherit from the `HX711` class and provide these additional functions.
-
-- `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS (such as Raspbian on a Raspberry Pi), this in itself is unreliable and therefore disabled by default. Use at your own risk.
-
-- `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
 - `void powerUp()`
 
 - `void powerDown()`
 
+- `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS (such as Raspbian on a Raspberry Pi), this in itself is unreliable and therefore disabled by default. Use at your own risk.
+
+- `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
+
 - `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` will be thrown if the given channel and gain are incompatible. See the datasheet for more information.
 
 ---
 
-### AbstractScale
+### [AbstractScale](include/AbstractScale.h)
 
 `SimpleHX711` and `AdvancedHX711` also both inherit from the `AbstractScale` class. This is the interface between raw data values from the HX711 chip and the functionality of a scale.
 
@@ -157,7 +157,7 @@ You will notice in the functions above there is an `Options` parameter. This det
 
 ---
 
-### Mass
+### [Mass](include/Mass.h)
 
 `Mass` is a self-contained class to easily convert between units of mass. A `Mass` object contains a value stored as a `double` and a `Mass::Unit` representing the unit of that value. Methods of the `Mass` class you may find particularly useful include:
 
