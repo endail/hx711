@@ -1,3 +1,9 @@
+src/DiscoverTiming.cpp:127:5: style:inconclusive: Consecutive return, break, continue, goto or throw statements are unnecessary. [duplicateBreak]
+    return EXIT_SUCCESS;
+    ^
+src/DiscoverTiming.cpp:51:23: style: Variable 'samples' is assigned a value that is never used. [unreadVariable]
+    const int samples = stoi(argv[3]);
+                      ^
 src/test.cpp:47:23: style: Variable 'dataPin' is assigned a value that is never used. [unreadVariable]
     const int dataPin = stoi(argv[1]);
                       ^
@@ -7,16 +13,19 @@ src/test.cpp:48:24: style: Variable 'clockPin' is assigned a value that is never
 src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:220:0: style: The function 'getChannel' is never used. [unusedFunction]
+src/HX711.cpp:228:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:216:0: style: The function 'getClockPin' is never used. [unusedFunction]
+src/HX711.cpp:224:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:212:0: style: The function 'getDataPin' is never used. [unusedFunction]
+src/HX711.cpp:220:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:224:0: style: The function 'getGain' is never used. [unusedFunction]
+src/HX711.cpp:216:0: style: The function 'getFormat' is never used. [unusedFunction]
+
+^
+src/HX711.cpp:232:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:82:0: style: The function 'getOffset' is never used. [unusedFunction]
@@ -31,10 +40,13 @@ src/AbstractScale.cpp:64:0: style: The function 'getUnit' is never used. [unused
 src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunction]
 
 ^
+src/HX711.cpp:207:0: style: The function 'isStrictTiming' is never used. [unusedFunction]
+
+^
 src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:207:0: style: The function 'setFormat' is never used. [unusedFunction]
+src/HX711.cpp:211:0: style: The function 'setFormat' is never used. [unusedFunction]
 
 ^
 src/HX711.cpp:202:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
