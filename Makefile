@@ -7,20 +7,20 @@ BINDIR := bin
 SRCEXT := cpp
 LIBS := -llgpio -pthread
 INC := -I $(INCDIR)
-CFLAGS :=	-O2 \
-			-fomit-frame-pointer \
-			-pipe \
-			-Wall \
-			-Wfatal-errors \
-			-Werror=format-security \
-			-Wl,-z,relro \
-			-Wl,-z,now \
-			-Wl,-z,defs	\
-			-Wl,--hash-style=gnu \
-			-Wl,--as-needed \
-			-D_FORTIFY_SOURCE=2 \
-			-fstack-clash-protection \
-			-DNDEBUG=1
+CFLAGS :=		-O2 \
+				-fomit-frame-pointer \
+				-pipe \
+				-Wall \
+				-Wfatal-errors \
+				-Werror=format-security \
+				-Wl,-z,relro \
+				-Wl,-z,now \
+				-Wl,-z,defs	\
+				-Wl,--hash-style=gnu \
+				-Wl,--as-needed \
+				-D_FORTIFY_SOURCE=2 \
+				-fstack-clash-protection \
+				-DNDEBUG=1
 
 ########################################################################
 
@@ -51,10 +51,10 @@ endif
 
 ifeq ($(IS_PI),1)
 # only include these flags on rpi
-	CFLAGS := 	-march=native \
-				-mfpu=vfp \
-				-mfloat-abi=hard \
-				$(CFLAGS)
+	CFLAGS :=		-march=native \
+					-mfpu=vfp \
+					-mfloat-abi=hard \
+					$(CFLAGS)
 endif
 
 ifeq ($(IS_GHA),1)
@@ -62,9 +62,9 @@ ifeq ($(IS_GHA),1)
 	LIBS := $(LIBS) -lrt -lcrypt -pthread
 endif
 
-CXXFLAGS := -std=c++11 \
-			-fexceptions \
-			$(CFLAGS)
+CXXFLAGS :=		-std=c++11 \
+				-fexceptions \
+				$(CFLAGS)
 
 ########################################################################
 
@@ -99,42 +99,42 @@ $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c -o $@ $<
 
 # Build static library
-$(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/AbstractScale.o \
-								$(BUILDDIR)/static/AdvancedHX711.o \
-								$(BUILDDIR)/static/HX711.o \
-								$(BUILDDIR)/static/Mass.o \
-								$(BUILDDIR)/static/SimpleHX711.o \
-								$(BUILDDIR)/static/Utility.o \
-								$(BUILDDIR)/static/Value.o \
-								$(BUILDDIR)/static/ValueStack.o \
-								$(BUILDDIR)/static/Watcher.o
+$(BUILDDIR)/static/libhx711.a:		$(BUILDDIR)/static/AbstractScale.o \
+									$(BUILDDIR)/static/AdvancedHX711.o \
+									$(BUILDDIR)/static/HX711.o \
+									$(BUILDDIR)/static/Mass.o \
+									$(BUILDDIR)/static/SimpleHX711.o \
+									$(BUILDDIR)/static/Utility.o \
+									$(BUILDDIR)/static/Value.o \
+									$(BUILDDIR)/static/ValueStack.o \
+									$(BUILDDIR)/static/Watcher.o
 
-	$(AR) rcs 					$(BUILDDIR)/static/libhx711.a \
-								$(BUILDDIR)/static/AbstractScale.o \
-								$(BUILDDIR)/static/AdvancedHX711.o \
-								$(BUILDDIR)/static/HX711.o \
-								$(BUILDDIR)/static/Mass.o \
-								$(BUILDDIR)/static/SimpleHX711.o \
-								$(BUILDDIR)/static/Utility.o \
-								$(BUILDDIR)/static/Value.o \
-								$(BUILDDIR)/static/ValueStack.o \
-								$(BUILDDIR)/static/Watcher.o
+	$(AR) rcs						$(BUILDDIR)/static/libhx711.a \
+									$(BUILDDIR)/static/AbstractScale.o \
+									$(BUILDDIR)/static/AdvancedHX711.o \
+									$(BUILDDIR)/static/HX711.o \
+									$(BUILDDIR)/static/Mass.o \
+									$(BUILDDIR)/static/SimpleHX711.o \
+									$(BUILDDIR)/static/Utility.o \
+									$(BUILDDIR)/static/Value.o \
+									$(BUILDDIR)/static/ValueStack.o \
+									$(BUILDDIR)/static/Watcher.o
 
 # Build shared library
-$(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/static/AbstractScale.o \
-								$(BUILDDIR)/static/AdvancedHX711.o \
-								$(BUILDDIR)/static/HX711.o \
-								$(BUILDDIR)/static/Mass.o \
-								$(BUILDDIR)/static/SimpleHX711.o \
-								$(BUILDDIR)/static/Utility.o \
-								$(BUILDDIR)/static/Value.o \
-								$(BUILDDIR)/static/ValueStack.o \
-								$(BUILDDIR)/static/Watcher.o
-	$(CXX)	-shared \
-			$(CXXFLAGS) \
-			$(INC) \
-			$(LIBS) \
-			-o $(BUILDDIR)/shared/libhx711.so
+$(BUILDDIR)/shared/libhx711.so:		$(BUILDDIR)/static/AbstractScale.o \
+									$(BUILDDIR)/static/AdvancedHX711.o \
+									$(BUILDDIR)/static/HX711.o \
+									$(BUILDDIR)/static/Mass.o \
+									$(BUILDDIR)/static/SimpleHX711.o \
+									$(BUILDDIR)/static/Utility.o \
+									$(BUILDDIR)/static/Value.o \
+									$(BUILDDIR)/static/ValueStack.o \
+									$(BUILDDIR)/static/Watcher.o
+	$(CXX)		-shared \
+				$(CXXFLAGS) \
+				$(INC) \
+				$(LIBS) \
+				-o $(BUILDDIR)/shared/libhx711.so
 
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o

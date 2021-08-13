@@ -106,18 +106,6 @@ void Utility::sleepns(const std::chrono::nanoseconds ns) noexcept {
     std::this_thread::sleep_for(ns);
 }
 
-void Utility::delayns(const std::chrono::nanoseconds ns) noexcept {
-
-    using namespace std::chrono;
-
-    /**
-     * _delayus is called as microseconds is the highest precision
-     * available for a busy-wait loop (at least in userspace)
-     */
-    delayus(duration_cast<microseconds>(ns));
-
-}
-
 void Utility::delayus(const std::chrono::microseconds us) noexcept {
 
     /**
@@ -172,7 +160,7 @@ void Utility::delayus(const std::chrono::microseconds us) noexcept {
 
 }
 
-void Utility::delayns_2(const std::chrono::nanoseconds ns) noexcept {
+void Utility::delayns(const std::chrono::nanoseconds ns) noexcept {
 
     using namespace std::chrono;
 
@@ -197,6 +185,12 @@ void Utility::delayns_2(const std::chrono::nanoseconds ns) noexcept {
         ::clock_gettime(CLOCK_MONOTONIC_RAW, &tNow);
     }
 
+}
+
+std::chrono::nanoseconds Utility::getnanos() noexcept {
+    timespec ts;
+    ::clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    return timespec_to_nanos(&ts);
 }
 
 std::chrono::nanoseconds Utility::timespec_to_nanos(const timespec* const ts) {

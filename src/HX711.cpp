@@ -105,13 +105,9 @@ bool HX711::isReady() const {
 
 bool HX711::_readBit() const {
 
-    //TODO: do these need to be 0-init'd?
-    ::timespec startTime;
-    ::timespec endTime;
-
     //first, clock pin is set high to make DOUT ready to be read from
     //and the current ACTUAL time is noted for later
-    ::clock_gettime(CLOCK_MONOTONIC_RAW, &startTime);
+    const auto startNanos = Utility::getnanos();
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
@@ -132,15 +128,14 @@ bool HX711::_readBit() const {
     //with the bit value now read, set the clock pin low and note the
     //current ACTUAL time again
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-    ::clock_gettime(CLOCK_MONOTONIC_RAW, &endTime);
+    const auto endNanos = Utility::getnanos();
 
     //At this point, according to the documentation, if the clock pin
     //was held high for longer than 60us, the chip will have entered
     //power down mode. This means the currently read bit is unreliable.
     //
     //So... first, calculate the difference
-    const std::chrono::nanoseconds diff = Utility::timespec_to_nanos(&endTime) -
-        Utility::timespec_to_nanos(&startTime);
+    const auto diff = endNanos - startNanos;
 
     //...and if the threshold was exceeded, raise the exception
     if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
