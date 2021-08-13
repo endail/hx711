@@ -1,16 +1,22 @@
+src/test.cpp:47:23: style: Variable 'dataPin' is assigned a value that is never used. [unreadVariable]
+    const int dataPin = stoi(argv[1]);
+                      ^
+src/test.cpp:48:24: style: Variable 'clockPin' is assigned a value that is never used. [unreadVariable]
+    const int clockPin = stoi(argv[2]);
+                       ^
 src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:225:0: style: The function 'getChannel' is never used. [unusedFunction]
+src/HX711.cpp:220:0: style: The function 'getChannel' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:221:0: style: The function 'getClockPin' is never used. [unusedFunction]
+src/HX711.cpp:216:0: style: The function 'getClockPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:217:0: style: The function 'getDataPin' is never used. [unusedFunction]
+src/HX711.cpp:212:0: style: The function 'getDataPin' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:229:0: style: The function 'getGain' is never used. [unusedFunction]
+src/HX711.cpp:224:0: style: The function 'getGain' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:82:0: style: The function 'getOffset' is never used. [unusedFunction]
@@ -28,10 +34,10 @@ src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunc
 src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:212:0: style: The function 'setFormat' is never used. [unusedFunction]
+src/HX711.cpp:207:0: style: The function 'setFormat' is never used. [unusedFunction]
 
 ^
-src/HX711.cpp:207:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
+src/HX711.cpp:202:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
 
 ^
 src/AbstractScale.cpp:60:0: style: The function 'setUnit' is never used. [unusedFunction]
