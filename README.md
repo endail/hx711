@@ -28,7 +28,7 @@ int main() {
   // create a SimpleHX711 object using GPIO pin 2 as the data pin,
   // GPIO pin 3 as the clock pin, -370 as the reference unit, and
   // -367471 as the offset
-  SimpleHX711 hx(2, 3, -370, -367471);
+  SimpleHX711 hx(2, 3);
 
   // set the scale to output weights in ounces
   hx.setUnit(Mass::Unit::OZ);
@@ -52,7 +52,7 @@ int main() {
 
   using std::chrono::seconds;
 
-  HX711::AdvancedHX711 hx(2, 3);
+  HX711::AdvancedHX711 hx(2, 3, -370, -367471, Rate::HZ_80);
 
   // constantly output weights using the median of all samples
   // obtained within 1 second
