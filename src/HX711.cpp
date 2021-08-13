@@ -204,9 +204,17 @@ void HX711::setStrictTiming(const bool strict) noexcept {
     this->_strictTiming = strict;
 }
 
+bool HX711::isStrictTiming() const noexcept {
+    return this->_strictTiming;
+}
+
 void HX711::setFormat(const Format bitFormat) noexcept {
     std::lock_guard<std::mutex> lock(this->_commLock);
     this->_bitFormat = bitFormat;
+}
+
+Format HX711::getFormat() const noexcept {
+    return this->_bitFormat;
 }
 
 int HX711::getDataPin() const noexcept {

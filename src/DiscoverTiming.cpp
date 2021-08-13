@@ -31,7 +31,7 @@
 #include <thread>
 #include <pthread.h>
 #include <sched.h>
-#include "../include/HX711.h"
+#include "../include/common.h"
 
 int main(int argc, char** argv) {
 
@@ -59,6 +59,17 @@ int main(int argc, char** argv) {
         SCHED_FIFO,
         &schParams);
 
+
+    SimpleHX711 hx(dataPin, clockPin, 1, 0 Rate::HZ_80);
+
+    
+
+
+
+
+    return 0;
+
+/*
     Discovery dx(dataPin, clockPin, Rate::HZ_80);
 
     const TimingCollection timings = dx.getTimings(samples);
@@ -111,6 +122,7 @@ int main(int argc, char** argv) {
             ;
 
     }
+    */
 
     return EXIT_SUCCESS;
 

@@ -109,6 +109,9 @@ public:
     void begin();
 
     void setStrictTiming(const bool strict) noexcept;
+    bool isStrictTiming() const noexcept;
+
+    Format getFormat() const noexcept;
     void setFormat(const Format bitFormat) noexcept;
 
     int getDataPin() const noexcept;
