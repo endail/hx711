@@ -1,9 +1,3 @@
-include/AbstractScale.h:55:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::size_t s) noexcept;
-    ^
-include/AbstractScale.h:56:5: style: Struct 'Options' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
-    Options(const std::chrono::nanoseconds t) noexcept;
-    ^
 src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
 
 ^
@@ -45,9 +39,6 @@ src/AbstractScale.cpp:60:0: style: The function 'setUnit' is never used. [unused
 ^
 src/AbstractScale.cpp:140:0: style: The function 'zero' is never used. [unusedFunction]
 
-^
-src/Utility.cpp:197:0: information: Unmatched suppression: syntaxError [unmatchedSuppression]
-    while(timespeccmp(&tNow, &tEnd, <)) {
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
 
