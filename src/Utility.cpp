@@ -190,11 +190,11 @@ void Utility::delayns_2(const std::chrono::nanoseconds ns) noexcept {
     tLong.tv_sec = ns.count() / nanoseconds::period::den;
     tLong.tv_nsec = ns.count() % nanoseconds::period::den;
 
-    ::clock_gettime(CLOCK_REALTIME, &tNow);
+    ::clock_gettime(CLOCK_MONOTONIC_RAW, &tNow);
     timespecadd(&tNow, &tLong, &tEnd);
 
     while(timespeccmp(&tNow, &tEnd, <)) {
-        ::clock_gettime(CLOCK_REALTIME, &tNow);
+        ::clock_gettime(CLOCK_MONOTONIC_RAW, &tNow);
     }
 
 }
