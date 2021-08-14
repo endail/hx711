@@ -68,7 +68,7 @@ public:
     static void delayns(const std::chrono::nanoseconds ns) noexcept;
     static std::chrono::nanoseconds getnanos() noexcept;
 
-    static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts);
+    static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts) noexcept;
 
     //Taken from https://github.com/openbsd/src/blob/master/sys/sys/time.h#L84
     static void timespecclear(timespec* const tsp) noexcept;
@@ -82,7 +82,7 @@ public:
         const int pri, const int policy, const pthread_t th) noexcept;
 
     template <typename T>
-    static double average(const std::vector<T>* const vals) {
+    static double average(const std::vector<T>* const vals) noexcept {
 
         assert(vals != nullptr);
         assert(!vals->empty());
@@ -95,7 +95,7 @@ public:
     }
 
     template <typename T>
-    static double median(std::vector<T>* const vals) {
+    static double median(std::vector<T>* const vals) noexcept {
 
         assert(vals != nullptr);
         assert(!vals->empty());
@@ -130,11 +130,10 @@ public:
 
     }
 
-
-
+    //reverse bits in int
     //https://stackoverflow.com/a/2602871/570787
     template <typename T>
-    static T reverse(T n, size_t b = sizeof(T) * CHAR_BIT) {
+    static T reverse(T n, size_t b = sizeof(T) * CHAR_BIT) noexcept {
 
         assert(b <= std::numeric_limits<T>::digits);
 

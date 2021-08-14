@@ -164,7 +164,7 @@ std::chrono::nanoseconds Utility::getnanos() noexcept {
     return timespec_to_nanos(&ts);
 }
 
-std::chrono::nanoseconds Utility::timespec_to_nanos(const timespec* const ts) {
+std::chrono::nanoseconds Utility::timespec_to_nanos(const timespec* const ts) noexcept {
     using namespace std::chrono;
     return duration_cast<nanoseconds>(seconds(ts->tv_sec)) + nanoseconds(ts->tv_nsec);
 }
