@@ -1,9 +1,3 @@
-src/DiscoverTiming.cpp:127:5: style:inconclusive: Consecutive return, break, continue, goto or throw statements are unnecessary. [duplicateBreak]
-    return EXIT_SUCCESS;
-    ^
-src/DiscoverTiming.cpp:51:23: style: Variable 'samples' is assigned a value that is never used. [unreadVariable]
-    const int samples = stoi(argv[3]);
-                      ^
 src/test.cpp:47:23: style: Variable 'dataPin' is assigned a value that is never used. [unreadVariable]
     const int dataPin = stoi(argv[1]);
                       ^
