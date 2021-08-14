@@ -158,7 +158,7 @@ hx711calibration: $(BUILDDIR)/Calibration.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/hx711calibration \
 		$(BUILDDIR)/Calibration.o \
-		-L $(BUILDDIR)/shared \
+		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
 
 .PHONY: test
@@ -166,13 +166,13 @@ test: $(BUILDDIR)/SimpleHX711Test.o $(BUILDDIR)/AdvancedHX711Test.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
-		-L $(BUILDDIR)/shared \
+		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
 
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/advancedhx711test \
 		$(BUILDDIR)/AdvancedHX711Test.o \
-		-L $(BUILDDIR)/shared \
+		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
 	
 
@@ -181,7 +181,7 @@ discovery: $(BUILDDIR)/DiscoverTiming.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/discovery \
 		$(BUILDDIR)/DiscoverTiming.o \
-		-L $(BUILDDIR)/shared \
+		-L $(BUILDDIR)/static \
 		-lhx711 -lgsl $(LIBS)
 
 
