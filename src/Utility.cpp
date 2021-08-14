@@ -31,35 +31,6 @@
 #include "../include/GpioException.h"
 #include "../include/Utility.h"
 
-//Taken from https://github.com/openbsd/src/blob/master/sys/sys/time.h#L84
-/* Operations on timespecs. */
-#define	timespecclear(tsp)		(tsp)->tv_sec = (tsp)->tv_nsec = 0
-#define	timespecisset(tsp)		((tsp)->tv_sec || (tsp)->tv_nsec)
-#define	timespecisvalid(tsp)						\
-	((tsp)->tv_nsec >= 0 && (tsp)->tv_nsec < 1000000000L)
-#define	timespeccmp(tsp, usp, cmp)					\
-	(((tsp)->tv_sec == (usp)->tv_sec) ?				\
-	    ((tsp)->tv_nsec cmp (usp)->tv_nsec) :			\
-	    ((tsp)->tv_sec cmp (usp)->tv_sec))
-#define	timespecadd(tsp, usp, vsp)					\
-	do {								\
-		(vsp)->tv_sec = (tsp)->tv_sec + (usp)->tv_sec;		\
-		(vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec;	\
-		if ((vsp)->tv_nsec >= 1000000000L) {			\
-			(vsp)->tv_sec++;				\
-			(vsp)->tv_nsec -= 1000000000L;			\
-		}							\
-	} while (0)
-#define	timespecsub(tsp, usp, vsp)					\
-	do {								\
-		(vsp)->tv_sec = (tsp)->tv_sec - (usp)->tv_sec;		\
-		(vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec;	\
-		if ((vsp)->tv_nsec < 0) {				\
-			(vsp)->tv_sec--;				\
-			(vsp)->tv_nsec += 1000000000L;			\
-		}							\
-	} while (0)
-
 namespace HX711 {
 
 void Utility::_throwGpioExIfErr(const int code) {
@@ -181,7 +152,7 @@ void Utility::delayns(const std::chrono::nanoseconds ns) noexcept {
     ::clock_gettime(CLOCK_MONOTONIC_RAW, &tNow);
     timespecadd(&tNow, &tLong, &tEnd);
 
-    while(timespeccmp(&tNow, &tEnd, <)) {
+    while(timespeccmp(&tNow, &tEnd) < 0) {
         ::clock_gettime(CLOCK_MONOTONIC_RAW, &tNow);
     }
 
@@ -196,6 +167,77 @@ std::chrono::nanoseconds Utility::getnanos() noexcept {
 std::chrono::nanoseconds Utility::timespec_to_nanos(const timespec* const ts) {
     using namespace std::chrono;
     return duration_cast<nanoseconds>(seconds(ts->tv_sec)) + nanoseconds(ts->tv_nsec);
+}
+
+void Utility::timespecclear(timespec* const tsp) noexcept {
+    tsp->tv_sec = tsp->tv_nsec = 0;
+}
+
+bool Utility::timespecisset(const timespec* const tsp) noexcept {
+    return tsp->tv_sec || tsp->tv_nsec;
+}
+
+bool Utility::timespecisvalid(const timespec* const tsp) noexcept {
+    return tsp->tv_nsec >= 0 && tsp->tv_nsec < 1000000000L;
+}
+
+int Utility::timespeccmp(const timespec* const tsp, const timespec* const usp) noexcept {
+
+    do {
+
+        if(tsp->tv_sec < usp->tv_sec) {
+            return -1;
+        }
+        else if(tsp->tv_sec > usp->tv_sec) {
+            return 1;
+        }
+
+        if(tsp->tv_nsec < usp->tv_nsec) {
+            return -1;
+        }
+        else if(tsp->tv_nsec > usp->tv_nsec) {
+            return 1;
+        }
+
+        return 0;
+
+    }
+    while(0);
+
+}
+
+void Utility::timespecadd(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept {
+
+    do {
+
+        vsp->tv_sec = tsp->tv_sec + usp->tv_sec;
+        vsp->tv_nsec = tsp->tv_nsec + usp->tv_nsec;
+
+        if(vsp->tv_nsec >= 1000000000L) {
+            vsp->tv_sec++;
+            vsp->tv_nsec -= 1000000000L;
+        }
+
+    }
+    while(0);
+
+}
+
+void Utility::timespecsub(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept {
+
+    do {
+
+        vsp->tv_sec = tsp->tv_sec - usp->tv_sec;
+        vsp->tv_nsec = tsp->tv_nsec - usp->tv_nsec;
+
+        if(vsp->tv_nsec < 0) {
+            vsp->tv_sec--;
+            vsp->tv_nsec += 1000000000L;
+        }
+
+    }
+    while(0);
+
 }
 
 void Utility::setThreadPriority(const int pri, const int policy, const pthread_t th) noexcept {

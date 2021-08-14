@@ -70,6 +70,14 @@ public:
 
     static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts);
 
+    //Taken from https://github.com/openbsd/src/blob/master/sys/sys/time.h#L84
+    static void timespecclear(timespec* const tsp) noexcept;
+    static bool timespecisset(const timespec* const tsp) noexcept;
+    static bool timespecisvalid(const timespec* const tsp) noexcept;
+    static int timespeccmp(const timespec* const tsp, const timespec* const usp) noexcept;
+    static void timespecadd(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept;
+    static void timespecsub(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept;
+
     static void setThreadPriority(
         const int pri, const int policy, const pthread_t th) noexcept;
 
