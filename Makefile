@@ -71,14 +71,13 @@ CXXFLAGS :=		-std=c++11 \
 .PHONY: all
 all:	dirs \
 		build \
-		hx711calibration \
-		test
+		execs
 
 .PHONY: build
-build: build-static build-shared
+build: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 
-.PHONY: install
-install: install-static install-shared
+.PHONY execs:
+execs: hx711calibration test
 
 .PHONY: clean
 clean:
@@ -185,26 +184,15 @@ discovery: $(BUILDDIR)/DiscoverTiming.o
 		-lhx711 -lgsl $(LIBS)
 
 
-.PHONY: build-shared
-build-shared: $(BUILDDIR)/shared/libhx711.so
 
-.PHONY: build-static
-build-static: $(BUILDDIR)/static/libhx711.a
-
-.PHONY: install-shared
-install-shared: $(BUILDDIR)/shared/libhx711.so
+.PHONY: install
+install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 	install -d $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 $(BUILDDIR)/static/libhx711.a $(DESTDIR)$(PREFIX)/lib/
 	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/hx711
 	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
 	ldconfig $(DESTDIR)$(PREFIX)/lib
-
-.PHONY: install-static
-install-static: $(BUILDDIR)/static/libhx711.a
-	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -m 644 $(BUILDDIR)/static/libhx711.a $(DESTDIR)$(PREFIX)/lib/
-	install -d $(DESTDIR)$(PREFIX)/include/hx711
-	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
 
 .PHONY: uninstall
 uninstall:
