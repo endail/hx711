@@ -55,7 +55,7 @@ src/HX711.cpp:202:0: style: The function 'setStrictTiming' is never used. [unuse
 src/AbstractScale.cpp:60:0: style: The function 'setUnit' is never used. [unusedFunction]
 
 ^
-src/AbstractScale.cpp:132:0: style: The function 'zero' is never used. [unusedFunction]
+src/AbstractScale.cpp:125:0: style: The function 'zero' is never used. [unusedFunction]
 
 ^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
