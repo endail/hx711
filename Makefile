@@ -75,10 +75,10 @@ all:	dirs \
 		test
 
 .PHONY: build
-build: build-shared
+build: build-static build-shared
 
 .PHONY: install
-install: install-shared
+install: install-static install-shared
 
 .PHONY: clean
 clean:
