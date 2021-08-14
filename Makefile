@@ -68,16 +68,27 @@ CXXFLAGS :=		-std=c++11 \
 
 ########################################################################
 
-
 .PHONY: all
 all:	dirs \
-		$(BUILDDIR)/static/libhx711.a \
-		$(BUILDDIR)/shared/libhx711.so \
+		build \
 		hx711calibration \
 		test
 
+.PHONY: build
+build: build-shared
+
 .PHONY: install
-install:	install-shared
+install: install-shared
+
+.PHONY: clean
+clean:
+ifeq ($(IS_WIN),1)
+	del /S /Q $(BUILDDIR)\*
+	del /S /Q $(BINDIR)\*
+else
+	rm -r $(BUILDDIR)/*
+	rm -r $(BINDIR)/*
+endif
 
 .PHONY: dirs
 dirs:
@@ -92,6 +103,7 @@ else
 	mkdir -p $(BUILDDIR)/shared
 endif
 
+
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
 
@@ -100,6 +112,7 @@ $(BUILDDIR)/static/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 $(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c -o $@ $<
+
 
 # Build static library
 $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/AbstractScale.o \
@@ -139,6 +152,7 @@ $(BUILDDIR)/shared/libhx711.so:		$(BUILDDIR)/static/AbstractScale.o \
 			$(LIBS) \
 			-o $(BUILDDIR)/shared/libhx711.so
 
+
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
 	$(CXX) $(CXXFLAGS) $(INC) \
@@ -170,15 +184,14 @@ discovery: $(BUILDDIR)/DiscoverTiming.o
 		-L $(BUILDDIR)/shared \
 		-lhx711 -lgsl $(LIBS)
 
-.PHONY: clean
-clean:
-ifeq ($(IS_WIN),1)
-	del /S /Q $(BUILDDIR)\*
-	del /S /Q $(BINDIR)\*
-else
-	rm -r $(BUILDDIR)/*
-	rm -r $(BINDIR)/*
-endif
+
+.PHONY: build-shared
+build-shared:
+	$(BUILDDIR)/shared/libhx711.so
+
+.PHONY: build-static
+build-static:
+	$(BUILDDIR)/static/libhx711.so
 
 .PHONY: install-shared
 install-shared: $(BUILDDIR)/shared/libhx711.so
