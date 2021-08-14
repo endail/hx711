@@ -149,7 +149,16 @@ $(BUILDDIR)/shared/libhx711.so:		$(BUILDDIR)/shared/AbstractScale.o \
 			$(CXXFLAGS) \
 			$(INC) \
 			$(LIBS) \
-			-o $(BUILDDIR)/shared/libhx711.so
+			-o $(BUILDDIR)/shared/libhx711.so \
+				$(BUILDDIR)/shared/AbstractScale.o \
+				$(BUILDDIR)/shared/AdvancedHX711.o \
+				$(BUILDDIR)/shared/HX711.o \
+				$(BUILDDIR)/shared/Mass.o \
+				$(BUILDDIR)/shared/SimpleHX711.o \
+				$(BUILDDIR)/shared/Utility.o \
+				$(BUILDDIR)/shared/Value.o \
+				$(BUILDDIR)/shared/ValueStack.o \
+				$(BUILDDIR)/shared/Watcher.o
 
 
 .PHONY: hx711calibration
