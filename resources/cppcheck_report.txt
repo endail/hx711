@@ -1,6 +1,3 @@
-src/AbstractScale.cpp:58:19: error: Exception thrown in function declared not to throw exceptions. [throwInNoexceptFunction]
-            this->setReferenceUnit(refUnit);
-                  ^
 src/DiscoverTiming.cpp:127:5: style:inconclusive: Consecutive return, break, continue, goto or throw statements are unnecessary. [duplicateBreak]
     return EXIT_SUCCESS;
     ^
@@ -13,53 +10,5 @@ src/test.cpp:47:23: style: Variable 'dataPin' is assigned a value that is never 
 src/test.cpp:48:24: style: Variable 'clockPin' is assigned a value that is never used. [unreadVariable]
     const int clockPin = stoi(argv[2]);
                        ^
-src/Mass.cpp:91:0: style: The function 'convertTo' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:228:0: style: The function 'getChannel' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:224:0: style: The function 'getClockPin' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:220:0: style: The function 'getDataPin' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:216:0: style: The function 'getFormat' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:232:0: style: The function 'getGain' is never used. [unusedFunction]
-
-^
-src/AbstractScale.cpp:84:0: style: The function 'getOffset' is never used. [unusedFunction]
-
-^
-src/AbstractScale.cpp:70:0: style: The function 'getReferenceUnit' is never used. [unusedFunction]
-
-^
-src/AbstractScale.cpp:66:0: style: The function 'getUnit' is never used. [unusedFunction]
-
-^
-src/Value.cpp:32:0: style: The function 'isSaturated' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:207:0: style: The function 'isStrictTiming' is never used. [unusedFunction]
-
-^
-src/Value.cpp:36:0: style: The function 'isValid' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:211:0: style: The function 'setFormat' is never used. [unusedFunction]
-
-^
-src/HX711.cpp:202:0: style: The function 'setStrictTiming' is never used. [unusedFunction]
-
-^
-src/AbstractScale.cpp:62:0: style: The function 'setUnit' is never used. [unusedFunction]
-
-^
-src/AbstractScale.cpp:127:0: style: The function 'zero' is never used. [unusedFunction]
-
-^
 nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
 
