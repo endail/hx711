@@ -189,3 +189,4 @@ install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/lib/libhx711.*
 	rm -rf $(DESTDIR)$(PREFIX)/include/hx711
+	ldconfig $(DESTDIR)$(PREFIX)/lib
