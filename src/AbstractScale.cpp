@@ -118,22 +118,14 @@ double AbstractScale::read(const Options o) {
         throw std::runtime_error("no samples obtained");
     }
 
-    double val;
-
     switch(o.readType) {
         case ReadType::Median:
-            val = Utility::median(&vals);
-            break;
-
+            return Utility::median(&vals);
         case ReadType::Average:
-            val = Utility::average(&vals);
-            break;
-
+            return Utility::average(&vals);
         default:
             throw std::invalid_argument("unknown read type");
     }
-
-    return val;
 
 }
 
