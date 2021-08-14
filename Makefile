@@ -124,16 +124,16 @@ $(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/AbstractScale.o \
 								$(BUILDDIR)/static/ValueStack.o \
 								$(BUILDDIR)/static/Watcher.o
 
-	$(AR) rcs					$(BUILDDIR)/static/libhx711.a \
-								$(BUILDDIR)/static/AbstractScale.o \
-								$(BUILDDIR)/static/AdvancedHX711.o \
-								$(BUILDDIR)/static/HX711.o \
-								$(BUILDDIR)/static/Mass.o \
-								$(BUILDDIR)/static/SimpleHX711.o \
-								$(BUILDDIR)/static/Utility.o \
-								$(BUILDDIR)/static/Value.o \
-								$(BUILDDIR)/static/ValueStack.o \
-								$(BUILDDIR)/static/Watcher.o
+	$(AR) rcs	$(BUILDDIR)/static/libhx711.a \
+				$(BUILDDIR)/static/AbstractScale.o \
+				$(BUILDDIR)/static/AdvancedHX711.o \
+				$(BUILDDIR)/static/HX711.o \
+				$(BUILDDIR)/static/Mass.o \
+				$(BUILDDIR)/static/SimpleHX711.o \
+				$(BUILDDIR)/static/Utility.o \
+				$(BUILDDIR)/static/Value.o \
+				$(BUILDDIR)/static/ValueStack.o \
+				$(BUILDDIR)/static/Watcher.o
 
 # Build shared library
 $(BUILDDIR)/shared/libhx711.so:		$(BUILDDIR)/shared/AbstractScale.o \
@@ -146,19 +146,19 @@ $(BUILDDIR)/shared/libhx711.so:		$(BUILDDIR)/shared/AbstractScale.o \
 									$(BUILDDIR)/shared/ValueStack.o \
 									$(BUILDDIR)/shared/Watcher.o
 	$(CXX)	-shared \
-			$(CXXFLAGS) \
-			$(INC) \
-			-o $(BUILDDIR)/shared/libhx711.so \
-				$(BUILDDIR)/shared/AbstractScale.o \
-				$(BUILDDIR)/shared/AdvancedHX711.o \
-				$(BUILDDIR)/shared/HX711.o \
-				$(BUILDDIR)/shared/Mass.o \
-				$(BUILDDIR)/shared/SimpleHX711.o \
-				$(BUILDDIR)/shared/Utility.o \
-				$(BUILDDIR)/shared/Value.o \
-				$(BUILDDIR)/shared/ValueStack.o \
-				$(BUILDDIR)/shared/Watcher.o \
-			$(LIBS)
+		$(CXXFLAGS) \
+		$(INC) \
+		-o $(BUILDDIR)/shared/libhx711.so \
+			$(BUILDDIR)/shared/AbstractScale.o \
+			$(BUILDDIR)/shared/AdvancedHX711.o \
+			$(BUILDDIR)/shared/HX711.o \
+			$(BUILDDIR)/shared/Mass.o \
+			$(BUILDDIR)/shared/SimpleHX711.o \
+			$(BUILDDIR)/shared/Utility.o \
+			$(BUILDDIR)/shared/Value.o \
+			$(BUILDDIR)/shared/ValueStack.o \
+			$(BUILDDIR)/shared/Watcher.o \
+		$(LIBS)
 
 
 .PHONY: hx711calibration
