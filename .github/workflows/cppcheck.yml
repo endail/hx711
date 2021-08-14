@@ -30,7 +30,7 @@ jobs:
           inline_suppression: enable
           platform: unix32
           std: c++11
-          other_options: --suppress=unusedFunction
+          other_options: --suppress=unusedFunction --suppress=missingIncludeSystem
           output_file: resources/cppcheck_report.txt
 
       - name: Publish report    
