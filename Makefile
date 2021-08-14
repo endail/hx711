@@ -189,7 +189,7 @@ discovery: $(BUILDDIR)/DiscoverTiming.o
 build-shared: $(BUILDDIR)/shared/libhx711.so
 
 .PHONY: build-static
-build-static: $(BUILDDIR)/static/libhx711.so
+build-static: $(BUILDDIR)/static/libhx711.a
 
 .PHONY: install-shared
 install-shared: $(BUILDDIR)/shared/libhx711.so
