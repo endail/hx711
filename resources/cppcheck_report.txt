@@ -10,5 +10,3 @@ src/test.cpp:47:23: style: Variable 'dataPin' is assigned a value that is never 
 src/test.cpp:48:24: style: Variable 'clockPin' is assigned a value that is never used. [unreadVariable]
     const int clockPin = stoi(argv[2]);
                        ^
-nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingIncludeSystem]
-
