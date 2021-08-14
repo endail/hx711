@@ -53,8 +53,10 @@ AbstractScale::AbstractScale(
     const Value refUnit,
     const Value offset) noexcept : 
         _massUnit(massUnit),
-        _refUnit(refUnit),
-        _offset(offset) {
+        _refUnit(1),
+        _offset(0) {
+            this->setReferenceUnit(refUnit);
+            this->setOffset(offset);
 }
 
 void AbstractScale::setUnit(const Mass::Unit unit) noexcept {
