@@ -70,11 +70,14 @@ CXXFLAGS :=		-std=c++11 \
 
 
 .PHONY: all
-all: 	dirs \
+all:	dirs \
 		$(BUILDDIR)/static/libhx711.a \
 		$(BUILDDIR)/shared/libhx711.so \
 		hx711calibration \
 		test
+
+.PHONY: install
+install:	install-shared
 
 .PHONY: dirs
 dirs:
@@ -141,7 +144,7 @@ hx711calibration: $(BUILDDIR)/Calibration.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/hx711calibration \
 		$(BUILDDIR)/Calibration.o \
-		-L $(BUILDDIR)/static \
+		-L $(BUILDDIR)/shared \
 		-lhx711 $(LIBS)
 
 .PHONY: test
@@ -149,12 +152,13 @@ test: $(BUILDDIR)/SimpleHX711Test.o $(BUILDDIR)/AdvancedHX711Test.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
-		-L $(BUILDDIR)/static \
+		-L $(BUILDDIR)/shared \
 		-lhx711 $(LIBS)
+
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/advancedhx711test \
 		$(BUILDDIR)/AdvancedHX711Test.o \
-		-L $(BUILDDIR)/static \
+		-L $(BUILDDIR)/shared \
 		-lhx711 $(LIBS)
 	
 
@@ -163,7 +167,7 @@ discovery: $(BUILDDIR)/DiscoverTiming.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/discovery \
 		$(BUILDDIR)/DiscoverTiming.o \
-		-L $(BUILDDIR)/static \
+		-L $(BUILDDIR)/shared \
 		-lhx711 -lgsl $(LIBS)
 
 .PHONY: clean
@@ -176,14 +180,20 @@ else
 	rm -r $(BINDIR)/*
 endif
 
-.PHONY: install
-install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
+.PHONY: install-shared
+install-shared: $(BUILDDIR)/shared/libhx711.so
 	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -m 644 $(BUILDDIR)/static/libhx711.a $(DESTDIR)$(PREFIX)/lib/
 	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/hx711
 	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
 	ldconfig $(DESTDIR)$(PREFIX)/lib
+
+.PHONY: install-static
+install-static: $(BUILDDIR)/static/libhx711.a
+	install -d $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 $(BUILDDIR)/static/libhx711.a $(DESTDIR)$(PREFIX)/lib/
+	install -d $(DESTDIR)$(PREFIX)/include/hx711
+	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
 
 .PHONY: uninstall
 uninstall:
