@@ -46,6 +46,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+/*
     const int dataPin = stoi(argv[1]);
     const int clockPin = stoi(argv[2]);
     const int samples = stoi(argv[3]);
@@ -61,7 +62,7 @@ int main(int argc, char** argv) {
 
 
     SimpleHX711 hx(dataPin, clockPin, 1, 0 Rate::HZ_80);
-
+*/
     
 
 
@@ -122,8 +123,8 @@ int main(int argc, char** argv) {
             ;
 
     }
-    */
 
     return EXIT_SUCCESS;
+*/
 
 }
