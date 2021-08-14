@@ -178,7 +178,8 @@ bool Utility::timespecisset(const timespec* const tsp) noexcept {
 }
 
 bool Utility::timespecisvalid(const timespec* const tsp) noexcept {
-    return tsp->tv_nsec >= 0 && tsp->tv_nsec < 1000000000L;
+    using namespace std::chrono;
+    return tsp->tv_nsec >= 0 && tsp->tv_nsec < nanoseconds::period::den;
 }
 
 int Utility::timespeccmp(const timespec* const tsp, const timespec* const usp) noexcept {
@@ -208,14 +209,16 @@ int Utility::timespeccmp(const timespec* const tsp, const timespec* const usp) n
 
 void Utility::timespecadd(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept {
 
+    using namespace std::chrono;
+
     do {
 
         vsp->tv_sec = tsp->tv_sec + usp->tv_sec;
         vsp->tv_nsec = tsp->tv_nsec + usp->tv_nsec;
 
-        if(vsp->tv_nsec >= 1000000000L) {
+        if(vsp->tv_nsec >= nanoseconds::period::den) {
             vsp->tv_sec++;
-            vsp->tv_nsec -= 1000000000L;
+            vsp->tv_nsec -= nanoseconds::period::den;
         }
 
     }
@@ -225,6 +228,8 @@ void Utility::timespecadd(const timespec* const tsp, const timespec* const usp, 
 
 void Utility::timespecsub(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept {
 
+    using namespace std::chrono;
+
     do {
 
         vsp->tv_sec = tsp->tv_sec - usp->tv_sec;
@@ -232,7 +237,7 @@ void Utility::timespecsub(const timespec* const tsp, const timespec* const usp, 
 
         if(vsp->tv_nsec < 0) {
             vsp->tv_sec--;
-            vsp->tv_nsec += 1000000000L;
+            vsp->tv_nsec += nanoseconds::period::den;
         }
 
     }
