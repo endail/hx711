@@ -183,6 +183,7 @@ install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/hx711
 	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
+	ldconfig $(DESTDIR)$(PREFIX)/lib
 
 .PHONY: uninstall
 uninstall:
