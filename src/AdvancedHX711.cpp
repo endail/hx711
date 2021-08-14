@@ -22,6 +22,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 #include "../include/AdvancedHX711.h"
@@ -82,6 +83,10 @@ std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeo
 std::vector<Value> AdvancedHX711::getValues(const std::size_t samples) {
 
     using namespace std::chrono;
+
+    if(samples == 0) {
+        throw std::range_error("samples must be at least 1");
+    }
 
     this->_wx->values.clear();
     this->_wx->watch();

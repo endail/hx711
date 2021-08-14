@@ -98,18 +98,11 @@ double AbstractScale::read(const Options o) {
 
     switch(o.stratType) {
         case StrategyType::Samples:
-
-            if(o.samples == 0) {
-                throw std::range_error("samples must be at least 1");
-            }
-
             vals = this->getValues(o.samples);
             break;
-
         case StrategyType::Time:
             vals = this->getValues(o.timeout);
             break;
-
         default:
             throw std::invalid_argument("unknown strategy type");
     }
