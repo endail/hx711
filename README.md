@@ -4,6 +4,7 @@
 
 - Use with Raspberry Pi
 - Requires [lgpio](http://abyz.me.uk/lg/index.html)
+- Developed and tested with a Raspberry Pi Zero W
 
 ## Sample Output from Test Code
 
