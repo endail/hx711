@@ -41,7 +41,8 @@
                 "-Wl,-z,relro",
                 "-fwrapv",
                 "-mfloat-abi=hard"
-            ]
+            ],
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4

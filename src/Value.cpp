@@ -20,29 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-#define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-
-#include <cstdint>
-#include <vector>
-#include "AbstractScale.h"
-#include "HX711.h"
-#include "Value.h"
+#include <limits>
+#include "../include/Value.h"
 
 namespace HX711 {
-class SimpleHX711 : public AbstractScale, public HX711 {
-public:
 
-    SimpleHX711(
-        const int dataPin,
-        const int clockPin,
-        const Value refUnit = 1,
-        const Value offset = 0,
-        const Rate rate = Rate::HZ_10);
+Value::operator _INTERNAL_TYPE() const noexcept {
+    return this->_v;
+}
 
-    virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
-    virtual std::vector<Value> getValues(const std::size_t samples) override;
+bool Value::isSaturated() const noexcept {
+    return this->_v == SATURATION_MIN || this->_v == SATURATION_MAX;
+}
+
+bool Value::isValid() const noexcept {
+    return this->_v >= _MIN && this->_v <= _MAX;
+}
+
+Value::Value(const _INTERNAL_TYPE v) noexcept : _v(v) {
+}
+
+Value::Value() noexcept : _v(std::numeric_limits<_INTERNAL_TYPE>::min()) {
+}
+
+Value& Value::operator=(const Value& v2) noexcept {
+    this->_v = v2._v;
+    return *this;
+}
 
 };
-};
-#endif

@@ -63,6 +63,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "cerrno": "cpp",
+        "ios": "cpp"
     }
 }

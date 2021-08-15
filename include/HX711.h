@@ -23,8 +23,11 @@
 #ifndef HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 #define HX711_HX711_H_670BFDCD_DA15_4F8B_A15C_0F0043905889
 
+#include <chrono>
 #include <cstdint>
 #include <mutex>
+#include <unordered_map>
+#include "Value.h"
 
 namespace HX711 {
 
@@ -33,119 +36,98 @@ namespace HX711 {
  * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
  */
 
-/**
- * The HX711 is a 24-bit ADC. Values it outputs will always be
- * treated as 32-bit integers and not floating point numbers.
- */
-typedef std::int32_t HX_VALUE;
-
-enum class Format {
-    MSB = 0, //most significant bit
-    LSB //least significant bit
-};
-
-enum class Channel {
-    A = 0,
+enum class Channel : unsigned char {
+    A,
     B
 };
 
-//Datasheet pg. 4
-enum class Gain {
-    GAIN_128 = 0,
+/**
+ * Datasheet pg. 4
+ */
+enum class Gain : unsigned char {
+    GAIN_128,
     GAIN_32,
     GAIN_64
 };
 
 /**
- * Used as a map to select to correct number of clock pulses
- * depending on the set gain
- * Datasheet pg. 4
+ * Datasheet pg. 3
+ * OTHER is to be used when an external clock (ie. crystal is used)
  */
-const std::uint8_t PULSES[3] = {
-    25,
-    26,
-    27
+enum class Rate : unsigned char {
+    HZ_10,
+    HZ_80,
+    OTHER
+};
+
+enum class Format : unsigned char {
+    MSB,
+    LSB
 };
 
 class HX711 {
-
 protected:
 
-    /**
-     * Maximum number of attempts to read bytes from the sensor
-     * before failing. Can be interpreted as:
-     * 
-     * "Will check every _WAIT_INTERVAL_US microseconds to a 
-     * maximum of _MAX_READ_TRIES times"
-     * 
-     * ie. a TimeoutException will occur after at least:
-     * _WAIT_INTERVAL_US * _MAX_READ_TRIES microseconds has
-     * elapsed
-     */
-    static const std::uint8_t _MAX_READ_TRIES = 100;
-    static const std::uint16_t _WAIT_INTERVAL_US = 1000;
+    static const unsigned char _BITS_PER_CONVERSION_PERIOD = 24;
+    static const std::unordered_map<const Gain, const unsigned char> _PULSES;
+    static constexpr auto _T1 = std::chrono::nanoseconds(100);
+    static constexpr auto _T2 = std::chrono::nanoseconds(100);
+    static constexpr auto _T3 = std::chrono::nanoseconds(200);
+    static constexpr auto _T4 = std::chrono::nanoseconds(200);
+    static constexpr auto _POWER_DOWN_TIMEOUT = std::chrono::microseconds(60);
+    static const std::unordered_map<const Rate, const std::chrono::milliseconds> _SETTLING_TIMES;
 
-    //Datasheet pg. 5
-    //HX711 is a 24-bit ADC (ie. 3 8-bit values = 24 bits)
-    static const std::uint8_t _BYTES_PER_CONVERSION_PERIOD = 3;
-
-    /**
-     * ints (not int32_t) are used for pins to be as compatible as possible
-     * with wiringPi calls (and to not make presumptions about pin 
-     * numbering schemes).
-     */
     int _gpioHandle;
     const int _dataPin;
     const int _clockPin;
-    std::mutex _readLock;
+    std::mutex _commLock;
+    Rate _rate;
+    Channel _channel;
     Gain _gain;
+    bool _strictTiming;
     Format _bitFormat;
-    Format _byteFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
-    bool _readBit() const noexcept;
-    std::uint8_t _readByte() const noexcept;
-    void _readRawBytes(std::uint8_t* const bytes = nullptr);
-    HX_VALUE _readInt();
-    static void _delayMicroseconds(const unsigned int us) noexcept;
+    static unsigned char _calculatePulses(const Gain g) noexcept;
+    void _setInputGainSelection();
+    bool _readBit() const;
+    void _readBits(std::int32_t* const v);
 
-    HX_VALUE _getChannelAValue();
-    HX_VALUE _getChannelBValue();
 
 public:
-    
-    HX711(const int dataPin, const int clockPin) noexcept;
+
+    HX711(
+        const int dataPin,
+        const int clockPin,
+        const Rate rate = Rate::HZ_10) noexcept;
+
+    HX711(const HX711& that) = delete;
+    HX711& operator=(const HX711& that) = delete;
+
     virtual ~HX711();
 
     void begin();
 
+    void setStrictTiming(const bool strict) noexcept;
+    bool isStrictTiming() const noexcept;
+
+    Format getFormat() const noexcept;
+    void setFormat(const Format bitFormat) noexcept;
+
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
 
-    void setGain(const Gain gain);
+    Channel getChannel() const noexcept;
     Gain getGain() const noexcept;
-    
-    bool isReady() noexcept;
+    void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
 
-    /**
-     * If Channel B value is requested but an exception is thrown
-     * setGain MUST be called again.
-     */
-    HX_VALUE getValue(const Channel c = Channel::A);
+    bool isReady() const;
+    Value readValue();
 
-    Format getBitFormat() const noexcept;
-    Format getByteFormat() const noexcept;
-    void setBitFormat(const Format f) noexcept;
-    void setByteFormat(const Format f) noexcept;
-
-    void powerDown() noexcept;
+    void powerDown();
     void powerUp();
 
 };
 };
-
-#include "Mass.h"
-#include "TimeoutException.h"
-#include "SimpleHX711.h"
 
 #endif

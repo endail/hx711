@@ -14,8 +14,6 @@ jobs:
 
       - name: Build and Install lgpio
         run: |
-          sudo apt install swig python-dev python3-dev
-          sudo apt install python-setuptools python3-setuptools
           make
           sudo make install
           sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
@@ -29,7 +27,12 @@ jobs:
         uses: deep5050/cppcheck-action@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN}}
-        
+          inline_suppression: enable
+          platform: unix32
+          std: c++11
+          other_options: --suppress=unusedFunction --suppress=missingIncludeSystem
+          output_file: resources/cppcheck_report.txt
+
       - name: Publish report    
         uses: mikeal/publish-to-github-action@master
         env:

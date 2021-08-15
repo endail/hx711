@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -28,6 +29,7 @@
 int main(int argc, char** argv) {
 
     using namespace std;
+    using namespace std::chrono;
     using namespace HX711;
 
     const char* const err = "Usage: [DATA PIN] [CLOCK PIN] [REFERENCE UNIT] [OFFSET]";
@@ -42,11 +44,11 @@ int main(int argc, char** argv) {
     const int refUnit = stoi(argv[3]);
     const int offset = stoi(argv[4]);
 
-    SimpleHX711 hx(dataPin, clockPin, refUnit, offset);
+    AdvancedHX711 hx(dataPin, clockPin, refUnit, offset);
 
     for(int i = 0; i < 1000; ++i) {
 
-        const Mass m = hx.weight(3);
+        const Mass m = hx.weight(milliseconds(250));
 
         cout    << "\x1B[2J\x1B[H"
                 << "\t" << m.getValue() << '\n'

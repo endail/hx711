@@ -1,0 +1,6 @@
+src/test.cpp:47:23: style: Variable 'dataPin' is assigned a value that is never used. [unreadVariable]
+    const int dataPin = stoi(argv[1]);
+                      ^
+src/test.cpp:48:24: style: Variable 'clockPin' is assigned a value that is never used. [unreadVariable]
+    const int clockPin = stoi(argv[2]);
+                       ^

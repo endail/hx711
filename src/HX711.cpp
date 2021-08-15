@@ -20,360 +20,68 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <chrono>
+#include <cstdint>
+#include <mutex>
+#include <stdexcept>
+#include <time.h>
+#include <unordered_map>
+#include <utility>
+#include "../include/GpioException.h"
 #include "../include/HX711.h"
+#include "../include/IntegrityException.h"
 #include "../include/TimeoutException.h"
-#include <lgpio.h>
-#include <sys/time.h>
+#include "../include/Utility.h"
+#include "../include/Value.h"
 
 namespace HX711 {
+
+constexpr std::chrono::nanoseconds HX711::_T1;
+constexpr std::chrono::nanoseconds HX711::_T2;
+constexpr std::chrono::nanoseconds HX711::_T3;
+constexpr std::chrono::nanoseconds HX711::_T4;
+constexpr std::chrono::microseconds HX711::_POWER_DOWN_TIMEOUT;
+
+/**
+ * Used to select the correct number of clock pulses depending on the
+ * gain
+ * Datasheet pg. 4
+ */
+const std::unordered_map<const Gain, const unsigned char> HX711::_PULSES({
+    { Gain::GAIN_128,       25 },
+    { Gain::GAIN_32,        26 },
+    { Gain::GAIN_64,        27 }
+});
+
+/**
+ * Used to select the correct settling time depending on rate
+ * Datasheet pg. 3
+ */
+const std::unordered_map<const Rate, const std::chrono::milliseconds> 
+    HX711::_SETTLING_TIMES({
+        { Rate::HZ_10, std::chrono::milliseconds(400) },
+        { Rate::HZ_80, std::chrono::milliseconds(50) }
+});
 
 std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
-bool HX711::_readBit() const noexcept {
-
-    /**
-     * The following code does not appear to work when using
-     * std::this_thread::sleep_for. Code using delayMicroseconds
-     * does work and is implemented below. I have left it here
-     * for reference and how it should operate.
-     * 
-     * //first, clock pin is set high to make DOUT ready to be read from
-     * ::digitalWrite(this->_clockPin, HIGH);
-     * 
-     * //!!!IMPORTANT NOTE!!!
-     * //
-     * //There is an overlap in timing between the clock pin changing from
-     * //high to low and the data pin being ready to output the respective
-     * //bit. This overlap is T2 in Fig.2 on pg. 5 of the datasheet.
-     * //
-     * //For the data pin to be ready, 0.1us needs to have elapsed.
-     * std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-     * 
-     * //at this stage, DOUT is ready to be read from
-     * const bool bit = ::digitalRead(this->_dataPin) == HIGH;
-     * 
-     * //clock pin needs to be remain high for at least another 0.1us
-     * std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-     * ::digitalWrite(this->_clockPin, LOW);
-
-     * //once low, clock pin needs to remain low for at least 0.2us
-     * //before the next bit can be read
-     * //technically this doesn't need to exist here, but it is
-     * //convenient
-     * std::this_thread::sleep_for(std::chrono::nanoseconds(200));
-     * 
-     * return bit;
-     */
-
-    //first, clock pin is set high to make DOUT ready to be read from
-    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
-
-    //then delay for sufficient time to allow DOUT to be ready (0.1us)
-    //this will also permit a sufficient amount of time for the clock
-    //pin to remain high
-    _delayMicroseconds(1);
-    
-    //at this stage, DOUT is ready and the clock pin has been held
-    //high for sufficient amount of time, so read the bit value
-    const bool bit = ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 1;
-
-    //the clock pin then needs to be held for at least 0.2us before
-    //the next bit can be read
-    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    _delayMicroseconds(1);
-
-    return bit;
-
+unsigned char HX711::_calculatePulses(const Gain g) noexcept {
+    return _PULSES.at(g) - _BITS_PER_CONVERSION_PERIOD;
 }
 
-std::uint8_t HX711::_readByte() const noexcept {
+void HX711::_setInputGainSelection() {
 
-    std::uint8_t val = 0;
+    const unsigned char pulses = _calculatePulses(this->_gain);
 
-    //8 bits per byte...
-    for(std::uint8_t i = 0; i < 8; ++i) {
-        if(this->_bitFormat == Format::MSB) {
-            val <<= 1;
-            val |= this->_readBit();
-        }
-        else {
-            val >>= 1;
-            val |= this->_readBit() * 0x80;
-        }
-    }
-
-    return val;
-
-}
-
-void HX711::_readRawBytes(std::uint8_t* const bytes) {
-
-    /**
-     * Bytes are ready to be read from the HX711 when DOUT goes low. Therefore,
-     * wait until this occurs.
-     * Datasheet pg. 5
-     * 
-     * The - potential- issue is that DOUT going low does not appear to be
-     * defined. It appears to occur whenever it is ready, whenever that is.
-     * 
-     * The code below should limit that to a reasonable time-frame of checking
-     * after a predefined interval for a predefined number of attempts.
-     */
-
-    std::uint8_t tries = 0;
-
-    do {
-
-        if(this->isReady()) {
-            break;
-        }
-
-        if(++tries < _MAX_READ_TRIES) {
-            _delayMicroseconds(_WAIT_INTERVAL_US);
-        }
-        else {
-            throw TimeoutException("timed out while trying to read bytes from HX711");
-        }
-
-    }
-    while(true);
-
-    //this must occur AFTER the isReady call otherwise it
-    //will deadlock
-    std::unique_lock<std::mutex> lock(this->_readLock);
-
-    /**
-     * When DOUT goes low, there is a minimum of 0.1us until the clock pin
-     * can go high. T1 in Fig.2.
-     * Datasheet pg. 5
-     */
-    _delayMicroseconds(1);
-
-    //delcare array of bytes of sufficient size
-    //uninitialised is fine; they'll be overwritten
-    std::uint8_t raw[_BYTES_PER_CONVERSION_PERIOD];
-
-    //then populate it with values from the hx711
-    for(std::uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
-        raw[i] = this->_readByte();
-    }
-
-    /**
-     * The HX711 requires a certain number of "positive clock
-     * pulses" depending on the set gain value.
-     * Datasheet pg. 4
-     * 
-     * The expression below calculates the number of pulses
-     * after having read the three bytes above. For example,
-     * a gain of 128 requires 25 pulses: 24 pulses were made
-     * when reading the three bytes (3 * 8), so only one
-     * additional pulse is needed.
-     */
-    const std::uint8_t pulsesNeeded = 
-        PULSES[static_cast<std::size_t>(this->_gain)] -
-            8 * _BYTES_PER_CONVERSION_PERIOD;
-
-    for(std::uint8_t i = 0; i < pulsesNeeded; ++i) {
+    for(unsigned char i = 0; i < pulses; ++i) {
         this->_readBit();
     }
 
-    //not reading from the sensor any more so no need to keep
-    //the lock in place
-    lock.unlock();
-
-    //if no byte pointer is given, don't try to write to it
-    if(bytes == nullptr) {
-        return;
-    }
-
-    /**
-     * The HX711 will supply bits in big-endian format;
-     * the 0th read bit is the MSB.
-     * Datasheet pg. 4
-     * 
-     * If this->_byteFormat indicates the HX711 is outputting
-     * bytes in LSB format, swap the first and last bytes
-     * 
-     * Remember, the bytes param expects an array of bytes
-     * which will be converted to an int.
-     */
-    if(this->_byteFormat == Format::LSB) {
-        const std::uint8_t swap = raw[0];
-        raw[0] = raw[_BYTES_PER_CONVERSION_PERIOD - 1];
-        raw[_BYTES_PER_CONVERSION_PERIOD - 1] = swap;
-    }
-
-    //finally, copy the local raw bytes to the byte array
-    for(std::uint8_t i = 0; i < _BYTES_PER_CONVERSION_PERIOD; ++i) {
-        bytes[i] = raw[i];
-    }
-
 }
 
-HX_VALUE HX711::_readInt() {
-
-    std::uint8_t bytes[_BYTES_PER_CONVERSION_PERIOD];
-    
-    this->_readRawBytes(bytes);
-
-    /**
-     * An int (int32_t) is 32 bits (4 bytes), but
-     * the HX711 only uses 24 bits (3 bytes).
-     */
-    const std::int32_t twosComp = ((       0 << 24) |
-                                   (bytes[0] << 16) |
-                                   (bytes[1] << 8)  |
-                                    bytes[2]         );
-
-    return _convertFromTwosComplement(twosComp);
-
-}
-
-void HX711::_delayMicroseconds(const unsigned int us) noexcept {
-
-    /**
-     * This requires some explanation.
-     * 
-     * Delays on a pi are inconsistent due to the OS not being a real-time OS.
-     * A previous version of this code used wiringPi which used its
-     * delayMicroseconds function to delay in the microsecond range. The way this
-     * was implemented was with a busy-wait loop for times under 100 nanoseconds.
-     * 
-     * https://github.com/WiringPi/WiringPi/blob/f15240092312a54259a9f629f9cc241551f9faae/wiringPi/wiringPi.c#L2165-L2166
-     * https://github.com/WiringPi/WiringPi/blob/f15240092312a54259a9f629f9cc241551f9faae/wiringPi/wiringPi.c#L2153-L2154
-     * 
-     * This (the busy-wait) would, presumably, help to prevent context switching
-     * therefore keep the timing required by the HX711 module relatively
-     * consistent.
-     * 
-     * When this code changed to using the lgpio library, its lguSleep function
-     * appeared to be an equivalent replacement. But it did not work.
-     * 
-     * http://abyz.me.uk/lg/lgpio.html#lguSleep
-     * https://github.com/joan2937/lg/blob/8f385c9b8487e608aeb4541266cc81d1d03514d3/lgUtil.c#L56-L67
-     * 
-     * The problem appears to be that lguSleep is not busy-waiting. And, when
-     * a sleep occurs, it is taking far too long to return. Contrast this
-     * behaviour with wiringPi, which constantly calls gettimeofday until return.
-     * 
-     * In short, use this function for delays under 100us.
-     */
-
-    struct timeval tNow;
-    struct timeval tLong;
-    struct timeval tEnd;
-
-    tLong.tv_sec = us / 1000000;
-    tLong.tv_usec = us % 1000000;
-
-    ::gettimeofday(&tNow, nullptr);
-    timeradd(&tNow, &tLong, &tEnd);
-
-    while(timercmp(&tNow, &tEnd, <)) {
-        ::gettimeofday(&tNow, nullptr);
-    }
-
-}
-
-HX_VALUE HX711::_getChannelAValue() {
-
-    /**
-     * "Channel A can be programmed with a gain 
-     * of 128 or 64..."
-     * Datasheet pg. 1
-     * 
-     * Opt to default to 128
-     */
-    if(this->_gain == Gain::GAIN_32) {
-        this->setGain(Gain::GAIN_128);
-    }
-
-    return this->_readInt();
-
-}
-
-HX_VALUE HX711::_getChannelBValue() {
-    
-    /**
-     * "Channel B has a fixed gain of 32"
-     * Datasheet pg. 1
-     */
-    if(this->_gain != Gain::GAIN_32) {
-        this->setGain(Gain::GAIN_32);
-    }
-
-    return this->_readInt();
-
-}
-
-HX711::HX711(const int dataPin, const int clockPin) noexcept :
-    _gpioHandle(-1),
-    _dataPin(dataPin),
-    _clockPin(clockPin),
-    _gain(Gain::GAIN_128),
-    _bitFormat(Format::MSB),
-    _byteFormat(Format::MSB) {
-}
-
-HX711::~HX711() {
-    ::lgGpioFree(this->_gpioHandle, this->_clockPin);
-    ::lgGpioFree(this->_gpioHandle, this->_dataPin);
-    ::lgGpiochipClose(this->_gpioHandle);
-}
-
-void HX711::begin() {
-
-    if(!(   
-        (this->_gpioHandle = ::lgGpiochipOpen(0)) >= 0 &&
-        ::lgGpioClaimInput(this->_gpioHandle, 0, this->_dataPin) == 0 &&
-        ::lgGpioClaimOutput(this->_gpioHandle, 0, this->_clockPin, 0) == 0
-    )) {
-        throw std::runtime_error("unable to access GPIO");
-    }
-
-    this->powerUp();
-
-    /**
-     * Cannot simply set this->_gain. this->setGain()
-     * must be called to set the HX711 module at the
-     * hardware-level.
-     * 
-     * If, for whatever reason, the sensor cannot be
-     * reached, setGain will fail and throw a
-     * TimeoutException.
-     * 
-     * try {
-     *     hx.begin();
-     * }
-     * catch(TimeoutException& e) {
-     *     //sensor failed to connect
-     * }
-     */
-    this->setGain(this->_gain);
-
-}
-
-bool HX711::isReady() noexcept {
-
-    /**
-     * The datasheet states DOUT is used to shift-out data,
-     * and in the process DOUT will either be HIGH or LOW
-     * to represent bits of the resulting integer. The issue
-     * is that during the "conversion period" of shifting
-     * bits out, DOUT could be LOW, but not necessarily
-     * mean there is "new" data for retrieval. Page 4 states
-     * that the "25th pulse at PD_SCK input will pull DOUT
-     * pin back to high".
-     * 
-     * This is justification enough to guard against
-     * potentially erroneous "ready" states while a
-     * conversion is in progress. The lock is already in
-     * place to prevent extra reads from the sensor, so
-     * it should suffice to stop this issue as well.
-     */
-    std::lock_guard<std::mutex> lock(this->_readLock);
+bool HX711::isReady() const {
 
     /**
      * HX711 will be "ready" when DOUT is low.
@@ -384,19 +92,129 @@ bool HX711::isReady() noexcept {
      * or looping for checking if the sensor is ready
      * over time can/should be done by other calling code
      */
-    return ::lgGpioRead(this->_gpioHandle, this->_dataPin) == 0;
+    try {
+        return Utility::readGpio(
+            this->_gpioHandle,
+            this->_dataPin) == GpioLevel::LOW;
+    }
+    catch(const GpioException& ex) {
+        return false;
+    }
 
 }
 
-HX_VALUE HX711::getValue(const Channel c) {
+bool HX711::_readBit() const {
 
-    if(c == Channel::A) {
-        return this->_getChannelAValue();
+    //first, clock pin is set high to make DOUT ready to be read from
+    //and the current ACTUAL time is noted for later
+    const auto startNanos = Utility::getnanos();
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
+
+    //then delay for sufficient time to allow DOUT to be ready (0.1us)
+    //this will also permit a sufficient amount of time for the clock
+    //pin to remain high
+    //
+    //In practice this [probably] isn't really going to matter
+    //due to how miniscule the amount of time is and how slow the
+    //execution of the code is in comparison. For that reason, the
+    //delay below is excluded
+    //Utility::delayns(std::max(_T2, _T3));
+
+    //at this stage, DOUT is ready and the clock pin has been held
+    //high for sufficient amount of time, so read the bit value
+    const bool bit = static_cast<bool>(
+        Utility::readGpio(this->_gpioHandle, this->_dataPin));
+
+    //with the bit value now read, set the clock pin low and note the
+    //current ACTUAL time again
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
+    const auto endNanos = Utility::getnanos();
+
+    //At this point, according to the documentation, if the clock pin
+    //was held high for longer than 60us, the chip will have entered
+    //power down mode. This means the currently read bit is unreliable.
+    //
+    //So... first, calculate the difference
+    const auto diff = endNanos - startNanos;
+
+    //...and if the threshold was exceeded, raise the exception
+    if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
+        throw IntegrityException("bit integrity failure");
     }
-    
-    //else channel B
-    return this->_getChannelBValue();
 
+    //Assuming everything was OK, the datasheet requires a further
+    //delay. But, as for the reasons previously mentioned above, the
+    //following delay is probably not going to matter and is therefore
+    //excluded.
+    //Utility::delayns(_T4);
+
+    return bit;
+
+}
+
+void HX711::_readBits(std::int32_t* const v) {
+
+    std::lock_guard<std::mutex> lock(this->_commLock);
+
+    //The datasheet notes a tiny delay between DOUT going low and the
+    //initial clock pin change. But, as for the reasons previously
+    //mentioned above, the following delay is probably not going to
+    //matter and is therefore excluded.
+    //Utility::delayns(_T1);
+
+    //msb first
+    for(unsigned char i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
+        *v <<= 1;
+        *v |= this->_readBit();
+    }
+
+    this->_setInputGainSelection();
+
+}
+
+HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
+    _gpioHandle(-1),
+    _dataPin(dataPin),
+    _clockPin(clockPin),
+    _rate(rate),
+    _channel(Channel::A),
+    _gain(Gain::GAIN_128),
+    _strictTiming(false),
+    _bitFormat(Format::MSB) {
+}
+
+HX711::~HX711() {
+    Utility::closeGpioPin(this->_gpioHandle, this->_clockPin);
+    Utility::closeGpioPin(this->_gpioHandle, this->_dataPin);
+    Utility::closeGpioHandle(this->_gpioHandle);
+}
+
+void HX711::begin() {
+
+    this->_gpioHandle = Utility::openGpioHandle(0);
+    Utility::openGpioInput(this->_gpioHandle, this->_dataPin);
+    Utility::openGpioOutput(this->_gpioHandle, this->_clockPin);
+
+    this->setConfig(this->_channel, this->_gain);
+
+}
+
+void HX711::setStrictTiming(const bool strict) noexcept {
+    std::lock_guard<std::mutex> lock(this->_commLock);
+    this->_strictTiming = strict;
+}
+
+bool HX711::isStrictTiming() const noexcept {
+    return this->_strictTiming;
+}
+
+void HX711::setFormat(const Format bitFormat) noexcept {
+    std::lock_guard<std::mutex> lock(this->_commLock);
+    this->_bitFormat = bitFormat;
+}
+
+Format HX711::getFormat() const noexcept {
+    return this->_bitFormat;
 }
 
 int HX711::getDataPin() const noexcept {
@@ -407,9 +225,28 @@ int HX711::getClockPin() const noexcept {
     return this->_clockPin;
 }
 
-void HX711::setGain(const Gain gain) {
+Channel HX711::getChannel() const noexcept {
+    return this->_channel;
+}
 
-    const Gain backup = this->_gain;
+Gain HX711::getGain() const noexcept {
+    return this->_gain;
+}
+
+void HX711::setConfig(const Channel c, const Gain g) {
+
+    if(c == Channel::A && g == Gain::GAIN_32) {
+        throw std::invalid_argument("Channel A can only use a gain of 128 or 64");
+    }
+    else if(c == Channel::B && g != Gain::GAIN_32) {
+        throw std::invalid_argument("Channel B can only use a gain of 32");
+    }
+
+    const auto backupChannel = this->_channel;
+    const auto backupGain = this->_gain;
+
+    this->_channel = c;
+    this->_gain = g;
 
     /**
      * If the attempt to set the gain fails, it should
@@ -417,57 +254,63 @@ void HX711::setGain(const Gain gain) {
      */
     try {
 
-        this->_gain = gain;
-        
         /**
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
          */
-        this->_readRawBytes();
+        while(!this->isReady());
+        this->readValue();
 
         /**
-         * "Settling time refers to the time from power up,
-         * reset, input channel change and gain change to 
-         * valid stable output data."
-         * Datasheet pg. 3
+         * If PD_SCK pulse number is changed during
+         * the current conversion period, power down should
+         * be executed after current conversion period is
+         * completed. This is to ensure that the change is
+         * saved. When chip returns back to normal
+         * operation from power down, it will return to the
+         * set up conditions of the last change.
+         * 
+         * Datasheet pg. 5
          */
-        ::lguSleep(0.4);
-        
+        this->powerDown();
+        this->powerUp();
+
     }
     catch(const TimeoutException& e) {
-        this->_gain = backup;
+        this->_channel = backupChannel;
+        this->_gain = backupGain;
         throw;
     }
 
 }
 
-Gain HX711::getGain() const noexcept {
-    return this->_gain;
+Value HX711::readValue() {
+
+    std::int32_t v = 0;
+
+    this->_readBits(&v);
+
+    if(this->_bitFormat == Format::LSB) {
+        v = Utility::reverse(v);
+    }
+
+    return Value(_convertFromTwosComplement(v));
+    
 }
 
-Format HX711::getBitFormat() const noexcept {
-    return this->_bitFormat;
-}
+void HX711::powerDown() {
 
-Format HX711::getByteFormat() const noexcept {
-    return this->_byteFormat;
-}
+    std::lock_guard<std::mutex> lock(this->_commLock);
 
-void HX711::setBitFormat(const Format f) noexcept {
-    this->_bitFormat = f;
-}
-
-void HX711::setByteFormat(const Format f) noexcept {
-    this->_byteFormat = f;
-}
-
-void HX711::powerDown() noexcept {
-
-    std::lock_guard<std::mutex> lock(this->_readLock);
-
-    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
-    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 1);
+    /**
+     * The delay between low to high is probably not necessary, but it
+     * should help to keep the underlying code from optimising it away -
+     * if does at all.
+     */
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
+    Utility::delayus(std::chrono::microseconds(1));
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
 
     /**
      * "When PD_SCK pin changes from low to high
@@ -475,44 +318,24 @@ void HX711::powerDown() noexcept {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    _delayMicroseconds(60);
+    Utility::sleepns(_POWER_DOWN_TIMEOUT);
 
 }
 
 void HX711::powerUp() {
 
-    //TODO: is this actually needed?
-    std::unique_lock<std::mutex> lock(this->_readLock);
+    std::lock_guard<std::mutex> lock(this->_commLock);
 
     /**
      * "When PD_SCK returns to low,
      * chip will reset and enter normal operation mode"
      * Datasheet pg. 5
      */
-    ::lgGpioWrite(this->_gpioHandle, this->_clockPin, 0);
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
 
-    lock.unlock();
-
-    /**
-     * "After a reset or power-down event, input
-     * selection is default to Channel A with a gain of
-     * 128."
-     * Datasheet pg. 5
-     * 
-     * This means the following statement to set the gain
-     * is needed ONLY IF the current gain isn't 128
-     */
-    if(this->_gain != Gain::GAIN_128) {
-        this->setGain(this->_gain);
+    if(this->_rate != Rate::OTHER) {
+        Utility::sleepns(_SETTLING_TIMES.at(this->_rate));
     }
-
-    /**
-     * "Settling time refers to the time from power up,
-     * reset, input channel change and gain change to 
-     * valid stable output data."
-     * Datasheet pg. 3
-     */
-    ::lguSleep(0.4);
 
 }
 

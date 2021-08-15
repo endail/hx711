@@ -20,32 +20,64 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "../include/Mass.h"
 #include <cmath>
-#include <iomanip>
-#include <sstream>
+#include <cstdio>
+#include <ostream>
+#include <string>
 #include <stdexcept>
+#include <unordered_map>
+#include "../include/Mass.h"
 
 namespace HX711 {
 
+const std::unordered_map<const Mass::Unit, const double> Mass::_RATIOS({
+    { Unit::UG,         1.0 },
+    { Unit::MG,         1000.0 },
+    { Unit::G,          1000000.0 },
+    { Unit::KG,         1000000000.0 },
+    { Unit::TON,        1000000000000.0 },
+    { Unit::IMP_TON,    1016046908800.0 },
+    { Unit::US_TON,     907184740000.0 },
+    { Unit::ST,         6350293180.0 },
+    { Unit::LB,         453592370.0 },
+    { Unit::OZ,         28349523.125 }
+});
+
+const std::unordered_map<const Mass::Unit, const char* const> Mass::_UNIT_NAMES({
+    { Unit::UG,         "μg" },
+    { Unit::MG,         "mg" },
+    { Unit::G,          "g" },
+    { Unit::KG,         "kg" },
+    { Unit::TON,        "ton" },
+    { Unit::IMP_TON,    "ton (IMP)" },
+    { Unit::US_TON,     "ton (US)" },
+    { Unit::ST,         "st" },
+    { Unit::LB,         "lb" },
+    { Unit::OZ,         "oz" }
+});
+
 Mass::Mass(const double amount, const Unit u) noexcept
-    :   _g(Mass::convert(amount, u, Unit::G)),
+    :   _ug(convert(amount, u, Unit::UG)),
         _u(u) {
 }
 
 Mass::Mass(const Mass& m2) noexcept 
-    :   _g(m2._g),
+    :   _ug(m2._ug),
         _u(m2._u) {
 }
 
 Mass& Mass::operator=(const Mass& rhs) noexcept {
-    this->_g = rhs._g;
+    this->_ug = rhs._ug;
     this->_u = rhs._u;
     return *this;
 }
 
+Mass::operator double() const noexcept {
+    return this->getValue(this->_u);
+}
+
 double Mass::getValue(Unit u) const noexcept {
-    return Mass::convert(this->_g, Unit::G, u);
+    return convert(this->_ug, Unit::UG, u);
 }
 
 Mass::Unit Mass::getUnit() const noexcept {
@@ -57,71 +89,71 @@ void Mass::setUnit(const Unit u) noexcept {
 }
 
 Mass Mass::convertTo(const Unit to) const noexcept {
-    return Mass(this->_g, to);
+    return Mass(this->_ug, to);
 }
 
 Mass operator+(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
-        lhs._g + rhs._g,
+        lhs._ug + rhs._ug,
         lhs._u
     );
 }
 
 Mass operator-(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
-        lhs._g - rhs._g,
+        lhs._ug - rhs._ug,
         lhs._u
     );
 }
 
 Mass operator*(const Mass& lhs, const Mass& rhs) noexcept {
     return Mass(
-        lhs._g * rhs._g,
+        lhs._ug * rhs._ug,
         lhs._u
     );
 }
 
 Mass operator/(const Mass& lhs, const Mass& rhs) {
     
-    if(rhs._g == 0) {
+    if(rhs._ug == 0) {
         throw std::invalid_argument("cannot divide by 0");
     }
     
     return Mass(
-        lhs._g / rhs._g,
+        lhs._ug / rhs._ug,
         lhs._u
     );
 
 }
 
 Mass& Mass::operator+=(const Mass& rhs) noexcept {
-    this->_g += rhs._g;
+    this->_ug += rhs._ug;
     return *this;
 }
 
 Mass& Mass::operator-=(const Mass& rhs) noexcept {
-    this->_g -= rhs._g;
+    this->_ug -= rhs._ug;
     return *this;
 }
 
 Mass& Mass::operator*=(const Mass& rhs) noexcept {
-    this->_g *= rhs._g;
+    this->_ug *= rhs._ug;
     return *this;
 }
 
 Mass& Mass::operator/=(const Mass& rhs) {
 
-    if(rhs._g == 0) {
+    if(rhs._ug == 0) {
         throw std::invalid_argument("cannot divide by 0");
     }
 
-    this->_g /= rhs._g;
+    this->_ug /= rhs._ug;
     return *this;
 
 }
 
 bool operator==(const Mass& lhs, const Mass& rhs) noexcept {
-    return lhs._g == rhs._g;
+    return lhs._ug == rhs._ug;
 }
 
 bool operator!=(const Mass& lhs, const Mass& rhs) noexcept {
@@ -129,7 +161,7 @@ bool operator!=(const Mass& lhs, const Mass& rhs) noexcept {
 }
 
 bool operator<(const Mass& lhs, const Mass& rhs) noexcept {
-    return lhs._g < rhs._g;
+    return lhs._ug < rhs._ug;
 }
 
 bool operator>(const Mass& lhs, const Mass& rhs) noexcept {
@@ -149,16 +181,11 @@ std::string Mass::toString() const noexcept {
 }
 
 std::string Mass::toString(const Unit u) const noexcept {
-    
-    std::stringstream ss;
 
-    double n; //mass as a double converted to u
-    double i; //integer (discard; don't use)
-    double f; //fractional
-    int d = 0; //decimals
-
-    n = Mass::convert(this->_g, Unit::G, u);
-    f = std::modf(n, &i);
+    const double n = Mass::convert(this->_ug, Unit::UG, u); //mass as double converted to u
+    double i; //integer; don't use
+    const double f = std::modf(n, &i); //fractional
+    int d = 0; //decimal count
 
     /**
      * Credit: https://www.mrexcel.com/board/threads/rounding-to-first-non-zero-decimal.433225/#post-2139493
@@ -176,18 +203,22 @@ std::string Mass::toString(const Unit u) const noexcept {
 
     /**
      * At this point d may be 1 even if the only decimal is 0. I
-     * do not know why this is, but I will leave it instead of 
-     * "fixing" it with string manipulation.
+     * do not know why this is.
      */
 
-    ss  << std::fixed
-        << std::setprecision(d)
-        << std::noshowpoint
-        << n
-        << " "
-        << Mass::_UNIT_NAMES[static_cast<std::size_t>(u)];
-    
-    return ss.str();
+    char buff[_TOSTRING_BUFF_SIZE];
+
+    ::snprintf(
+        buff,
+        _TOSTRING_BUFF_SIZE,
+        "%01.*f %s",
+        d,
+        n,
+        _UNIT_NAMES.at(u));
+
+    //std::string will automatically limit chars to first \0
+    //so no need to trim
+    return std::string(buff);
 
 }
 
@@ -201,42 +232,20 @@ double Mass::convert(
     const Unit from,
     const Unit to) noexcept {
 
-        if(to == Unit::G) {
-            return amount * Mass::_CONVERSIONS[static_cast<std::size_t>(from)];
-        }
-        else if(from == Unit::G) {
-            return amount / Mass::_CONVERSIONS[static_cast<std::size_t>(to)];
+        if(from == to) {
+            return amount;
         }
 
-        return Mass::convert(amount, to, Unit::G);
+        if(to == Unit::UG) {
+            return amount * _RATIOS.at(from);
+        }
+        
+        if(from == Unit::UG) {
+            return amount / _RATIOS.at(to);
+        }
+
+        return convert(amount, to, Unit::UG);
 
 }
-
-// ratios of units to g
-const double Mass::_CONVERSIONS[10] = {
-    1e-6,           //ug
-    0.001,          //mg
-    1.0,            //g
-    1000.0,         //kg
-    1e+6,           //ton
-    1.016e+6,       //ton (IMP)
-    907185,         //ton (US)
-    6350.29,        //st
-    535.592,        //lb
-    28.3495         //oz
-};
-
-const char* const Mass::_UNIT_NAMES[] = {
-    "μg",
-    "mg",
-    "g",
-    "kg",
-    "ton",
-    "ton (IMP)",
-    "ton (US)",
-    "st",
-    "lb",
-    "oz"
-};
 
 };

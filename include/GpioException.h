@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2021 Daniel Robertson
+// Copyright (c) 2020 Daniel Robertson
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
-#define HX711_SIMPLEHX711_H_F776CAA5_D3AE_46D8_BD65_F4B3CD8E1DBA
+#ifndef HX711_GPIOEXCEPTION_H_895614C3_EF94_4A60_92EC_BA629230B29A
+#define HX711_GPIOEXCEPTION_H_895614C3_EF94_4A60_92EC_BA629230B29A
 
-#include <cstdint>
-#include <vector>
-#include "AbstractScale.h"
-#include "HX711.h"
-#include "Value.h"
+#include <stdexcept>
 
 namespace HX711 {
-class SimpleHX711 : public AbstractScale, public HX711 {
+class GpioException : public std::runtime_error {
 public:
-
-    SimpleHX711(
-        const int dataPin,
-        const int clockPin,
-        const Value refUnit = 1,
-        const Value offset = 0,
-        const Rate rate = Rate::HZ_10);
-
-    virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
-    virtual std::vector<Value> getValues(const std::size_t samples) override;
-
+    explicit GpioException(const char* what_arg)
+        : std::runtime_error(what_arg) { }
 };
 };
 #endif
