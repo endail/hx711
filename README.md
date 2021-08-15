@@ -167,7 +167,7 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
-- `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` will be thrown if the given channel and gain are incompatible. See the datasheet for more information.
+- `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` will be thrown if the given channel and gain are incompatible. Channel A may be set to a gain of 64 or 128. Channel B may only use a gain of 32. Please see the datasheet for more information.
 
 ---
 
