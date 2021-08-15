@@ -67,12 +67,13 @@ int main() {
 
 int main() {
 
+  using namespace HX711;
   using std::chrono::seconds;
 
   // create an AdvancedHX711 object using GPIO pin 2 as the data pin,
   // GPIO pin 3 as the clock pin, -370 as the reference unit, -367471
   // as the offset, and indicate that the chip is operating at 80Hz
-  HX711::AdvancedHX711 hx(2, 3, -370, -367471, Rate::HZ_80);
+  AdvancedHX711 hx(2, 3, -370, -367471, Rate::HZ_80);
 
   // constantly output weights using the median of all samples
   // obtained within 1 second
