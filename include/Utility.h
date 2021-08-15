@@ -63,14 +63,12 @@ public:
      * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
      */
     static void sleepns(const std::chrono::nanoseconds ns) noexcept;
-    //static void delayns(const std::chrono::nanoseconds ns) noexcept;
     static void delayus(const std::chrono::microseconds us) noexcept;
     static void delayns(const std::chrono::nanoseconds ns) noexcept;
     static std::chrono::nanoseconds getnanos() noexcept;
 
     static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts) noexcept;
 
-    //Taken from https://github.com/openbsd/src/blob/master/sys/sys/time.h#L84
     static void timespecclear(timespec* const tsp) noexcept;
     static bool timespecisset(const timespec* const tsp) noexcept;
     static bool timespecisvalid(const timespec* const tsp) noexcept;

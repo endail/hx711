@@ -4,7 +4,7 @@
 
 - Use with Raspberry Pi
 - Requires [lgpio](http://abyz.me.uk/lg/index.html)
-- Developed and tested with a Raspberry Pi Zero W
+- Developed and tested with a Raspberry Pi Zero W (should work on other Pis)
 
 ## Sample Output from Test Code
 
@@ -12,7 +12,23 @@ See: [`src/SimpleHX711Test.cpp`](src/SimpleHX711Test.cpp)
 
 ![hx711.gif](resources/hx711.gif)
 
-The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is the median of three samples from the sensor.
+The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is the median of three samples from the sensor. Also note the automatic formatting of the floating point numbers.
+
+## Build and Install
+
+```console
+pi@raspberrypi:~ $ git clone https://github.com/endail/hx711
+pi@raspberrypi:~ $ cd hx711
+pi@raspberrypi:~/hx711 $ make && sudo make install
+```
+
+## Use
+
+After writing your own code (eg. main.cpp), compile and link with the HX711 and lgpio libraries as follows:
+
+```console
+pi@raspberrypi:~ $ g++ -Wall -o prog main.cpp -lhx711 -llgpio
+```
 
 ## Examples
 
@@ -29,7 +45,7 @@ int main() {
   // create a SimpleHX711 object using GPIO pin 2 as the data pin,
   // GPIO pin 3 as the clock pin, -370 as the reference unit, and
   // -367471 as the offset
-  SimpleHX711 hx(2, 3);
+  SimpleHX711 hx(2, 3, -370, -367471);
 
   // set the scale to output weights in ounces
   hx.setUnit(Mass::Unit::OZ);
@@ -65,6 +81,38 @@ int main() {
   return 0;
 
 }
+```
+
+## Calibrate
+
+`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Arguments are as follows:
+
+- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
+
+- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
+
+Example using GPIO pin 2 for data and GPIO pin 3 for clock.
+
+```console
+pi@raspberrypi:~/hx711 $ bin/hx711calibration 2 3
+```
+
+## Test
+
+`make` will create the executables `bin/simplehx711test` and `bin/advancedhx711test` in the project directory. You can use these programs to test your load cell and HX711 module. Arguments are as follows:
+
+- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
+
+- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
+
+- **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
+
+- **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
+
+Example using GPIO pin 2 for data, GPIO pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
+
+```console
+pi@raspberrypi:~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 ```
 
 ## Documentation
@@ -195,51 +243,3 @@ With that said, if you are looking for a simple but effective method to filter m
 - `sudo make uninstall` from the project directory to remove the library
 
 - If you are looking for a version of this library which uses wiringPi rather than lgpio, [v1.1 is available](https://github.com/endail/hx711/releases/tag/1.1). However, given that [wiringPi is deprecated](http://wiringpi.com/wiringpi-deprecated/), I have chosen to use lgpio going forward.
-
-## Build and Install
-
-```console
-pi@raspberrypi:~ $ git clone https://github.com/endail/hx711
-pi@raspberrypi:~ $ cd hx711
-pi@raspberrypi:~/hx711 $ make && sudo make install
-```
-
-## Calibrate
-
-`make` will create the executable `bin/hx711calibration` in the project directory. You can use this to calibrate your load cell and HX711 chip. Arguments are as follows:
-
-- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
-
-- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
-
-Example using GPIO pin 2 for data and GPIO pin 3 for clock.
-
-```console
-pi@raspberrypi:~/hx711 $ bin/hx711calibration 2 3
-```
-
-## Test
-
-`make` will create the executables `bin/simplehx711test` and `bin/advancedhx711test` in the project directory. You can use these programs to test your load cell and HX711 module. Arguments are as follows:
-
-- **data pin**: Raspberry Pi pin which connects to the HX711 chip's data pin.
-
-- **clock pin**: Raspberry Pi pin which connects to the HX711 chip's clock pin.
-
-- **reference unit**: load cell's reference unit. Find this value with the calibration program above, otherwise set it to 1.
-
-- **offset**: load cell's offset from zero. Find this value with the calibration program above, otherwise set it to 0.
-
-Example using GPIO pin 2 for data, GPIO pin 3 for clock, -377 as the reference unit, and -363712 as the offset:
-
-```console
-pi@raspberrypi:~/hx711 $ bin/simplehx711test 2 3 -377 -363712
-```
-
-## Use
-
-After writing your own code (eg. main.cpp), compile and link with the HX711 and lgpio libraries as follows:
-
-```console
-pi@raspberrypi:~ $ g++ -Wall -o prog main.cpp -lhx711 -llgpio
-```
