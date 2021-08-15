@@ -8,11 +8,11 @@
 
 ## Sample Output from Test Code
 
-See: [`src/SimpleHX711Test.cpp`](src/SimpleHX711Test.cpp)
+See: [src/SimpleHX711Test.cpp](src/SimpleHX711Test.cpp)
 
 ![hx711.gif](resources/hx711.gif)
 
-The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is the median of three samples from the sensor. Also note the automatic formatting of the floating point numbers.
+The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the [code](src/SimpleHX711Test.cpp) that the value being used is the median of three samples from the sensor. Also note the automatic formatting of the floating point numbers.
 
 ## Build and Install
 
