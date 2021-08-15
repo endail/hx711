@@ -337,6 +337,14 @@ void HX711::powerUp() {
         Utility::sleepns(_SETTLING_TIMES.at(this->_rate));
     }
 
+    /**
+     * "Settling time refers to the time from power up,
+     * reset, input channel change and gain change to 
+     * valid stable output data."
+     * Datasheet pg. 3
+     */
+    ::lguSleep(0.4);
+
 }
 
 };
