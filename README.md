@@ -180,6 +180,12 @@ Mass m(1.03, Mass::Unit::KG);
 std::cout << m; //1.03 kg
 ```
 
+### Filtering
+
+It is possible that the HX711 chip will return - or the code will read - an invalid value or "noise". I have opted not to filter these values in this library and instead leave them up to the individual developer on how best to go about doing so for their individual application.
+
+With that said, if you are looking for a simple but effective method to filter momentary noise, I highly recommend taking the median of at least three samples from the sensor. The [SimpleHX711Test.cpp code](src/SimpleHX711Test.cpp) does this and can be seen in the .gif above.
+
 ### Other Notes
 
 - All HX711 library code exists within the `HX711` namespace
