@@ -12,7 +12,7 @@ See: [`src/SimpleHX711Test.cpp`](src/SimpleHX711Test.cpp)
 
 ![hx711.gif](resources/hx711.gif)
 
-The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is [the median of five samples](src/SimpleHX711Test.cpp#L50) from the sensor.
+The .gif above illustrates the output of the test code where I applied pressure to the load cell. The HX711 chip was operating at 80Hz. However, note from the code that the value being used is the median of three samples from the sensor.
 
 ## Examples
 
@@ -53,6 +53,9 @@ int main() {
 
   using std::chrono::seconds;
 
+  // create an AdvancedHX711 object using GPIO pin 2 as the data pin,
+  // GPIO pin 3 as the clock pin, -370 as the reference unit, -367471
+  // as the offset, and indicate that the chip is operating at 80Hz
   HX711::AdvancedHX711 hx(2, 3, -370, -367471, Rate::HZ_80);
 
   // constantly output weights using the median of all samples
