@@ -28,7 +28,8 @@ jobs:
     - name: Clone lgpio
       uses: actions/checkout@v2
       with:
-        repository: 'joan2937/lg'
+          repository: 'joan2937/lg'
+          ref: '9ebaf583b8647d5531a6d2d797cb27d4aefb6d1a'
 
     - name: Build and Install lgpio
       run: |
