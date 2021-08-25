@@ -183,7 +183,7 @@ std::string Mass::toString() const noexcept {
 std::string Mass::toString(const Unit u) const noexcept {
 
     const double n = Mass::convert(this->_ug, Unit::UG, u); //mass as double converted to u
-    double i; //integer; don't use
+    double i; //integer leftover from modf; don't use
     const double f = std::modf(n, &i); //fractional
     int d = 0; //decimal count
 

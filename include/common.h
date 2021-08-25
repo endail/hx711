@@ -22,7 +22,6 @@
 
 #include "AbstractScale.h"
 #include "AdvancedHX711.h"
-// #include "Discovery.h"
 #include "GpioException.h"
 #include "HX711.h"
 #include "IntegrityException.h"

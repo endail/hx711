@@ -73,7 +73,7 @@ unsigned char HX711::_calculatePulses(const Gain g) noexcept {
 
 void HX711::_setInputGainSelection() {
 
-    const unsigned char pulses = _calculatePulses(this->_gain);
+    const auto pulses = _calculatePulses(this->_gain);
 
     for(unsigned char i = 0; i < pulses; ++i) {
         this->_readBit();

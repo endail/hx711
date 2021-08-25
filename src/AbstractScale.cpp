@@ -124,8 +124,8 @@ double AbstractScale::read(const Options o) {
 
 void AbstractScale::zero(const Options o) {
 
-    const Value refBackup = this->_refUnit;
-    const Value offsetBackup = this->_offset;
+    const auto refBackup = this->_refUnit;
+    const auto offsetBackup = this->_offset;
 
     try {
         this->setReferenceUnit(1);

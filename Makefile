@@ -33,6 +33,7 @@ CFLAGS :=	-O2 \
 			-fomit-frame-pointer \
 			-pipe \
 			-Wall \
+			-fstack-clash-protection \
 			-Wfatal-errors \
 			-Werror=format-security \
 			-Wl,-z,relro \
@@ -43,7 +44,6 @@ CFLAGS :=	-O2 \
 			-D_FORTIFY_SOURCE=2 \
 			-DNDEBUG=1
 
-# 			-fstack-clash-protection \
 ########################################################################
 
 # https://stackoverflow.com/a/39895302/570787
@@ -83,7 +83,7 @@ endif
 
 ifeq ($(IS_GHA),1)
 # gha needs these additional libs
-	LIBS := $(LIBS) -lrt -lcrypt -pthread
+	LIBS := $(LIBS) -lrt -lcrypt
 endif
 
 CXXFLAGS :=		-std=c++11 \
@@ -225,10 +225,8 @@ install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
 	install -d $(DESTDIR)$(PREFIX)/include/hx711
 	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
-#	ldconfig $(DESTDIR)$(PREFIX)/lib
 
 .PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/lib/libhx711.*
 	rm -rf $(DESTDIR)$(PREFIX)/include/hx711
-#	ldconfig $(DESTDIR)$(PREFIX)/lib
