@@ -5,6 +5,7 @@
 - Use with Raspberry Pi
 - Requires [lgpio](http://abyz.me.uk/lg/index.html)
 - Developed and tested with a Raspberry Pi Zero W (should work on other Pis)
+- Looking for a Python alternative? [Try here](https://github.com/endail/hx711-rpi-py).
 
 ## Sample Output from Test Code
 
