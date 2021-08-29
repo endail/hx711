@@ -24,7 +24,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-#include <thread>
 #include <chrono>
 #include <string>
 
@@ -37,11 +36,6 @@ double knownWeight;
 Value zeroValue;
 SimpleHX711* hx;
 
-void setupHx(const int dataPin, const int clockPin) {
-    hx = new SimpleHX711(dataPin, clockPin, 1, 0);
-    this_thread::sleep_for(chrono::seconds(1));
-}
-
 int main(int argc, char** argv) {
 
     if(argc != 3) {
@@ -50,10 +44,14 @@ int main(int argc, char** argv) {
     }
 
     try {
-        setupHx(stoi(argv[1]), stoi(argv[2]));
+        hx = new SimpleHX711(stoi(argv[1]), stoi(argv[2]), 1, 0);
     }
-    catch(HX711::TimeoutException& e) {
-        cout << "Failed to connect to HX711 module" << endl;
+    catch(const GpioException& ex) {
+        cerr << "Failed to connect to HX711 chip" << endl;
+        return EXIT_FAILURE;
+    }
+    catch(const TimeoutException& ex) {
+        cerr << "Failed to connect to HX711 chip" << endl;
         return EXIT_FAILURE;
     }
 
@@ -84,7 +82,7 @@ int main(int argc, char** argv) {
 
     //samples prompt
     cout    << endl
-            << "3. Enter the number of samples to take from the HX711 module (eg. 15): ";
+            << "3. Enter the number of samples to take from the HX711 chip (eg. 15): ";
     cin >> samples;
     cin.ignore();
 
@@ -112,13 +110,19 @@ int main(int argc, char** argv) {
             << "-> REFERENCE UNIT: " << refUnit << endl
             << "-> ZERO VALUE: " << zeroValue << endl
             << endl
-            << "Use the reference unit value above to set the HX711 module's "
-            << "reference unit. ie. using hx.setReferenceUnit()."
+            << "You can provide these values to the constructor when you create the "
+            << "HX711 objects or later on. For example: " << endl
             << endl
-            << "Use the zero value above to set the zero value of the scale "
-            << "using hx.setOffset(). You won't need to tare the scale if you use "
-            << "this."
-            << endl << endl;
+            << "SimpleHX711 hx("
+            << argv[1] << ", " << argv[2] << ", " << refUnit << ", " << zeroValue
+            << ");" << endl
+            << "OR" << endl
+            << "hx.setReferenceUnit("
+            << refUnit
+            << "); and hx.setOffset("
+            << zeroValue
+            << ");" << endl
+            << endl;
 
     return EXIT_SUCCESS;
 
