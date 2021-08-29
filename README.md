@@ -183,9 +183,13 @@ The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking 
 
 - `Value getOffset()` and `void setOffset( Value offset )`. Offset from zero. See calibration program.
 
-- `double normalise( double v )`. Given a raw value from HX711, returns a "normalised" value according to the scale's reference unit and offset.
+- `double normalise( double v )`. Given a raw value from HX711, returns a "normalised" value adjusted according to the scale's reference unit and offset.
 
-- `double read( Options o = Options() )`. Obtains values from the HX711 according to given `Options`. You should call this method if you want to deal with the numeric values from the scale rather than `.weight()` which returns the numeric value as a `Mass` object.
+- `std::vector<Value> getValues( std::size_t samples )`. Returns a vector of `samples` number of raw `Value`s from the HX711 chip. You should use this method if you want to deal with raw, numeric values which have not been adjusted for weighing functions.
+
+- `std::vector<Value> getValues( std::chrono::nanoseconds timeout )`. Returns a vector of raw `Value`s obtained from the HX711 chip within `timeout`. You should use this method if you want to deal with raw, numeric values which have not been adjusted for weighing functions.
+
+- `double read( Options o = Options() )`. Returns a numeric value from the scale according to the given `Options`. The returned value has **not** been adjusted with .`normalise()`. You should use this method if you want to deal with a **single** numeric value which has not been adjusted for weighing functions.
 
 - `void zero( Options o = Options() )`. Zeros the scale.
 
@@ -245,3 +249,19 @@ With that said, if you are looking for a simple but effective method to filter m
 - `sudo make uninstall` from the project directory to remove the library
 
 - If you are looking for a version of this library which uses wiringPi rather than lgpio, [v1.1 is available](https://github.com/endail/hx711/releases/tag/1.1). However, given that [wiringPi is deprecated](http://wiringpi.com/wiringpi-deprecated/), I have chosen to use lgpio going forward.
+
+### FAQ
+
+***"I just want to get some raw numbers from the scale".***
+
+There are a few different methods for this.
+
+1. `getValues( std::size_t samples )` and `getValues( std::chrono::nanoseconds timeout )` are both accessible from `SimpleHX711` and `AdvancedHX711` and return an `std::vector<Value>` containing raw, unadjusted values from the HX711 chip. You should use this.
+
+2. `double read( Options o = Options() )` is accessible from `SimpleHX711` and `AdvancedHX711`. The difference between `.read()` and `.getValues()` is that `.read()` takes an optional `Options` argument to filter and return a **single** value. For example, by finding the average or median.
+
+3. `HX711::readValue` is essentially what `.getValues()` uses. But calling `readValue()` does not check whether the HX711 chip is ready for a value to be read. Using this on its own will produce unreliable results.
+
+***"What's the difference between `SimpleHX711` and `AdvancedHX711`?***
+
+`AdvancedHX711` uses a separate thread of execution to watch for and collect values from the HX711 chip when they are ready. It aims to be as efficient as possible. I recommend using `AdvancedHX711` when you are obtaining a large number of samples.

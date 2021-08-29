@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <mutex>
 #include <stdexcept>
-#include <time.h>
 #include <unordered_map>
 #include <utility>
 #include "../include/GpioException.h"
