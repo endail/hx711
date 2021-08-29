@@ -100,8 +100,12 @@ int main(int argc, char** argv) {
 
     const double raw = hx->read(Options(samples));
     const double refUnitFloat = (raw - zeroValue) / knownWeight;
-    const Value refUnit = static_cast<Value>(round(refUnitFloat));
+    Value refUnit = static_cast<Value>(round(refUnitFloat));
     delete hx;
+
+    if(refUnit == 0) {
+        refUnit = 1;
+    }
 
     cout    << endl << endl
             << "Known weight (your object): " << knownWeight << unit << endl 
