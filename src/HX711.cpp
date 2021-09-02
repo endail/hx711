@@ -118,7 +118,7 @@ bool HX711::_readBit() const {
     //execution of the code is in comparison. For that reason, the
     //delay below is an optional flag
     if(this->_useDelays) {
-        Utility::delayns(std::max(_T2, _T3));
+        Utility::delay(std::max(_T2, _T3));
     }
 
     //at this stage, DOUT is ready and the clock pin has been held
@@ -147,7 +147,7 @@ bool HX711::_readBit() const {
     //following delay is probably not going to matter and is therefore
     //optional
     if(this->_useDelays) {
-        Utility::delayns(_T4);
+        Utility::delay(_T4);
     }
 
     return bit;
@@ -163,7 +163,7 @@ void HX711::_readBits(std::int32_t* const v) {
     //mentioned above, the following delay is probably not going to
     //matter and is therefore optional
     if(this->_useDelays) {
-        Utility::delayns(_T1);
+        Utility::delay(_T1);
     }
 
     //msb first
