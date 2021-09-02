@@ -273,18 +273,18 @@ std::cout << m; //1.03 kg
 
 The following `Mass::Unit`s are supported:
 
-| identifier            | description   |
-| --------------------- | --------------|
-| `Mass::Unit::UG`      | micrograms    |
-| `Mass::Unit::MG`      | milligrams    |
-| `Mass::Unit::G`       | grams         |
-| `Mass::Unit::KG`      | kilograms     |
-| `Mass::Unit::TON`     | metric tons   |
-| `Mass::Unit::IMP_TON` | imperial tons |
-| `Mass::Unit::US_TON`  | US tons       |
-| `Mass::Unit::ST`      | stones        |
-| `Mass::Unit::LB`      | pounds        |
-| `Mass::Unit::OZ`      | ounces        |
+| identifier            | description   | toString suffix |
+| --------------------- | --------------| --------------- |
+| `Mass::Unit::UG`      | micrograms    | μg              |
+| `Mass::Unit::MG`      | milligrams    | mg              |
+| `Mass::Unit::G`       | grams         | g               |
+| `Mass::Unit::KG`      | kilograms     | kg              |
+| `Mass::Unit::TON`     | metric tons   | ton             |
+| `Mass::Unit::IMP_TON` | imperial tons | ton (IMP)       |
+| `Mass::Unit::US_TON`  | US tons       | ton (US)        |
+| `Mass::Unit::ST`      | stones        | st              |
+| `Mass::Unit::LB`      | pounds        | lb              |
+| `Mass::Unit::OZ`      | ounces        | oz              |
 
 ### Noise
 
