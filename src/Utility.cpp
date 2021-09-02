@@ -73,11 +73,13 @@ void Utility::writeGpio(const int handle, const int pin, const GpioLevel lev) {
     _throwGpioExIfErr(::lgGpioWrite(handle, pin, static_cast<int>(lev)));
 }
 
-void Utility::sleepns(const std::chrono::nanoseconds ns) noexcept {
+void Utility::sleep(const std::chrono::nanoseconds ns) noexcept {
     std::this_thread::sleep_for(ns);
 }
 
-void Utility::delayus(const std::chrono::microseconds us) noexcept {
+void Utility::delay(const std::chrono::nanoseconds ns) noexcept {
+
+    using namespace std::chrono;
 
     /**
      * This requires some explanation.
@@ -107,38 +109,7 @@ void Utility::delayus(const std::chrono::microseconds us) noexcept {
      * In short, use this function for delays under 100us.
      */
 
-    using std::chrono::microseconds;
-
     /**
-     * TODO: Can we do a min check here for uselessness?
-     * ie. what is the overhead of calling this function with 0us delay?
-     */
-
-    struct timeval tNow;
-    struct timeval tLong;
-    struct timeval tEnd;
-
-    tLong.tv_sec = us.count() / microseconds::period::den;
-    tLong.tv_usec = us.count() % microseconds::period::den;
-
-    ::gettimeofday(&tNow, nullptr);
-    timeradd(&tNow, &tLong, &tEnd);
-
-    //cppcheck-suppress syntaxError
-    while(timercmp(&tNow, &tEnd, <)) {
-        ::gettimeofday(&tNow, nullptr);
-    }
-
-}
-
-void Utility::delayns(const std::chrono::nanoseconds ns) noexcept {
-
-    using namespace std::chrono;
-
-    /**
-     * TODO: figure out if this function performs better than
-     * delayns.
-     * 
      * TODO: figure out the overhead in calling this function
      */
 

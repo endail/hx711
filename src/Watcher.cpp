@@ -108,7 +108,7 @@ void* Watcher::_watchPin(void* const watcherPtr) {
             if(!self->_hx->isReady()) {
                 stateLock.unlock();
                 ::sched_yield();
-                Utility::delayns(self->_notReadySleep);
+                Utility::delay(self->_notReadySleep);
                 continue;
             }
 
@@ -160,7 +160,7 @@ void* Watcher::_watchPin(void* const watcherPtr) {
 
             //finally, sleep for a reasonable amount of time
             //to go through the process again
-            Utility::sleepns(self->_pollSleep);
+            Utility::sleep(self->_pollSleep);
             continue;
 
 
@@ -169,7 +169,7 @@ void* Watcher::_watchPin(void* const watcherPtr) {
             //documentation recommends sched_yield over pthread_yield
             //https://man7.org/linux/man-pages/man3/pthread_yield.3.html#CONFORMING_TO
             ::sched_yield();
-            Utility::sleepns(self->_pauseSleep);
+            Utility::sleep(self->_pauseSleep);
             continue;
             
 

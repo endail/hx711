@@ -117,7 +117,7 @@ bool HX711::_readBit() const {
     //due to how miniscule the amount of time is and how slow the
     //execution of the code is in comparison. For that reason, the
     //delay below is excluded
-    //Utility::delayns(std::max(_T2, _T3));
+    //Utility::delay(std::max(_T2, _T3));
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
@@ -145,7 +145,7 @@ bool HX711::_readBit() const {
     //delay. But, as for the reasons previously mentioned above, the
     //following delay is probably not going to matter and is therefore
     //excluded.
-    //Utility::delayns(_T4);
+    //Utility::delay(_T4);
 
     return bit;
 
@@ -159,7 +159,7 @@ void HX711::_readBits(std::int32_t* const v) {
     //initial clock pin change. But, as for the reasons previously
     //mentioned above, the following delay is probably not going to
     //matter and is therefore excluded.
-    //Utility::delayns(_T1);
+    //Utility::delay(_T1);
 
     //msb first
     for(unsigned char i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
@@ -308,7 +308,7 @@ void HX711::powerDown() {
      * if does at all.
      */
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-    Utility::delayus(std::chrono::microseconds(1));
+    Utility::delay(std::chrono::microseconds(1));
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
 
     /**
@@ -317,7 +317,7 @@ void HX711::powerDown() {
      * enters power down mode (Fig.3)."
      * Datasheet pg. 5
      */
-    Utility::sleepns(_POWER_DOWN_TIMEOUT);
+    Utility::sleep(_POWER_DOWN_TIMEOUT);
 
 }
 
@@ -333,7 +333,7 @@ void HX711::powerUp() {
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
 
     if(this->_rate != Rate::OTHER) {
-        Utility::sleepns(_SETTLING_TIMES.at(this->_rate));
+        Utility::sleep(_SETTLING_TIMES.at(this->_rate));
     }
 
 }

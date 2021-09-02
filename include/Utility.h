@@ -58,13 +58,13 @@ public:
     static void writeGpio(const int handle, const int pin, const GpioLevel lev);
 
     /**
-     * Sleep for ns nanoseconds. The _sleepns/_delayns functions are
+     * Sleep for ns nanoseconds. The _sleep/_delay functions are
      * an attempt to be analogous to usleep/udelay in the kernel.
      * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
      */
-    static void sleepns(const std::chrono::nanoseconds ns) noexcept;
-    static void delayus(const std::chrono::microseconds us) noexcept;
-    static void delayns(const std::chrono::nanoseconds ns) noexcept;
+    static void sleep(const std::chrono::nanoseconds ns) noexcept;
+    static void delay(const std::chrono::nanoseconds ns) noexcept;
+
     static std::chrono::nanoseconds getnanos() noexcept;
 
     static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts) noexcept;
