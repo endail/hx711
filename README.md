@@ -174,17 +174,33 @@ pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
 
 ### [HX711](include/HX711.h)
 
-`SimpleHX711` and `AdvancedHX711` both inherit from the `HX711` class and provide these additional functions.
+`SimpleHX711` and `AdvancedHX711` both inherit from the `HX711` class and provides these additional functions.
 
-- `void powerUp()`
-
-- `void powerDown()`
+- `bool isReady( )`. Returns true if the HX711 chip has data ready to be retrieved.
 
 - `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS (such as Raspbian on a Raspberry Pi), this in itself is unreliable and therefore disabled by default. Use at your own risk.
 
+- `bool isStrictTiming( )`. Returns true if strict timing is used.
+
 - `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
+- `Format getFormat( )`. Returns the `Format` currently being used.
+
+- `int getDataPin( )`. Returns the GPIO pin number connected to the HX711's data pin (DOUT).
+
+- `int getClockPin( )`. Returns the GPIO pin number connected to the HX711's clock pin (PD_SCK).
+
+- `Channel getChannel( )`. Returns the `Channel` being used when reading from the HX711 chip.
+
+- `Gain getGain( )`. Returns the `Gain` being used when reading from the HX711 chip.
+
 - `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` will be thrown if the given channel and gain are incompatible. Channel A may be set to a gain of 64 or 128. Channel B may only use a gain of 32. Please see the datasheet for more information.
+
+- `Value readValue( )`. Reads a value from the HX711 chip. You should generally **not** use this method. If you do, you must check whether the HX711 has data ready to be read (see: `.isReady( )`).
+
+- `void powerDown()`
+
+- `void powerUp()`
 
 ---
 
@@ -248,6 +264,21 @@ You will notice in the functions above there is an `Options` parameter. This det
 Mass m(1.03, Mass::Unit::KG);
 std::cout << m; //1.03 kg
 ```
+
+The following `Mass::Unit`s are supported:
+
+| identifier            | description   |
+| --------------------- | --------------|
+| `Mass::Unit::UG`      | micrograms    |
+| `Mass::Unit::MG`      | milligrams    |
+| `Mass::Unit::G`       | grams         |
+| `Mass::Unit::KG`      | kilograms     |
+| `Mass::Unit::TON`     | metric tons   |
+| `Mass::Unit::IMP_TON` | imperial tons |
+| `Mass::Unit::US_TON`  | US tons       |
+| `Mass::Unit::ST`      | stones        |
+| `Mass::Unit::LB`      | pounds        |
+| `Mass::Unit::OZ`      | ounces        |
 
 ### Noise
 

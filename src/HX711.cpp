@@ -80,28 +80,6 @@ void HX711::_setInputGainSelection() {
 
 }
 
-bool HX711::isReady() const {
-
-    /**
-     * HX711 will be "ready" when DOUT is low.
-     * "Ready" means "data is ready for retrieval".
-     * Datasheet pg. 4
-     * 
-     * This should be a one-shot test. Any follow-ups
-     * or looping for checking if the sensor is ready
-     * over time can/should be done by other calling code
-     */
-    try {
-        return Utility::readGpio(
-            this->_gpioHandle,
-            this->_dataPin) == GpioLevel::LOW;
-    }
-    catch(const GpioException& ex) {
-        return false;
-    }
-
-}
-
 bool HX711::_readBit() const {
 
     //first, clock pin is set high to make DOUT ready to be read from
@@ -280,6 +258,28 @@ void HX711::setConfig(const Channel c, const Gain g) {
         this->_channel = backupChannel;
         this->_gain = backupGain;
         throw;
+    }
+
+}
+
+bool HX711::isReady() const {
+
+    /**
+     * HX711 will be "ready" when DOUT is low.
+     * "Ready" means "data is ready for retrieval".
+     * Datasheet pg. 4
+     * 
+     * This should be a one-shot test. Any follow-ups
+     * or looping for checking if the sensor is ready
+     * over time can/should be done by other calling code
+     */
+    try {
+        return Utility::readGpio(
+            this->_gpioHandle,
+            this->_dataPin) == GpioLevel::LOW;
+    }
+    catch(const GpioException& ex) {
+        return false;
     }
 
 }
