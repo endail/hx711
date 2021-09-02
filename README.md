@@ -182,6 +182,8 @@ pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
 
 - `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS (such as Raspbian on a Raspberry Pi), this in itself is unreliable and therefore disabled by default. Use at your own risk.
 
+- `void useDelays( bool use )`. If true, _very_ short delays will be used during the period during which bits are read from the HX711 chip. These delays conform to the datasheet's specifications. On a Raspberry Pi, using delays is not likely to be useful unless, for some reason, the CPU is _too_ fast. For that reason, the default is not to use them.
+
 - `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
 - `void setConfig( Channel c = Channel::A, Gain g = Gain::GAIN_128 )`. Changes the channel and gain of the HX711 chip. An `std::invalid_argument` will be thrown if the given channel and gain are incompatible. Channel A may be set to a gain of 64 or 128. Channel B may only use a gain of 32. Please see the datasheet for more information.
