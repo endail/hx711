@@ -61,22 +61,28 @@ std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeo
     std::vector<Value> vals;
     const auto endTime = high_resolution_clock::now() + timeout;
 
-    while(high_resolution_clock::now() < endTime) {
+    while(true) {
 
-        while(this->_wx->values.empty()) {
-            std::this_thread::yield();
-            Utility::sleep(milliseconds(1));
+        if(high_resolution_clock::now() >= endtime) {
+            return vals;
         }
 
-        this->_wx->valuesLock.lock();
-        while(!this->_wx->values.empty()) {
-            vals.push_back(this->_wx->values.pop());
+        if(!this->_wx->values.empty()) {
+
+            this->_wx->valuesLock.lock();
+            while(!this->_wx->values.empty()) {
+                vals.push_back(this->_wx->values.pop());
+            }
+            this->_wx->valuesLock.unlock();
+
+            continue;
+
         }
-        this->_wx->valuesLock.unlock();
+
+        std::this_thread::yield();
+        Utility::sleep(milliseconds(1));
 
     }
-
-    return vals;
 
 }
 
