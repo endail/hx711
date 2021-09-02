@@ -49,12 +49,17 @@ std::vector<Value> SimpleHX711::getValues(const std::chrono::nanoseconds timeout
     std::vector<Value> vals;
     const auto endTime = high_resolution_clock::now() + timeout;
 
-    while(high_resolution_clock::now() < endTime) {
-        while(!this->isReady());
-        vals.push_back(this->readValue());
-    }
+    while(true) {
 
-    return vals;
+        if(high_resolution_clock::now() >= endTime) {
+            return vals;
+        }
+
+        if(this->isReady()) {
+            vals.push_back(this->readValue());
+        }
+
+    }
 
 }
 
