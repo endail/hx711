@@ -117,6 +117,12 @@ Example using GPIO pin 2 for data, GPIO pin 3 for clock, -377 as the reference u
 pi@raspberrypi:~/hx711 $ bin/simplehx711test 2 3 -377 -363712
 ```
 
+Same example, except running as root using `sudo` with the `AdvancedHX711` to use real-time scheduling. More information about this is avaliable below.
+
+```console
+pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
+```
+
 ## Documentation
 
 ### Datasheet
