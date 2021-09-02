@@ -153,7 +153,22 @@ As the name implies, this is a simple interface to the HX711 chip. Its core oper
 
 Arguments are identical to `SimpleHX711`.
 
-The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect available data when it is available.
+The `AdvancedHX711` is an effort to minimise the time spent by the CPU checking whether data is ready to be obtained from the HX711 module while remaining as efficient as possible. Its core operation, in contrast to `SimpleHX711`, is through the use of a separate thread of execution to intermittently watch for and collect data when it is available.
+
+Additionally, the thread watching for and collecting data will alter its own CPU scheduling priority accordingly if it has permission to. In practice, this means that if executed with `sudo`, the thread will run in "[real-time](https://man7.org/linux/man-pages/man7/sched.7.html)". You will note that from running `htop` simultaneously with the advancedhx711test program there is an entry for the watching thread with its priority set to RT (real-time). For example:
+
+```console
+pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
+```
+
+```console
+  CPU[|||||||||||||                     30.6%]   Tasks: 34, 10 thr; 1 running
+  Mem[|||||||||||||||||            39.4M/478M]   Load average: 0.77 0.53 0.27
+  Swp[                              0K/100.0M]   Uptime: 1 day, 01:55:01
+
+  PID USER      PRI  NI  VIRT   RES   SHR S CPU% MEM%   TIME+  Command
+ 1851 root       RT   0 30908  3012  2784 S 22.4  0.6  0:01.06 bin/advancedhx711test 2 3 -377 -363712
+```
 
 ---
 
