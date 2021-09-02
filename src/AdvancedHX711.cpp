@@ -63,7 +63,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeo
 
     while(true) {
 
-        if(high_resolution_clock::now() >= endtime) {
+        if(high_resolution_clock::now() >= endTime) {
             return vals;
         }
 
