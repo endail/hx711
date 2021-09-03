@@ -190,6 +190,8 @@ pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
 
 - `void useDelays( bool use )`. If true, _very_ short delays will be used during the period during which bits are read from the HX711 chip. These delays conform to the datasheet's specifications. On a Raspberry Pi, using delays is not likely to be useful unless, for some reason, the CPU is _too_ fast. For that reason, the default is not to use them.
 
+- `bool isUsingDelays( )`. Returns true if delays are in use. See above.
+
 - `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
 - `Format getFormat( )`. Returns the `Format` currently being used.
