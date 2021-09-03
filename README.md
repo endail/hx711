@@ -314,6 +314,6 @@ There are a few different methods for this.
 
 3. `HX711::readValue` is essentially what `.getValues()` uses. But calling `readValue()` does not check whether the HX711 chip is ready for a value to be read. Using this on its own will produce unreliable results.
 
-***"What's the difference between `SimpleHX711` and `AdvancedHX711`?***
+***"What's the difference between `SimpleHX711` and `AdvancedHX711`?"***
 
 `AdvancedHX711` uses a separate thread of execution to watch for and collect values from the HX711 chip when they are ready. It aims to be as efficient as possible. I recommend using `AdvancedHX711` when you are obtaining a large number of samples.
