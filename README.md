@@ -271,6 +271,8 @@ Mass m(1.03, Mass::Unit::KG);
 std::cout << m; //1.03 kg
 ```
 
+- Unary and binary operators are also supported.
+
 The following `Mass::Unit`s are supported:
 
 | identifier            | description   | toString suffix |
