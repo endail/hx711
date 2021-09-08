@@ -66,7 +66,7 @@ endif
 ########################################################################
 
 ifeq ($(IS_WIN),1)
-# overwrite binaries for dev 
+# overwrite binaries for dev
 # NOTE: toolchain available here: https://gnutoolchains.com/raspberry/
 # set RPI_TOOLCHAIN environment variable to directory of toolchain
 	CXX = $(RPI_TOOLCHAIN)/bin/arm-linux-gnueabihf-g++.exe
