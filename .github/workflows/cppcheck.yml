@@ -1,41 +1,50 @@
-name: cppcheck
-on: ["push"]
+name: buildcheck
+on:
+  push:
+    paths:
+      - "include/**"
+      - "src/**"
+      - "Makefile"
+      - "gh-actions-rpi-cmd.sh"
+      - "install-deps.sh"
 
 jobs:
+
   build:
-    name: cppcheck-test
+
+    name: Build on ${{ matrix.cpu }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        base_image: ["raspios_lite:2021-05-07"]
+        cpu: [arm1176, cortex-a8]
+
     steps:
+    
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    
+    - name: Build RPI environment
+      uses: pguyot/arm-runner-action@v1
+      with:
+        commands: ./gh-actions-rpi-cmd.sh
+        base_image: ${{ matrix.base_image }}
+        image_additional_mb: 10000
+        cpu: ${{ matrix.cpu }}
+        optimize_image: false
 
-      - name: Clone lgpio
-        uses: actions/checkout@v2
-        with:
-          repository: 'joan2937/lg'
-          ref: '9ebaf583b8647d5531a6d2d797cb27d4aefb6d1a'
+    - name: cppcheck
+      uses: deep5050/cppcheck-action@main
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN}}
+        inline_suppression: enable
+        platform: unix32
+        std: c++11
+        other_options: --suppress=unusedFunction --suppress=missingIncludeSystem
+        output_file: resources/cppcheck_report.txt
 
-      - name: Build and Install lgpio
-        run: |
-          make
-          sudo make install
-          sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
-          sudo ldconfig
-          sudo chown -R $USER:$USER /home/runner/work
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: cppcheck
-        uses: deep5050/cppcheck-action@main
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN}}
-          inline_suppression: enable
-          platform: unix32
-          std: c++11
-          other_options: --suppress=unusedFunction --suppress=missingIncludeSystem
-          output_file: resources/cppcheck_report.txt
-
-      - name: Publish report    
-        uses: mikeal/publish-to-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: master
+    - name: Publish report    
+      uses: mikeal/publish-to-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH_NAME: master

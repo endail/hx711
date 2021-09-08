@@ -1,53 +1,37 @@
-name: "CodeQL"
-
+name: buildcheck
 on:
   push:
-    branches: [ "*" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ master ]
-  schedule:
-    - cron: '22 6 * * 6'
+    paths:
+      - "include/**"
+      - "src/**"
+      - "Makefile"
+      - "gh-actions-rpi-cmd.sh"
+      - "install-deps.sh"
 
 jobs:
-  analyze:
-    name: Analyze
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
+  build:
+
+    name: Build on ${{ matrix.cpu }}
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        language: [ 'cpp' ]
+        base_image: ["raspios_lite:2021-05-07"]
+        cpu: [arm1176, cortex-a8]
 
     steps:
     
-    - name: Clone lgpio
+    - name: Checkout repo
       uses: actions/checkout@v2
+    
+    - name: Build RPI environment
+      uses: pguyot/arm-runner-action@v1
       with:
-          repository: 'joan2937/lg'
-          ref: '9ebaf583b8647d5531a6d2d797cb27d4aefb6d1a'
-
-    - name: Build and Install lgpio
-      run: |
-        make
-        sudo make install
-        sudo sh -c "echo '/usr/local/lib' >> /etc/ld.so.conf"
-        sudo ldconfig
-        sudo chown -R $USER:$USER /home/runner/work
-
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
-
-    - run: make && sudo make install
+        commands: ./gh-actions-rpi-cmd.sh
+        base_image: ${{ matrix.base_image }}
+        image_additional_mb: 10000
+        cpu: ${{ matrix.cpu }}
+        optimize_image: false
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1

@@ -1,4 +1,4 @@
-name: buildcheck
+name: Build on Raspberry Pi
 on:
   push:
     paths:
