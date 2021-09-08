@@ -94,27 +94,28 @@ bool HX711::_readBit() const {
     //In practice this [probably] isn't really going to matter
     //due to how miniscule the amount of time is and how slow the
     //execution of the code is in comparison. For that reason, the
-    //delay below is excluded
-    //Utility::delay(std::max(_T2, _T3));
+    //delay below is an optional flag
+    if(this->_useDelays) {
+        Utility::delay(std::max(_T2, _T3));
+    }
 
     //at this stage, DOUT is ready and the clock pin has been held
     //high for sufficient amount of time, so read the bit value
     const bool bit = static_cast<bool>(
         Utility::readGpio(this->_gpioHandle, this->_dataPin));
 
-    //with the bit value now read, set the clock pin low and note the
-    //current ACTUAL time again
+    //with the bit value now read, set the clock pin low
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-    const auto endNanos = Utility::getnanos();
 
     //At this point, according to the documentation, if the clock pin
     //was held high for longer than 60us, the chip will have entered
-    //power down mode. This means the currently read bit is unreliable.
+    //power down mode. This means the currently read bit, and
+    //consequently the entire value, is unreliable.
     //
     //So... first, calculate the difference
-    const auto diff = endNanos - startNanos;
+    const auto diff = Utility::getnanos() - startNanos;
 
-    //...and if the threshold was exceeded, raise the exception
+    //...and if the threshold was exceeded, throw the exception
     if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
         throw IntegrityException("bit integrity failure");
     }
@@ -122,8 +123,10 @@ bool HX711::_readBit() const {
     //Assuming everything was OK, the datasheet requires a further
     //delay. But, as for the reasons previously mentioned above, the
     //following delay is probably not going to matter and is therefore
-    //excluded.
-    //Utility::delay(_T4);
+    //optional
+    if(this->_useDelays) {
+        Utility::delay(_T4);
+    }
 
     return bit;
 
@@ -136,8 +139,10 @@ void HX711::_readBits(std::int32_t* const v) {
     //The datasheet notes a tiny delay between DOUT going low and the
     //initial clock pin change. But, as for the reasons previously
     //mentioned above, the following delay is probably not going to
-    //matter and is therefore excluded.
-    //Utility::delay(_T1);
+    //matter and is therefore optional
+    if(this->_useDelays) {
+        Utility::delay(_T1);
+    }
 
     //msb first
     for(unsigned char i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
@@ -157,6 +162,7 @@ HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
     _channel(Channel::A),
     _gain(Gain::GAIN_128),
     _strictTiming(false),
+    _useDelays(false),
     _bitFormat(Format::MSB) {
 }
 
@@ -183,6 +189,14 @@ void HX711::setStrictTiming(const bool strict) noexcept {
 
 bool HX711::isStrictTiming() const noexcept {
     return this->_strictTiming;
+}
+
+void HX711::useDelays(const bool use) noexcept {
+    this->_useDelays = use;
+}
+
+bool HX711::isUsingDelays() const noexcept {
+    return this->_useDelays;
 }
 
 void HX711::setFormat(const Format bitFormat) noexcept {

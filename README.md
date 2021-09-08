@@ -188,6 +188,10 @@ pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
 
 - `bool isStrictTiming( )`. Returns true if strict timing is used.
 
+- `void useDelays( bool use )`. If true, _very_ short delays will be used during the period during which bits are read from the HX711 chip. These delays conform to the datasheet's specifications. On a Raspberry Pi, using delays is not likely to be useful unless, for some reason, the CPU is _too_ fast. For that reason, the default is not to use them.
+
+- `bool isUsingDelays( )`. Returns true if delays are in use. See above.
+
 - `void setFormat( Format bitFormat )`. Defines the format of bits when read from the HX711 chip. Either `Format::MSB` (most significant bit first - the default) or `Format::LSB` (least significant bit first).
 
 - `Format getFormat( )`. Returns the `Format` currently being used.
@@ -271,6 +275,8 @@ Mass m(1.03, Mass::Unit::KG);
 std::cout << m; //1.03 kg
 ```
 
+- Unary and binary operators are also supported.
+
 The following `Mass::Unit`s are supported:
 
 | identifier            | description   | toString suffix |
@@ -314,6 +320,6 @@ There are a few different methods for this.
 
 3. `HX711::readValue` is essentially what `.getValues()` uses. But calling `readValue()` does not check whether the HX711 chip is ready for a value to be read. Using this on its own will produce unreliable results.
 
-***"What's the difference between `SimpleHX711` and `AdvancedHX711`?***
+***"What's the difference between `SimpleHX711` and `AdvancedHX711`?"***
 
 `AdvancedHX711` uses a separate thread of execution to watch for and collect values from the HX711 chip when they are ready. It aims to be as efficient as possible. I recommend using `AdvancedHX711` when you are obtaining a large number of samples.

@@ -85,6 +85,7 @@ protected:
     Channel _channel;
     Gain _gain;
     bool _strictTiming;
+    bool _useDelays;
     Format _bitFormat;
 
     static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
@@ -110,6 +111,9 @@ public:
 
     void setStrictTiming(const bool strict) noexcept;
     bool isStrictTiming() const noexcept;
+
+    void useDelays(const bool use) noexcept;
+    bool isUsingDelays() const noexcept;
 
     Format getFormat() const noexcept;
     void setFormat(const Format bitFormat) noexcept;
