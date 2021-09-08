@@ -20,6 +20,7 @@ The .gif above illustrates the output of the test code where I applied pressure 
 ```console
 pi@raspberrypi:~ $ git clone https://github.com/endail/hx711
 pi@raspberrypi:~ $ cd hx711
+pi@raspberrypi:~/hx711 $ sudo ./install-deps.sh
 pi@raspberrypi:~/hx711 $ make && sudo make install
 ```
 
