@@ -129,8 +129,8 @@ void AbstractScale::zero(const Options o) {
 
     try {
         this->setReferenceUnit(1);
-        this->_offset = static_cast<Value>(
-            std::round(this->normalise(this->read(o))));
+        this->setOffset(static_cast<Value>(
+            std::round(this->read(o))));
         this->setReferenceUnit(refBackup);
     }
     catch(const std::exception& ex) {
