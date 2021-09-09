@@ -11,7 +11,7 @@ if ! $(ldconfig -p | grep -q liblgpio); then
     unzip lg.zip
     cd lg
     make
-    sudo make install
+    make install
     cd ..
 else
     echo "liblgpio already installed"
