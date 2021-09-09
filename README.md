@@ -4,7 +4,7 @@
 
 - Use with Raspberry Pi
 - Requires [lgpio](http://abyz.me.uk/lg/index.html)
-- Developed and tested with a Raspberry Pi Zero W (should work on other Pis)
+- Code tested inside [virtual Raspberry Pi Zero/3/4 environments](.github/workflows/buildcheck.yml) on GitHub
 - Looking for a Python alternative? [Try here](https://github.com/endail/hx711-rpi-py).
 
 ## Sample Output from Test Code
