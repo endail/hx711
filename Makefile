@@ -33,6 +33,7 @@ CFLAGS :=	-O2 \
 			-fomit-frame-pointer \
 			-pipe \
 			-Wall \
+			-Wextra \
 			-fstack-clash-protection \
 			-Wfatal-errors \
 			-Werror=format-security \
@@ -61,6 +62,8 @@ endif
 
 ifneq ($(IS_WIN),1)
 	IS_PI := $(shell test -f /proc/device-tree/model && grep -qi "raspberry pi" /proc/device-tree/model)
+else ifeq ($(VIRTUAL_PI), 1)
+	IS_PI := 1
 endif
 
 ########################################################################
