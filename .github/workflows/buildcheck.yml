@@ -34,11 +34,11 @@ jobs:
         cpu: ${{ matrix.cpu }}
         optimize_image: false
 
-#  notify_hx711-rpi-py:
-#    runs-on: ubuntu-latest
-#    if: ${{ success() }}
-#    needs: [build]
-#    steps:
-#      - name: Send HTTP request
-#        run: |
-#          curl -XPOST -u "${{ secrets.HX711_RPI_PY_USERNAME }}:${{ secrets.HX711_RPI_PY_PAT }}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/endail/hx711-rpi-py/dispatches --data '{"event_type":"build"}'
+  notify_hx711-rpi-py:
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    needs: [build]
+    steps:
+      - name: Send HTTP request
+        run: |
+          curl -XPOST -u "${{ secrets.HX711_RPI_PY_USERNAME }}:${{ secrets.HX711_RPI_PY_PAT }}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/endail/hx711-rpi-py/dispatches --data '{"event_type":"build"}'
