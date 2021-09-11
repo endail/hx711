@@ -153,9 +153,7 @@ HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
 }
 
 HX711::~HX711() {
-    Utility::closeGpioPin(this->_gpioHandle, this->_clockPin);
-    Utility::closeGpioPin(this->_gpioHandle, this->_dataPin);
-    Utility::closeGpioHandle(this->_gpioHandle);
+    this->close();
 }
 
 void HX711::begin() {
@@ -165,6 +163,20 @@ void HX711::begin() {
     Utility::openGpioOutput(this->_gpioHandle, this->_clockPin);
 
     this->setConfig(this->_channel, this->_gain);
+
+}
+
+void HX711::close() {
+
+    if(this->_gpioHandle == -1) {
+        return;
+    }
+
+    Utility::closeGpioPin(this->_gpioHandle, this->_clockPin);
+    Utility::closeGpioPin(this->_gpioHandle, this->_dataPin);
+    Utility::closeGpioHandle(this->_gpioHandle);
+
+    this->_gpioHandle = -1;
 
 }
 
