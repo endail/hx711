@@ -88,15 +88,21 @@ bool HX711::_readBit() const {
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
 
     //then delay for sufficient time to allow DOUT to be ready (0.1us)
-    //this will also permit a sufficient amount of time for the clock
-    //pin to remain high
-    //
-    //In practice this [probably] isn't really going to matter
-    //due to how miniscule the amount of time is and how slow the
-    //execution of the code is in comparison. For that reason, the
-    //delay below is an optional flag
+    //and min amount of time between the high to low clock pulse. Note
+    //the overlap between T2 and T3
     if(this->_useDelays) {
         Utility::delay(std::max(_T2, _T3));
+    }
+
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
+    const auto diff = Utility::getnanos() - startNanos;
+
+    //at this point, according to the documentation, if the clock pin
+    //was held high for longer than 60us, the chip will have entered
+    //power down mode. This means the currently read bit, and
+    //consequently the entire value, is unreliable.
+    if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
+        throw IntegrityException("bit integrity failure");
     }
 
     //at this stage, DOUT is ready and the clock pin has been held
@@ -104,26 +110,8 @@ bool HX711::_readBit() const {
     const bool bit = static_cast<bool>(
         Utility::readGpio(this->_gpioHandle, this->_dataPin));
 
-    //with the bit value now read, set the clock pin low
-    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-
-    //At this point, according to the documentation, if the clock pin
-    //was held high for longer than 60us, the chip will have entered
-    //power down mode. This means the currently read bit, and
-    //consequently the entire value, is unreliable.
-    //
-    //So... first, calculate the difference
-    const auto diff = Utility::getnanos() - startNanos;
-
-    //...and if the threshold was exceeded, throw the exception
-    if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
-        throw IntegrityException("bit integrity failure");
-    }
-
     //Assuming everything was OK, the datasheet requires a further
-    //delay. But, as for the reasons previously mentioned above, the
-    //following delay is probably not going to matter and is therefore
-    //optional
+    //delay before the next pulse
     if(this->_useDelays) {
         Utility::delay(_T4);
     }
@@ -137,9 +125,7 @@ void HX711::_readBits(std::int32_t* const v) {
     std::lock_guard<std::mutex> lock(this->_commLock);
 
     //The datasheet notes a tiny delay between DOUT going low and the
-    //initial clock pin change. But, as for the reasons previously
-    //mentioned above, the following delay is probably not going to
-    //matter and is therefore optional
+    //initial clock pin change
     if(this->_useDelays) {
         Utility::delay(_T1);
     }
