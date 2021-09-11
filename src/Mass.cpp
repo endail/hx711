@@ -73,7 +73,11 @@ Mass& Mass::operator=(const Mass& rhs) noexcept {
 }
 
 Mass::operator double() const noexcept {
-    return this->getValue(this->_u);
+    return this->getValue();
+}
+
+double Mass::getValue() const noexcept {
+    return convert(this->_ug, Unit::UG, this->_u);
 }
 
 double Mass::getValue(Unit u) const noexcept {

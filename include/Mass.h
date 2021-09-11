@@ -72,7 +72,8 @@ public:
     Mass& operator=(const Mass& rhs) noexcept;
     
     operator double() const noexcept;
-    double getValue(const Unit u = Unit::UG) const noexcept;
+    double getValue() const noexcept;
+    double getValue(const Unit u) const noexcept;
 
     Unit getUnit() const noexcept;
     void setUnit(const Unit u) noexcept;
