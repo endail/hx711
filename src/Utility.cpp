@@ -50,7 +50,7 @@ void Utility::closeGpioHandle(const int chip) {
 }
 
 void Utility::openGpioInput(const int handle, const int pin) {
-    _throwGpioExIfErr(::lgGpioClaimInput(handle, 0, pin));
+    _throwGpioExIfErr(::lgGpioClaimInput(handle, LG_SET_PULL_UP, pin));
 }
 
 void Utility::openGpioOutput(const int handle, const int pin) {
