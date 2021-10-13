@@ -80,8 +80,8 @@ protected:
     int _gpioHandle;
     const int _dataPin;
     const int _clockPin;
+    const Rate _rate;
     std::mutex _commLock;
-    Rate _rate;
     Channel _channel;
     Gain _gain;
     bool _strictTiming;
