@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <ostream>
@@ -202,7 +203,12 @@ std::string Mass::toString(const Unit u) const noexcept {
      * See: https://www.cplusplus.com/reference/cmath/log10/
      */
     if(f != 0) {
+
         d = static_cast<int>(1 - std::log10(std::abs(f)));
+
+        //cap the minimum number of decimals at 0
+        d = std::max(0, d);
+
     }
 
     /**
