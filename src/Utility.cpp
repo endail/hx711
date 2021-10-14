@@ -40,7 +40,7 @@ void Utility::_throwGpioExIfErr(const int code) {
 }
 
 int Utility::openGpioHandle(const int chip) {
-    const int code = ::lgGpiochipOpen(chip);
+    const auto code = ::lgGpiochipOpen(chip);
     _throwGpioExIfErr(code);
     return code;
 }
@@ -62,7 +62,7 @@ void Utility::closeGpioPin(const int handle, const int pin) {
 }
 
 GpioLevel Utility::readGpio(const int handle, const int pin) {
-    const int code = ::lgGpioRead(handle, pin);
+    const auto code = ::lgGpioRead(handle, pin);
     _throwGpioExIfErr(code);
     //lgGpioRead returns 0 for low and 1 for high
     //underlying GpioLevel is bool type
