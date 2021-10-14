@@ -168,7 +168,7 @@ void HX711::begin() {
 
 void HX711::close() {
 
-    if(this->_gpioHandle == -1) {
+    if(this->_gpioHandle < 0) {
         return;
     }
 
