@@ -219,13 +219,21 @@ std::string Mass::toString(const Unit u) const noexcept {
     //0-init just to be safe
     char buff[_TOSTRING_BUFF_SIZE]{0};
 
+    /**
+     * Output format is as follows:
+     * [at least one integer].[precision set by {d}] [unit name]
+     * eg. 12.34 g
+     * 
+     * d must be a positive integer
+     */
     ::snprintf(
         buff,
         _TOSTRING_BUFF_SIZE,
         "%01.*f %s",
-        d,
-        n,
-        _UNIT_NAMES.at(u));
+        d,                  //number of decimals
+        n,                  //number to output
+        _UNIT_NAMES.at(u)   //unit name
+        );
 
     //std::string will automatically limit chars to first \0
     //so no need to trim
