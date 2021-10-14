@@ -158,6 +158,10 @@ HX711::~HX711() {
 
 void HX711::begin() {
 
+    if(this->_gpioHandle >= 0) {
+        return;
+    }
+
     this->_gpioHandle = Utility::openGpioHandle(0);
     Utility::openGpioInput(this->_gpioHandle, this->_dataPin);
     Utility::openGpioOutput(this->_gpioHandle, this->_clockPin);
