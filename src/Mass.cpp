@@ -210,7 +210,8 @@ std::string Mass::toString(const Unit u) const noexcept {
      * do not know why this is.
      */
 
-    char buff[_TOSTRING_BUFF_SIZE];
+    //0-init just to be safe
+    char buff[_TOSTRING_BUFF_SIZE]{0};
 
     ::snprintf(
         buff,
