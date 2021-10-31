@@ -307,7 +307,7 @@ Value HX711::readValue() {
     this->_readBits(&v);
 
     if(this->_bitFormat == Format::LSB) {
-        v = Utility::reverse(v);
+        v = Utility::reverseBits(v);
     }
 
     return Value(_convertFromTwosComplement(v));

@@ -128,10 +128,10 @@ public:
 
     }
 
-    //reverse bits in int
+    //reverseBits bits in int
     //https://stackoverflow.com/a/2602871/570787
     template <typename T>
-    static T reverse(T n, size_t b = sizeof(T) * CHAR_BIT) noexcept {
+    static T reverseBits(T n, size_t b = sizeof(T) * CHAR_BIT) noexcept {
 
         assert(b <= std::numeric_limits<T>::digits);
 
