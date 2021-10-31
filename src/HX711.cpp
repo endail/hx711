@@ -153,7 +153,14 @@ HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
 }
 
 HX711::~HX711() {
-    this->close();
+    
+    try {
+        this->close();
+    }
+    catch(...) {
+        //do not allow propagation
+    }
+
 }
 
 void HX711::begin() {
