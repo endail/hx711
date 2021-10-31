@@ -155,7 +155,7 @@ HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
 HX711::~HX711() {
     
     try {
-        this->close();
+        this->disconnect();
     }
     catch(...) {
         //do not allow propagation
@@ -177,7 +177,7 @@ void HX711::connect() {
 
 }
 
-void HX711::close() {
+void HX711::disconnect() {
 
     if(this->_gpioHandle < 0) {
         return;
