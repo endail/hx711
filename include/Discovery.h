@@ -147,7 +147,7 @@ public:
 
     Discovery(const int dataPin, const int clockPin, const Rate rate) : 
         HX711(dataPin, clockPin, rate) {
-            this->begin();
+            this->connect();
     }
 
     TimingCollection getTimings(const std::size_t samples) {

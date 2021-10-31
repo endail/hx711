@@ -163,7 +163,7 @@ HX711::~HX711() {
 
 }
 
-void HX711::begin() {
+void HX711::connect() {
 
     if(this->_gpioHandle >= 0) {
         return;

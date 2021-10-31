@@ -73,7 +73,7 @@ public:
     std::mutex valuesLock;
     explicit Watcher(HX711* const hx) noexcept;
     ~Watcher();
-    void begin();
+    void connect();
     void watch();
     void pause();
 

@@ -39,7 +39,7 @@ SimpleHX711::SimpleHX711(
     const Rate rate) :
         AbstractScale(Mass::Unit::G, refUnit, offset),
         HX711(dataPin, clockPin, rate) {
-            this->begin();
+            this->connect();
 }
 
 std::vector<Value> SimpleHX711::getValues(const std::chrono::nanoseconds timeout) {
