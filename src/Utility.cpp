@@ -20,14 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <lgpio.h>
+#include <limits>
+#include <numeric>
 #include <pthread.h>
 #include <sched.h>
 #include <sys/time.h>
 #include <thread>
 #include <time.h>
+#include <vector>
 #include "../include/GpioException.h"
 #include "../include/Utility.h"
 
@@ -247,6 +252,72 @@ void Utility::setThreadPriority(const int pri, const int policy, const pthread_t
         th,
         policy,
         &schParams);
+
+}
+
+template <typename T>
+static double average(const std::vector<T>* const vals) noexcept {
+
+    assert(vals != nullptr);
+    assert(!vals->empty());
+
+    const long long int sum = std::accumulate(
+        vals->begin(), vals->end(), static_cast<long long int>(0));
+
+    return static_cast<double>(sum) / vals->size();
+
+}
+
+template <typename T>
+static double median(std::vector<T>* const vals) noexcept {
+
+    assert(vals != nullptr);
+    assert(!vals->empty());
+
+    /**
+     * TODO: is this more efficient?
+     */
+    if(vals->size() == 1) {
+        return static_cast<double>((*vals)[0]);
+    }
+
+    //https://stackoverflow.com/a/42791986/570787
+    if(vals->size() % 2 == 0) {
+
+        const auto median_it1 = vals->begin() + vals->size() / 2 - 1;
+        const auto median_it2 = vals->begin() + vals->size() / 2;
+
+        std::nth_element(vals->begin(), median_it1, vals->end());
+        const auto e1 = *median_it1;
+
+        std::nth_element(vals->begin(), median_it2, vals->end());
+        const auto e2 = *median_it2;
+
+        return (e1 + e2) / 2.0;
+
+    }
+    else {
+        const auto median_it = vals->begin() + vals->size() / 2;
+        std::nth_element(vals->begin(), median_it, vals->end());
+        return static_cast<double>(*median_it);
+    }
+
+}
+
+//reverseBits bits in int
+//https://stackoverflow.com/a/2602871/570787
+template <typename T>
+static T reverseBits(T n, size_t b) noexcept {
+
+    assert(b <= std::numeric_limits<T>::digits);
+
+    T rv = 0;
+
+    for (size_t i = 0; i < b; ++i, n >>= 1) {
+        rv = (rv << 1) | (n & 0x01);
+    }
+
+    return rv;
 
 }
 
