@@ -74,7 +74,7 @@ void HX711::_setInputGainSelection() {
 
     const auto pulses = _calculatePulses(this->_gain);
 
-    for(unsigned char i = 0; i < pulses; ++i) {
+    for(auto i = decltype(pulses){0}; i < pulses; ++i) {
         this->_readBit();
     }
 
@@ -105,10 +105,8 @@ bool HX711::_readBit() const {
         throw IntegrityException("bit integrity failure");
     }
 
-    //at this stage, DOUT is ready and the clock pin has been held
-    //high for sufficient amount of time, so read the bit value
-    const bool bit = static_cast<bool>(
-        Utility::readGpio(this->_gpioHandle, this->_dataPin));
+    //at this stage, DOUT is ready so read the bit value
+    const auto bit = Utility::readGpio(this->_gpioHandle, this->_dataPin);
 
     //Assuming everything was OK, the datasheet requires a further
     //delay before the next pulse
@@ -116,7 +114,7 @@ bool HX711::_readBit() const {
         Utility::delay(_T4);
     }
 
-    return bit;
+    return static_cast<bool>(bit);
 
 }
 
@@ -131,9 +129,11 @@ void HX711::_readBits(std::int32_t* const v) {
     }
 
     //msb first
-    for(unsigned char i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
-        *v <<= 1;
-        *v |= this->_readBit();
+    for(auto i = decltype(_BITS_PER_CONVERSION_PERIOD){0};
+        i < _BITS_PER_CONVERSION_PERIOD;
+        ++i) {
+            *v <<= 1;
+            *v |= this->_readBit();
     }
 
     this->_setInputGainSelection();
@@ -258,6 +258,8 @@ void HX711::setConfig(const Channel c, const Gain g) {
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
+         * 
+         * TODO: this is an inefficient busy-wait. Solutions?
          */
         while(!this->isReady());
         this->readValue();
@@ -355,6 +357,11 @@ void HX711::powerUp() {
      */
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
 
+    /**
+     * "Settling time refers to the time from power up, reset,
+     * input channel change and gain change to valid stable output data."
+     * Datasheet pg. 3
+     */
     if(this->_rate != Rate::OTHER) {
         Utility::sleep(_SETTLING_TIMES.at(this->_rate));
     }

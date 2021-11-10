@@ -155,26 +155,21 @@ bool Utility::timespecisvalid(const timespec* const tsp) noexcept {
 
 int Utility::timespeccmp(const timespec* const tsp, const timespec* const usp) noexcept {
 
-    do {
-
-        if(tsp->tv_sec < usp->tv_sec) {
-            return -1;
-        }
-        else if(tsp->tv_sec > usp->tv_sec) {
-            return 1;
-        }
-
-        if(tsp->tv_nsec < usp->tv_nsec) {
-            return -1;
-        }
-        else if(tsp->tv_nsec > usp->tv_nsec) {
-            return 1;
-        }
-
-        return 0;
-
+    if(tsp->tv_sec < usp->tv_sec) {
+        return -1;
     }
-    while(0);
+    else if(tsp->tv_sec > usp->tv_sec) {
+        return 1;
+    }
+
+    if(tsp->tv_nsec < usp->tv_nsec) {
+        return -1;
+    }
+    else if(tsp->tv_nsec > usp->tv_nsec) {
+        return 1;
+    }
+
+    return 0;
 
 }
 
@@ -182,18 +177,13 @@ void Utility::timespecadd(const timespec* const tsp, const timespec* const usp, 
 
     using namespace std::chrono;
 
-    do {
+    vsp->tv_sec = tsp->tv_sec + usp->tv_sec;
+    vsp->tv_nsec = tsp->tv_nsec + usp->tv_nsec;
 
-        vsp->tv_sec = tsp->tv_sec + usp->tv_sec;
-        vsp->tv_nsec = tsp->tv_nsec + usp->tv_nsec;
-
-        if(vsp->tv_nsec >= nanoseconds::period::den) {
-            vsp->tv_sec++;
-            vsp->tv_nsec -= nanoseconds::period::den;
-        }
-
+    if(vsp->tv_nsec >= nanoseconds::period::den) {
+        vsp->tv_sec++;
+        vsp->tv_nsec -= nanoseconds::period::den;
     }
-    while(0);
 
 }
 
@@ -201,18 +191,13 @@ void Utility::timespecsub(const timespec* const tsp, const timespec* const usp, 
 
     using namespace std::chrono;
 
-    do {
+    vsp->tv_sec = tsp->tv_sec - usp->tv_sec;
+    vsp->tv_nsec = tsp->tv_nsec - usp->tv_nsec;
 
-        vsp->tv_sec = tsp->tv_sec - usp->tv_sec;
-        vsp->tv_nsec = tsp->tv_nsec - usp->tv_nsec;
-
-        if(vsp->tv_nsec < 0) {
-            vsp->tv_sec--;
-            vsp->tv_nsec += nanoseconds::period::den;
-        }
-
+    if(vsp->tv_nsec < 0) {
+        vsp->tv_sec--;
+        vsp->tv_nsec += nanoseconds::period::den;
     }
-    while(0);
 
 }
 
