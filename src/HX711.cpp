@@ -26,10 +26,8 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
-#include "../include/GpioException.h"
 #include "../include/HX711.h"
 #include "../include/IntegrityException.h"
-#include "../include/TimeoutException.h"
 #include "../include/Utility.h"
 #include "../include/Value.h"
 
@@ -258,6 +256,8 @@ void HX711::setConfig(const Channel c, const Gain g) {
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
+         * 
+         * TODO: this is an inefficient busy-wait. Solutions?
          */
         while(!this->isReady());
         this->readValue();
@@ -355,6 +355,11 @@ void HX711::powerUp() {
      */
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
 
+    /**
+     * "Settling time refers to the time from power up, reset,
+     * input channel change and gain change to valid stable output data."
+     * Datasheet pg. 3
+     */
     if(this->_rate != Rate::OTHER) {
         Utility::sleep(_SETTLING_TIMES.at(this->_rate));
     }
