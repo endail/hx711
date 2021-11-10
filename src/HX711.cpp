@@ -129,9 +129,11 @@ void HX711::_readBits(std::int32_t* const v) {
     }
 
     //msb first
-    for(unsigned char i = 0; i < _BITS_PER_CONVERSION_PERIOD; ++i) {
-        *v <<= 1;
-        *v |= this->_readBit();
+    for(auto i = decltype(_BITS_PER_CONVERSION_PERIOD){0};
+        i < _BITS_PER_CONVERSION_PERIOD;
+        ++i) {
+            *v <<= 1;
+            *v |= this->_readBit();
     }
 
     this->_setInputGainSelection();
