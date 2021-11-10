@@ -74,7 +74,7 @@ void HX711::_setInputGainSelection() {
 
     const auto pulses = _calculatePulses(this->_gain);
 
-    for(unsigned char i = 0; i < pulses; ++i) {
+    for(auto i = declytype(pulses){0}; i < pulses; ++i) {
         this->_readBit();
     }
 
