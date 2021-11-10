@@ -28,6 +28,7 @@
 #include <utility>
 #include "../include/HX711.h"
 #include "../include/IntegrityException.h"
+#include "../include/TimeoutException.h"
 #include "../include/Utility.h"
 #include "../include/Value.h"
 
