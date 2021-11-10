@@ -105,10 +105,8 @@ bool HX711::_readBit() const {
         throw IntegrityException("bit integrity failure");
     }
 
-    //at this stage, DOUT is ready and the clock pin has been held
-    //high for sufficient amount of time, so read the bit value
-    const bool bit = static_cast<bool>(
-        Utility::readGpio(this->_gpioHandle, this->_dataPin));
+    //at this stage, DOUT is ready so read the bit value
+    const auto bit = Utility::readGpio(this->_gpioHandle, this->_dataPin);
 
     //Assuming everything was OK, the datasheet requires a further
     //delay before the next pulse
@@ -116,7 +114,7 @@ bool HX711::_readBit() const {
         Utility::delay(_T4);
     }
 
-    return bit;
+    return static_cast<bool>(bit);
 
 }
 
