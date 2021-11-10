@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
+#include "../include/GpioException.h"
 #include "../include/HX711.h"
 #include "../include/IntegrityException.h"
 #include "../include/TimeoutException.h"
