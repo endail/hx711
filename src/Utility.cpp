@@ -33,10 +33,16 @@
 
 namespace HX711 {
 
+constexpr const char* const Utility::_VERSION;
+
 void Utility::_throwGpioExIfErr(const int code) {
     if(code < 0) {
         throw GpioException(::lguErrorText(code));
     }
+}
+
+const char* Utility::getVersion() noexcept {
+    return _VERSION;
 }
 
 int Utility::openGpioHandle(const int chip) {
