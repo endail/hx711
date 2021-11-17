@@ -306,6 +306,8 @@ With that said, if you are looking for a simple but effective method to filter m
 
 - After building and installing the library (see below), you can `#include <hx711/common.h>` to include everything
 
+- The current version of the library is accessible through `Utility::getVersion()`. It returns a `const char*` in the following format: `{major}`.`{minor}`.`{patch}` (eg. `2.4.1`).
+
 - `sudo make uninstall` from the project directory to remove the library
 
 - If you are looking for a version of this library which uses wiringPi rather than lgpio, [v1.1 is available](https://github.com/endail/hx711/releases/tag/1.1). However, given that [wiringPi is deprecated](http://wiringpi.com/wiringpi-deprecated/), I have chosen to use lgpio going forward.
