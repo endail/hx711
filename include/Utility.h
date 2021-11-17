@@ -81,7 +81,7 @@ public:
         const int pri, const int policy, const pthread_t th) noexcept;
 
     template <typename T>
-    static double average(const std::vector<const T>* const vals) noexcept {
+    static double average(const std::vector<T>* const vals) noexcept {
 
         if(vals->empty()) {
             std::length_error("average cannot be calculated from 0 values");
@@ -95,7 +95,7 @@ public:
     }
 
     template <typename T>
-    static double median(std::vector<const T>* const vals) noexcept {
+    static double median(std::vector<T>* const vals) noexcept {
 
         if(vals->empty()) {
             std::length_error("median cannot be calculated from 0 values");
