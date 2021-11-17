@@ -31,6 +31,7 @@
 #include <limits>
 #include <numeric>
 #include <pthread.h>
+#include <stdexcept>
 #include <time.h>
 #include <vector>
 
@@ -80,12 +81,13 @@ public:
         const int pri, const int policy, const pthread_t th) noexcept;
 
     template <typename T>
-    static double average(const std::vector<T>* const vals) noexcept {
+    static double average(const std::vector<const T>* const vals) noexcept {
 
-        assert(vals != nullptr);
-        assert(!vals->empty());
+        if(vals->empty()) {
+            std::length_error("average cannot be calculated from 0 values");
+        }
 
-        const long long int sum = std::accumulate(
+        const auto sum = std::accumulate(
             vals->begin(), vals->end(), static_cast<long long int>(0));
 
         return static_cast<double>(sum) / vals->size();
@@ -93,10 +95,11 @@ public:
     }
 
     template <typename T>
-    static double median(std::vector<T>* const vals) noexcept {
+    static double median(std::vector<const T>* const vals) noexcept {
 
-        assert(vals != nullptr);
-        assert(!vals->empty());
+        if(vals->empty()) {
+            std::length_error("median cannot be calculated from 0 values");
+        }
 
         /**
          * TODO: is this more efficient?
@@ -131,13 +134,13 @@ public:
     //reverseBits bits in int
     //https://stackoverflow.com/a/2602871/570787
     template <typename T>
-    static T reverseBits(T n, size_t b = sizeof(T) * CHAR_BIT) noexcept {
+    static T reverseBits(const T n, const std::size_t b = sizeof(T) * CHAR_BIT) noexcept {
 
         assert(b <= std::numeric_limits<T>::digits);
 
         T rv = 0;
 
-        for (size_t i = 0; i < b; ++i, n >>= 1) {
+        for(size_t i = 0; i < b; ++i, n >>= 1) {
             rv = (rv << 1) | (n & 0x01);
         }
 
