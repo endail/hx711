@@ -94,7 +94,7 @@ double AbstractScale::normalise(const double v) const noexcept {
 
 double AbstractScale::read(const Options o) {
 
-    std::vector<Value> vals;
+    std::vector<const Value> vals;
 
     switch(o.stratType) {
         case StrategyType::Samples:
