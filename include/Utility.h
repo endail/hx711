@@ -44,11 +44,14 @@ enum class GpioLevel : bool {
 
 class Utility {
 protected:
+    static const char* const _VERSION = "2.2.0";
     static void _throwGpioExIfErr(const int code);
     Utility();
 
 
 public:
+
+    static const char* getVersion() noexcept;
 
     static int openGpioHandle(const int chip);
     static void closeGpioHandle(const int chip);

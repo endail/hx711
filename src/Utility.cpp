@@ -39,6 +39,10 @@ void Utility::_throwGpioExIfErr(const int code) {
     }
 }
 
+const char* Utility::getVersion() noexcept {
+    return _VERSION;
+}
+
 int Utility::openGpioHandle(const int chip) {
     const auto code = ::lgGpiochipOpen(chip);
     _throwGpioExIfErr(code);
