@@ -36,12 +36,6 @@ namespace HX711 {
  * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
  */
 
-/**
- * typedef for type to hold at least 24 bits
- * as per HX711 spec
- */
-typedef std::int32_t val_t;
-
 enum class Channel : unsigned char {
     A,
     B

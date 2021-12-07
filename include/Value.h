@@ -25,9 +25,15 @@
 
 #include <cmath>
 #include <cstdint>
-#include "HX711.h"
 
 namespace HX711 {
+
+/**
+ * typedef for type to hold at least 24 bits
+ * as per HX711 spec
+ */
+typedef std::int32_t val_t;
+
 class Value {
 
 protected:
