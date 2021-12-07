@@ -25,27 +25,21 @@
 
 #include <cmath>
 #include <cstdint>
+#include "HX711.h"
 
 namespace HX711 {
 class Value {
 
 protected:
 
-    /**
-     * TODO: is it feasible to use a three byte array instead of a
-     * four byte int? 
-     */
-
-    typedef std::int32_t _INTERNAL_TYPE;
-
-    _INTERNAL_TYPE _v;
+    val_t _v;
 
     /**
      * Datasheet pg. 3
      * But also a consequence of the sensor being 24 bits
      */
-    static constexpr _INTERNAL_TYPE _MIN = -static_cast<_INTERNAL_TYPE>(std::pow(2, 24 - 1));
-    static constexpr _INTERNAL_TYPE _MAX = static_cast<_INTERNAL_TYPE>(std::pow(2, 24 - 1)) - 1;
+    static constexpr val_t _MIN = -static_cast<val_t>(std::pow(2, 24 - 1));
+    static constexpr val_t _MAX = static_cast<val_t>(std::pow(2, 24 - 1)) - 1;
 
 
 public:
@@ -53,8 +47,8 @@ public:
     /**
      * Saturation values
      */
-    static const _INTERNAL_TYPE SATURATION_MIN = 0x800000;
-    static const _INTERNAL_TYPE SATURATION_MAX = 0x7FFFFF;
+    static const val_t SATURATION_MIN = 0x800000;
+    static const val_t SATURATION_MAX = 0x7FFFFF;
 
     /**
      * When input differential signal goes out of
@@ -71,10 +65,10 @@ public:
      * the sensor.
      */
     bool isValid() const noexcept;
-    operator _INTERNAL_TYPE() const noexcept;
+    operator val_t() const noexcept;
     
     //cppcheck-suppress noExplicitConstructor
-    Value(const _INTERNAL_TYPE v) noexcept;
+    Value(const val_t v) noexcept;
     Value() noexcept;
     Value& operator=(const Value& v2) noexcept;
 

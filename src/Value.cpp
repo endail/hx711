@@ -25,7 +25,7 @@
 
 namespace HX711 {
 
-Value::operator _INTERNAL_TYPE() const noexcept {
+Value::operator val_t() const noexcept {
     return this->_v;
 }
 
@@ -37,10 +37,10 @@ bool Value::isValid() const noexcept {
     return this->_v >= _MIN && this->_v <= _MAX;
 }
 
-Value::Value(const _INTERNAL_TYPE v) noexcept : _v(v) {
+Value::Value(const val_t v) noexcept : _v(v) {
 }
 
-Value::Value() noexcept : _v(std::numeric_limits<_INTERNAL_TYPE>::min()) {
+Value::Value() noexcept : _v(std::numeric_limits<val_t>::min()) {
 }
 
 Value& Value::operator=(const Value& v2) noexcept {
