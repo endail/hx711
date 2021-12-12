@@ -64,11 +64,11 @@ build/*
 .nfs*
 
 ### VisualStudioCode ###
-.vscode
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/c_cpp_properties.json
-*.code-workspace
+.vscode/*
+#!.vscode/tasks.json
+#!.vscode/launch.json
+#!.vscode/c_cpp_properties.json
+#*.code-workspace
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
