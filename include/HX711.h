@@ -127,7 +127,7 @@ public:
     void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
 
     bool isReady() const;
-    virtual void waitReady();
+    virtual void waitReady() const;
     Value readValue();
 
     void powerDown();
