@@ -31,6 +31,7 @@ namespace HX711 {
 /**
  * typedef for type to hold at least 24 bits
  * as per HX711 spec
+ * TODO: would std::int_least32_t be more appropriate?
  */
 typedef std::int32_t val_t;
 
