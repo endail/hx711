@@ -68,6 +68,14 @@ CFLAGS :=	-O3 \
 			-D_FORTIFY_SOURCE=2 \
 			-DNDEBUG=1
 
+# link time optz
+# https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Bullseye/GCC%2010.3.0/Raspberry%20Pi%203A%2B%2C%203B%2B%2C%204/#optimization-flags-involved
+# these flags are for pi 0, A/B/A+/B+
+CFLAGS :=	$(CFLAGS) \
+			-march=armv6 \
+			-mfloat-abi=hard \
+			-mfpu=vfp
+
 CXXFLAGS :=	-std=c++11 \
 			-fexceptions \
 			$(CFLAGS)
