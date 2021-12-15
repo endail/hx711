@@ -19,10 +19,15 @@ The .gif above illustrates the output of the test code where I applied pressure 
 ## Build and Install
 
 ```console
-pi@raspberrypi:~ $ git clone https://github.com/endail/hx711
+pi@raspberrypi:~ $ git clone --depth=1 https://github.com/endail/hx711
 pi@raspberrypi:~ $ cd hx711
-pi@raspberrypi:~/hx711 $ sudo ./install-deps.sh
 pi@raspberrypi:~/hx711 $ make && sudo make install
+```
+
+There is a script in the project directory you can use to install lgpio if you need to. Run the following command prior to `make && sudo make install` above.
+
+```console
+pi@raspberrypi:~/hx711 $ sudo ./install-deps.sh
 ```
 
 ## Use
@@ -314,6 +319,8 @@ With that said, if you are looking for a simple but effective method to filter m
 
 ### FAQ
 
+---
+
 ***"I just want to get some raw numbers from the scale".***
 
 There are a few different methods for this.
@@ -324,6 +331,14 @@ There are a few different methods for this.
 
 3. `HX711::readValue` is essentially what `.getValues()` uses. But calling `readValue()` does not check whether the HX711 chip is ready for a value to be read. Using this on its own will produce unreliable results.
 
+---
+
 ***"What's the difference between `SimpleHX711` and `AdvancedHX711`?"***
 
 `AdvancedHX711` uses a separate thread of execution to watch for and collect values from the HX711 chip when they are ready. It aims to be as efficient as possible. I recommend using `AdvancedHX711` when you are obtaining a large number of samples.
+
+---
+
+***"I'm receiving a "no samples obtained" `std::runtime_error` exception. What's going on?"***
+
+This exception will be thrown when no samples could be obtained from the HX711 chip. If you are obtaining samples based on time, you need to extend the amount of time allowed.
