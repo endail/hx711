@@ -186,6 +186,8 @@ pi@raspberrypi:~/hx711 $ sudo bin/advancedhx711test 2 3 -377 -363712
 
 - `bool isReady( )`. Returns true if the HX711 chip has data ready to be retrieved.
 
+- `void waitReady( )`. When called, waits for the HX711 chip to have data ready, then returns.
+
 - `void setStrictTiming( bool strict )`. The HX711 chip has specific timing requirements which if not adhered to may lead to corrupt data. If strict timing is enabled, an `IntegrityException` will be thrown when data integrity cannot be guaranteed. However, given the unreliability of timing on a non-realtime OS (such as Raspbian on a Raspberry Pi), this in itself is unreliable and therefore disabled by default. Use at your own risk.
 
 - `bool isStrictTiming( )`. Returns true if strict timing is used.

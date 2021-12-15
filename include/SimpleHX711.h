@@ -42,6 +42,7 @@ public:
 
     virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
     virtual std::vector<Value> getValues(const std::size_t samples) override;
+    //no override for waitReady; SimpleHX711 is based on busy-waiting
 
 };
 };

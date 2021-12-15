@@ -258,10 +258,8 @@ void HX711::setConfig(const Channel c, const Gain g) {
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
-         * 
-         * TODO: this is an inefficient busy-wait. Solutions?
          */
-        while(!this->isReady());
+        this->waitReady();
         this->readValue();
 
         /**
@@ -307,6 +305,12 @@ bool HX711::isReady() const {
         return false;
     }
 
+}
+
+void HX711::waitReady() const {
+    while(!this->isReady()) {
+        //nop; busy-wait
+    }
 }
 
 Value HX711::readValue() {
