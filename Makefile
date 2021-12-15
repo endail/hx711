@@ -20,194 +20,147 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-TOOLCHAIN 		:= arm-linux-gnueabihf
-TOOLCHAIN_CC 		:= ${TOOLCHAIN}-gcc
-TOOLCHAIN_CXX 		:= ${TOOLCHAIN}-g++
-TOOLCHAIN_LD 		:= ${TOOLCHAIN}-ld
-TOOLCHAIN_AR 		:= ${TOOLCHAIN}-ar
-TOOLCHAIN_RANLIB 	:= ${TOOLCHAIN}-ranlib
-TOOLCHAIN_STRIP 	:= ${TOOLCHAIN}-strip
-TOOLCHAIN_NM 		:= ${TOOLCHAIN}-nm
+# set RASPI_TOOLCHAIN to cross compiler dir (ie. cross-pi-gcc-10.3.0-0/bin/arm-linux-gnueabihf)
+# set RASPI_SYSROOT to rpi's root dir (ie. raspberrypi/rootfs)
 
-SYSROOT_PATH 		:= ${RASPI_ROOT}
+SYSROOT_PATH		:= $(RASPI_SYSROOT)
+TOOLCHAIN			:= $(RASPI_TOOLCHAIN)
 
-CXX 		:= ${TOOLCHAIN_CXX}
-AR 		:= ${TOOLCHAIN_AR}
-STRIP 		:= ${TOOLCHAIN_STRIP}
-INCDIR 		:= include
-SRCDIR 		:= src
-BUILDDIR 	:= build
-BINDIR 		:= bin
-SRCEXT 		:= cpp
-LIBS 		:= -llgpio -pthread
-INC 		:= 	-I $(INCDIR) \
-	-L /usr/arm-linux-gnueabi/lib/hf -Wl,-rpath-link,/usr/arm-linux-gnueabi/lib/hf \
-	-L ${SYSROOT_PATH}/opt/lib -Wl,-rpath-link,${SYSROOT_PATH}/opt/lib \
-	-L ${SYSROOT_PATH}/lib/${TOOLCHAIN} -Wl,-rpath-link,${SYSROOT_PATH}/lib/${TOOLCHAIN} \
-	-L ${SYSROOT_PATH}/usr/local/lib -Wl,-rpath-link,${SYSROOT_PATH}/usr/local/lib \
-	-L ${SYSROOT_PATH}/usr/lib/${TOOLCHAIN} -Wl,-rpath-link,${SYSROOT_PATH}/usr/lib/${TOOLCHAIN} \
-	-L ${SYSROOT_PATH}/usr/lib -Wl,-rpath-link,${SYSROOT_PATH}/usr/lib \
-	-I ${SYSROOT_PATH}/usr/include \
-	-I ${SYSROOT_PATH}/usr/include/${TOOLCHAIN} \
-	-I ${SYSROOT_PATH}/usr/local/include
+TOOLCHAIN_CC		:= $(TOOLCHAIN)-gcc
+TOOLCHAIN_CXX		:= $(TOOLCHAIN)-g++
+TOOLCHAIN_LD		:= $(TOOLCHAIN)-ld
+TOOLCHAIN_AR		:= $(TOOLCHAIN)-ar
+TOOLCHAIN_RANLIB	:= $(TOOLCHAIN)-ranlib
+TOOLCHAIN_STRIP		:= $(TOOLCHAIN)-strip
+TOOLCHAIN_NM		:= $(TOOLCHAIN)-nm
 
+CXX			:= $(TOOLCHAIN_CXX)
+AR			:= $(TOOLCHAIN_AR)
+STRIP		:= $(TOOLCHAIN_STRIP)
+INCDIR		:= include
+SRCDIR		:= src
+BUILDDIR	:= build
+BINDIR		:= bin
+SRCEXT		:= cpp
+PREFIX 		:= /usr/local
+LIBS		:= -llgpio -pthread
+INC			:= -I$(INCDIR)
+
+# append paths for third-party libs (lgpio, etc...) from rpi sysroot
+LIBS :=	$(LIBS) \
+		-L$(SYSROOT_PATH)$(PREFIX)/lib -Wl,-rpath-link,$(SYSROOT_PATH)$(PREFIX)/lib
+INC := 	$(INC) \
+		-I$(SYSROOT_PATH)$(PREFIX)/include
 
 CFLAGS :=	-O3 \
-		-marm -march=armv6 -mfpu=vfp -mfloat-abi=hard \
-		-fomit-frame-pointer \
-		-pipe \
-		-Wall \
-		-Wextra \
-		-fstack-clash-protection \
-		-Wfatal-errors \
-		-Werror=format-security \
-		-Wl,-z,relro \
-		-Wl,-z,now \
-		-Wl,-z,defs	\
-		-Wl,--hash-style=gnu \
-		-Wl,--as-needed \
-		-D_FORTIFY_SOURCE=2 \
-		-DNDEBUG=1
-
-########################################################################
-
-# https://stackoverflow.com/a/39895302/570787
-ifeq ($(PREFIX),)
-	PREFIX := /usr/local
-endif
-
-########################################################################
+			-fomit-frame-pointer \
+			-pipe \
+			-Wall \
+			-Wextra \
+			-fstack-clash-protection \
+			-Wfatal-errors \
+			-Werror=format-security \
+			-Wl,-z,relro \
+			-Wl,-z,now \
+			-Wl,-z,defs	\
+			-Wl,--hash-style=gnu \
+			-Wl,--as-needed \
+			-D_FORTIFY_SOURCE=2 \
+			-DNDEBUG=1
 
 CXXFLAGS :=	-std=c++11 \
-		-fexceptions \
-		$(CFLAGS)
+			-fexceptions \
+			$(CFLAGS)
+
+########################################################################
+
+LIBNAME := hx711
+SOVERSION := 2.4.0
+SHARED_DIR := $(BUILDDIR)/shared
+SHARED_LIB := $(SHARED_DIR)/lib$(LIBNAME).so
+
+# generate a list of paths to .o object files
+OBJS	:=	AbstractScale \
+			AdvancedHX711 \
+			HX711 \
+			Mass \
+			SimpleHX711 \
+			Utility \
+			Value \
+			ValueStack \
+			Watcher
+OBJS 	:=	$(addsuffix .o,$(OBJS))
+OBJS 	:=	$(addprefix $(SHARED_DIR)/,$(OBJS))
 
 ########################################################################
 
 .PHONY: all
 all:	dirs \
-	build \
-	execs
+		build \
+		execs
 
 .PHONY: build
-build: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
+build: $(SHARED_LIB)
 
 .PHONY execs:
 execs: hx711calibration test
 
 .PHONY: clean
 clean:
-	rm -r $(BUILDDIR)/*
-	rm -r $(BINDIR)/*
+	rm -rf $(BUILDDIR)/*
+	rm -rf $(BINDIR)/*
 
 .PHONY: dirs
 dirs:
 	mkdir -p $(BINDIR)
-	mkdir -p $(BUILDDIR)/static
-	mkdir -p $(BUILDDIR)/shared
+	mkdir -p $(SHARED_DIR)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
 
-$(BUILDDIR)/static/%.o: $(SRCDIR)/%.$(SRCEXT)
-	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
-
-$(BUILDDIR)/shared/%.o: $(SRCDIR)/%.$(SRCEXT)
+$(SHARED_DIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CXX) $(CXXFLAGS) -fPIC $(INC) -c -o $@ $<
 
-# Build static library
-$(BUILDDIR)/static/libhx711.a:	$(BUILDDIR)/static/AbstractScale.o \
-								$(BUILDDIR)/static/AdvancedHX711.o \
-								$(BUILDDIR)/static/HX711.o \
-								$(BUILDDIR)/static/Mass.o \
-								$(BUILDDIR)/static/SimpleHX711.o \
-								$(BUILDDIR)/static/Utility.o \
-								$(BUILDDIR)/static/Value.o \
-								$(BUILDDIR)/static/ValueStack.o \
-								$(BUILDDIR)/static/Watcher.o
-
-	$(AR) rcs	$(BUILDDIR)/static/libhx711.a \
-				$(BUILDDIR)/static/AbstractScale.o \
-				$(BUILDDIR)/static/AdvancedHX711.o \
-				$(BUILDDIR)/static/HX711.o \
-				$(BUILDDIR)/static/Mass.o \
-				$(BUILDDIR)/static/SimpleHX711.o \
-				$(BUILDDIR)/static/Utility.o \
-				$(BUILDDIR)/static/Value.o \
-				$(BUILDDIR)/static/ValueStack.o \
-				$(BUILDDIR)/static/Watcher.o
-
-# Build shared library
-$(BUILDDIR)/shared/libhx711.so:	$(BUILDDIR)/shared/AbstractScale.o \
-				$(BUILDDIR)/shared/AdvancedHX711.o \
-				$(BUILDDIR)/shared/HX711.o \
-				$(BUILDDIR)/shared/Mass.o \
-				$(BUILDDIR)/shared/SimpleHX711.o \
-				$(BUILDDIR)/shared/Utility.o \
-				$(BUILDDIR)/shared/Value.o \
-				$(BUILDDIR)/shared/ValueStack.o \
-				$(BUILDDIR)/shared/Watcher.o
-	$(CXX)	-shared \
-		$(CXXFLAGS) \
-		$(INC) \
-		-o $(BUILDDIR)/shared/libhx711.so \
-			$(BUILDDIR)/shared/AbstractScale.o \
-			$(BUILDDIR)/shared/AdvancedHX711.o \
-			$(BUILDDIR)/shared/HX711.o \
-			$(BUILDDIR)/shared/Mass.o \
-			$(BUILDDIR)/shared/SimpleHX711.o \
-			$(BUILDDIR)/shared/Utility.o \
-			$(BUILDDIR)/shared/Value.o \
-			$(BUILDDIR)/shared/ValueStack.o \
-			$(BUILDDIR)/shared/Watcher.o \
-		$(LIBS)
-
-	$(STRIP) --strip-unneeded $(BUILDDIR)/shared/libhx711.so
-
+$(SHARED_LIB): $(OBJS)
+	$(CXX) -shared $(CXXFLAGS) $(INC) -o $(SHARED_LIB) $(OBJS) $(LIBS)
+	$(STRIP) --strip-unneeded $(SHARED_LIB)
+	file $(SHARED_LIB)
+	size $(SHARED_LIB)
+	mv $(SHARED_LIB) $(SHARED_LIB).$(SOVERSION)
+	ln -fs $(SHARED_LIB).$(SOVERSION) $(SHARED_LIB)
 
 .PHONY: hx711calibration
 hx711calibration: $(BUILDDIR)/Calibration.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/hx711calibration \
 		$(BUILDDIR)/Calibration.o \
-		-L $(BUILDDIR)/static \
-		-lhx711 $(LIBS)
+		-L$(SHARED_DIR) \
+		-l$(LIBNAME) $(LIBS)
 
 .PHONY: test
 test: $(BUILDDIR)/SimpleHX711Test.o $(BUILDDIR)/AdvancedHX711Test.o
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/simplehx711test \
 		$(BUILDDIR)/SimpleHX711Test.o \
-		-L $(BUILDDIR)/static \
-		-lhx711 $(LIBS)
+		-L$(SHARED_DIR) \
+		-l$(LIBNAME) $(LIBS)
 
 	$(CXX) $(CXXFLAGS) $(INC) \
 		-o $(BINDIR)/advancedhx711test \
 		$(BUILDDIR)/AdvancedHX711Test.o \
-		-L $(BUILDDIR)/static \
-		-lhx711 $(LIBS)
-
-
-.PHONY: discovery
-discovery: $(BUILDDIR)/DiscoverTiming.o
-	$(CXX) $(CXXFLAGS) $(INC) \
-		-o $(BINDIR)/discovery \
-		$(BUILDDIR)/DiscoverTiming.o \
-		-L $(BUILDDIR)/static \
-		-lhx711 -lgsl $(LIBS)
-
-
+		-L$(SHARED_DIR) \
+		-l$(LIBNAME) $(LIBS)
 
 .PHONY: install
-install: $(BUILDDIR)/shared/libhx711.so
+install: $(SHARED_LIB)
 	install -d $(DESTDIR)$(PREFIX)/lib/
-	install -m 644 $(BUILDDIR)/shared/libhx711.so $(DESTDIR)$(PREFIX)/lib/
-	install -d $(DESTDIR)$(PREFIX)/include/hx711
-	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/hx711
+	install -m 644 $(SHARED_LIB) $(DESTDIR)$(PREFIX)/lib/
+	install -d $(DESTDIR)$(PREFIX)/include/$(LIBNAME)
+	install -m 644 $(INCDIR)/*.h $(DESTDIR)$(PREFIX)/include/$(LIBNAME)
 	ldconfig
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/lib/libhx711.*
-	rm -rf $(DESTDIR)$(PREFIX)/include/hx711
+	rm -f $(DESTDIR)$(PREFIX)/lib/lib$(LIBNAME).*
+	rm -rf $(DESTDIR)$(PREFIX)/include/$(LIBNAME)
 	ldconfig
