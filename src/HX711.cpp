@@ -279,7 +279,7 @@ void HX711::setConfig(const Channel c, const Gain g) {
         this->powerUp();
 
     }
-    catch(const TimeoutException& e) {
+    catch(const std::exception& e) {
         this->_channel = backupChannel;
         this->_gain = backupGain;
         throw;
