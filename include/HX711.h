@@ -127,7 +127,7 @@ public:
     void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
 
     bool isReady() const;
-    virtual void waitReady() const;
+    virtual bool waitReady(const std::chrono::nanoseconds timeout = std::chrono::seconds(1)) const;
     Value readValue();
 
     void powerDown();

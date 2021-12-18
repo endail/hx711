@@ -307,10 +307,24 @@ bool HX711::isReady() const {
 
 }
 
-void HX711::waitReady() const {
-    while(!this->isReady()) {
-        //nop; busy-wait
+bool HX711::waitReady(const std::chrono::nanoseconds timeout) const {
+
+    using namespace std::chrono;
+
+    const auto maxEnd = high_resolution_clock::now();
+
+    while(true) {
+
+        if(this->isReady()) {
+            return true;
+        }
+
+        if(high_resolution_clock::now() >= maxEnd) {
+            return false;
+        }
+
     }
+
 }
 
 Value HX711::readValue() {
