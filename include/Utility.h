@@ -44,7 +44,7 @@ enum class GpioLevel : bool {
 
 class Utility {
 protected:
-    static constexpr const char* const _VERSION = "2.5.0";
+    static constexpr const char* const _VERSION = "2.6.0";
     static void _throwGpioExIfErr(const int code);
     Utility();
 
