@@ -52,7 +52,7 @@ enum class Gain : unsigned char {
 
 /**
  * Datasheet pg. 3
- * OTHER is to be used when an external clock (ie. crystal is used)
+ * OTHER is to be used when an external clock (ie. crystal) is used
  */
 enum class Rate : unsigned char {
     HZ_10,
@@ -88,11 +88,11 @@ protected:
     bool _useDelays;
     Format _bitFormat;
 
-    static std::int32_t _convertFromTwosComplement(const std::int32_t val) noexcept;
+    static val_t _convertFromTwosComplement(const val_t val) noexcept;
     static unsigned char _calculatePulses(const Gain g) noexcept;
     void _setInputGainSelection();
     bool _readBit() const;
-    void _readBits(std::int32_t* const v);
+    void _readBits(val_t* const v);
 
 
 public:

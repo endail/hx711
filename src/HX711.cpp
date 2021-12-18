@@ -62,7 +62,7 @@ const std::unordered_map<const Rate, const std::chrono::milliseconds>
         { Rate::HZ_80, std::chrono::milliseconds(50) }
 });
 
-std::int32_t HX711::_convertFromTwosComplement(const std::int32_t val) noexcept {
+val_t HX711::_convertFromTwosComplement(const val_t val) noexcept {
     return -(val & 0x800000) + (val & 0x7fffff);
 }
 
@@ -118,7 +118,7 @@ bool HX711::_readBit() const {
 
 }
 
-void HX711::_readBits(std::int32_t* const v) {
+void HX711::_readBits(val_t* const v) {
 
     std::lock_guard<std::mutex> lock(this->_commLock);
 
@@ -311,7 +311,7 @@ bool HX711::isReady() const {
 
 Value HX711::readValue() {
 
-    std::int32_t v = 0;
+    val_t v = 0;
 
     this->_readBits(&v);
 
