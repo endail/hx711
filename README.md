@@ -263,6 +263,20 @@ You will notice in the functions above there is an `Options` parameter. This det
 
 ---
 
+### [Value](include/Value.h)
+
+The `Value` class represents a useful value from the HX711 with some handy functions. A `Value` instance encapsulates a `val_t` type, which is a raw value from the HX711 after having been converted from a two's complement. You can use a `Value` in the same way as an `int` type.
+
+- `bool isMinSaturated( )`. Returns true if the `Value` is out of range at the low-end of the load-cell.
+
+- `bool isMaxSaturated( )`. Returns true if the `Value` is out of range at the high-end of the load-cell.
+
+- `bool isSaturated( )`. Returns true if the `Value` is out of range at either the low-end or high-end of the load-cell. You could use this - or the other `is*Saturated` functions - to show an error message (as [commonly seen on bathroom scales](https://pylonelectronics.com/wp-content/uploads/2019/05/Scale-Image-Calibration-Blog_2.png)).
+
+- `bool isValid( )`. Returns true if the underlying value (`val_t`) read from the HX711 is outside the normal operating range of possible valid values.
+
+---
+
 ### [Mass](include/Mass.h)
 
 `Mass` is a self-contained class to easily convert between units of mass. A `Mass` object contains a value stored as a `double` and a `Mass::Unit` representing the unit of that value. Methods of the `Mass` class you may find particularly useful include:
