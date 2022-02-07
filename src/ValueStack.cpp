@@ -37,7 +37,7 @@ void ValueStack::_update() {
         this->_container.pop_back();
     }
 
-    const auto now = high_resolution_clock::now();
+    const auto now = steady_clock::now();
 
     this->_container.remove_if([this, &now](const StackEntry& e) {
         return (e.when + this->_maxAge) > now;
@@ -62,7 +62,7 @@ void ValueStack::push(const Value val) noexcept {
 
     StackEntry e;
     e.val = val;
-    e.when = std::chrono::high_resolution_clock::now();
+    e.when = std::chrono::steady_clock::now();
 
     this->_container.push_front(e);
 

@@ -34,7 +34,7 @@ protected:
 
     struct StackEntry {
         Value val;
-        std::chrono::high_resolution_clock::time_point when;
+        std::chrono::steady_clock::time_point when;
     };
 
     static const size_t _DEFAULT_MAX_SIZE = 80;
