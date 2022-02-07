@@ -65,6 +65,8 @@ public:
      * Datasheet pg. 4
      */
     bool isSaturated() const noexcept;
+    bool isMinSaturated() const noexcept;
+    bool isMaxSaturated() const noexcept;
 
     /**
      * A 32 bit integer holds the actual value from the sensor. Calling
