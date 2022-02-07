@@ -30,7 +30,15 @@ Value::operator val_t() const noexcept {
 }
 
 bool Value::isSaturated() const noexcept {
-    return this->_v == SATURATION_MIN || this->_v == SATURATION_MAX;
+    return this->isMinSaturated() || this->isMaxSaturated();
+}
+
+bool Value::isMinSaturated() const noexcept {
+    return this->_v == SATURATION_MIN;
+}
+
+bool Value::isMaxSaturated() const noexcept {
+    return this->_v == SATURATION_MAX;
 }
 
 bool Value::isValid() const noexcept {
