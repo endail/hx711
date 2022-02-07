@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -88,7 +87,6 @@ void AbstractScale::setOffset(const Value offset) noexcept {
 }
 
 double AbstractScale::normalise(const double v) const noexcept {
-    assert(this->_refUnit != 0);
     return (v - this->_offset) / this->_refUnit;
 }
 

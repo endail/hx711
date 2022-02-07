@@ -24,7 +24,6 @@
 #define HX711_UTILITY_H_2F1DEBBD_F7BB_4202_BE2A_A33018D2AF5A
 
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <climits>
 #include <cstdint>
@@ -138,8 +137,6 @@ public:
     //https://stackoverflow.com/a/2602871/570787
     template <typename T>
     static T reverseBits(T n, const std::size_t b = sizeof(T) * CHAR_BIT) noexcept {
-
-        assert(b <= std::numeric_limits<T>::digits);
 
         T rv = 0;
 
