@@ -211,15 +211,6 @@ test: $(BUILDDIR)/SimpleHX711Test.o $(BUILDDIR)/AdvancedHX711Test.o
 		$(BUILDDIR)/AdvancedHX711Test.o \
 		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
-	
-
-.PHONY: discovery
-discovery: $(BUILDDIR)/DiscoverTiming.o
-	$(CXX) $(CXXFLAGS) $(INC) \
-		-o $(BINDIR)/discovery \
-		$(BUILDDIR)/DiscoverTiming.o \
-		-L $(BUILDDIR)/static \
-		-lhx711 -lgsl $(LIBS)
 
 
 
