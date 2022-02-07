@@ -229,7 +229,7 @@ void Watcher::_recoverHX711(const std::chrono::nanoseconds maxWait) {
 
     using namespace std::chrono;
 
-    const auto whenExceeded = high_resolution_clock::now() + maxWait;
+    const auto whenExceeded = steady_clock::now() + maxWait;
 
     //essentially...
 
@@ -245,7 +245,7 @@ void Watcher::_recoverHX711(const std::chrono::nanoseconds maxWait) {
             //if the read fails...
 
             //...and the max wait is met, return anyway
-            if(high_resolution_clock::now() >= whenExceeded) {
+            if(steady_clock::now() >= whenExceeded) {
                 return;
             }
 
