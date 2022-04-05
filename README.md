@@ -2,7 +2,7 @@
 
 [![Build on Raspberry Pi](https://github.com/endail/hx711/actions/workflows/buildcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/buildcheck.yml) [![cppcheck](https://github.com/endail/hx711/actions/workflows/cppcheck.yml/badge.svg)](https://github.com/endail/hx711/actions/workflows/cppcheck.yml)
 
-- v2.10.0
+- v2.11.0
 - Use with Raspberry Pi
 - Requires [lgpio](http://abyz.me.uk/lg/index.html)
 - Code tested inside [virtual Raspberry Pi Zero/3/4 environments](.github/workflows/buildcheck.yml) on GitHub
