@@ -36,15 +36,15 @@ namespace HX711 {
 Options::Options() noexcept
     : Options(_DEFAULT_SAMPLE_COUNT) { } //default constructor delegated to another
 
-Options::Options(const std::size_t s) noexcept
+Options::Options(const std::size_t s, const ReadType rt) noexcept
     :   stratType(StrategyType::Samples),
-        readType(ReadType::Median),
+        readType(rt),
         samples(s),
         timeout(0) { }
 
-Options::Options(const std::chrono::nanoseconds t) noexcept
+Options::Options(const std::chrono::nanoseconds t, const ReadType rt) noexcept
     :   stratType(StrategyType::Time),
-        readType(ReadType::Median),
+        readType(rt),
         samples(0),
         timeout(t) { }
 
