@@ -54,10 +54,10 @@ public:
     Options() noexcept;
 
     //cppcheck-suppress noExplicitConstructor
-    Options(const std::size_t s) noexcept;
+    Options(const std::size_t s, const ReadType rt = ReadType::Median) noexcept;
 
     //cppcheck-suppress noExplicitConstructor
-    Options(const std::chrono::nanoseconds t) noexcept;
+    Options(const std::chrono::nanoseconds t, const ReadType rt = ReadType::Median) noexcept;
 
 };
 

@@ -258,10 +258,8 @@ void HX711::setConfig(const Channel c, const Gain g) {
          * A read must take place to set the gain at the
          * hardware level. See datasheet pg. 4 "Serial
          * Interface".
-         * 
-         * TODO: this is an inefficient busy-wait. Solutions?
          */
-        while(!this->isReady());
+        this->waitReady();
         this->readValue();
 
         /**
@@ -305,6 +303,26 @@ bool HX711::isReady() const {
     }
     catch(const GpioException& ex) {
         return false;
+    }
+
+}
+
+bool HX711::waitReady(const std::chrono::nanoseconds timeout) const {
+
+    using namespace std::chrono;
+
+    const auto maxEnd = high_resolution_clock::now();
+
+    while(true) {
+
+        if(this->isReady()) {
+            return true;
+        }
+
+        if(high_resolution_clock::now() >= maxEnd) {
+            return false;
+        }
+
     }
 
 }
