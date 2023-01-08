@@ -171,9 +171,9 @@ HX711::HX711(
 }
 
 HX711::~HX711() {
-    
+
     try {
-        this->disconnect();
+        this->close();
     }
     catch(...) {
         //do not allow propagation
@@ -181,7 +181,7 @@ HX711::~HX711() {
 
 }
 
-void HX711::connect() {
+void HX711::init() {
 
     if(this->_gpioHandle >= 0) {
         return;
@@ -195,7 +195,7 @@ void HX711::connect() {
 
 }
 
-void HX711::disconnect() {
+void HX711::close() {
 
     if(this->_gpioHandle < 0) {
         return;

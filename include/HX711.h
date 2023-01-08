@@ -100,8 +100,8 @@ public:
 
     virtual ~HX711();
 
-    void connect();
-    void disconnect();
+    void init();
+    void close();
 
     void setStrictTiming(const bool strict) noexcept;
     bool isStrictTiming() const noexcept;
