@@ -354,14 +354,6 @@ void HX711::powerDown() {
     Utility::delay(std::chrono::microseconds(1));
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
 
-    /**
-     * "When PD_SCK pin changes from low to high
-     * and stays at high for longer than 60µs, HX711
-     * enters power down mode (Fig.3)."
-     * Datasheet pg. 5
-     */
-    Utility::sleep(_POWER_DOWN_TIMEOUT);
-
 }
 
 void HX711::powerUp() {
