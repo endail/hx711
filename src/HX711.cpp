@@ -45,7 +45,7 @@ constexpr std::chrono::microseconds HX711::_POWER_DOWN_TIMEOUT;
  * gain
  * Datasheet pg. 4
  */
-const std::unordered_map<const Gain, const unsigned char> HX711::_PULSES({
+const std::unordered_map<const Gain, const unsigned int> HX711::_PULSES({
     { Gain::GAIN_128,       25 },
     { Gain::GAIN_32,        26 },
     { Gain::GAIN_64,        27 }

@@ -33,7 +33,7 @@ namespace HX711 {
 /**
  * Datasheet pg. 4
  */
-enum class Gain : unsigned char {
+enum class Gain : unsigned int {
     GAIN_128,
     GAIN_32,
     GAIN_64
@@ -43,7 +43,7 @@ enum class Gain : unsigned char {
  * Datasheet pg. 3
  * OTHER is to be used when an external clock (ie. crystal) is used
  */
-enum class Rate : unsigned char {
+enum class Rate : unsigned int {
     HZ_10,
     HZ_80,
     OTHER
@@ -54,7 +54,7 @@ protected:
 
     static const std::int32_t _MIN_VALUE = -0x800000;
     static const std::int32_t _MAX_VALUE = 0x7fffff;
-    static const unsigned char _BITS_PER_CONVERSION_PERIOD = 24;
+    static const unsigned int _BITS_PER_CONVERSION_PERIOD = 24;
     static const std::unordered_map<const Gain, const unsigned char> _PULSES;
     static constexpr auto _T1 = std::chrono::nanoseconds(100);
     static constexpr auto _T2 = std::chrono::nanoseconds(100);
@@ -76,7 +76,7 @@ protected:
         return (std::int32_t)(-(raw & +_MIN_VALUE)) + (std::int32_t)(raw & _MAX_VALUE);
     }
 
-    static inline uint _calculatePulses(const Gain g) noexcept {
+    static inline unsigned int _calculatePulses(const Gain g) noexcept {
         return _PULSES.at(g) - _BITS_PER_CONVERSION_PERIOD;
     }
 
