@@ -79,7 +79,7 @@ void HX711::_setInputGainSelection() {
 
 }
 
-void HX711::_pulseClock() {
+void HX711::_pulseClockNoRead() {
 
     //first, clock pin is set high to make DOUT ready to be read from
     //and the current ACTUAL time is noted for later
@@ -115,15 +115,15 @@ bool HX711::_readBit() const {
         Utility::delay(std::max(_T2, _T3));
     }
 
+    //at this stage, DOUT is ready so read the bit value
+    const auto bit = Utility::readGpio(this->_gpioHandle, this->_dataPin);
+
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
     const auto diff = Utility::getnanos() - startNanos;
 
     if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
         throw IntegrityException("bit integrity failure");
     }
-
-    //at this stage, DOUT is ready so read the bit value
-    const auto bit = Utility::readGpio(this->_gpioHandle, this->_dataPin);
 
     //Assuming everything was OK, the datasheet requires a further
     //delay before the next pulse
