@@ -133,21 +133,6 @@ public:
 
     }
 
-    //reverseBits bits in int
-    //https://stackoverflow.com/a/2602871/570787
-    template <typename T>
-    static T reverseBits(T n, const std::size_t b = sizeof(T) * CHAR_BIT) noexcept {
-
-        T rv = 0;
-
-        for(size_t i = 0; i < b; ++i, n >>= 1) {
-            rv = (rv << 1) | (n & 0x01);
-        }
-
-        return rv;
-
-    }
-
 };
 };
 #endif
