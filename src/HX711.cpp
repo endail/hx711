@@ -367,15 +367,6 @@ void HX711::powerUp() {
      */
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
 
-    /**
-     * "Settling time refers to the time from power up, reset,
-     * input channel change and gain change to valid stable output data."
-     * Datasheet pg. 3
-     */
-    if(this->_rate != Rate::OTHER) {
-        Utility::sleep(_SETTLING_TIMES.at(this->_rate));
-    }
-
 }
 
 };
