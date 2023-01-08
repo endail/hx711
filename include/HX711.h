@@ -72,9 +72,24 @@ protected:
     bool _strictTiming;
     bool _useDelays;
 
-    static std::int32_t _convertFromTwosComplement(const std::uint32_t val) noexcept;
-    static uint _calculatePulses(const Gain g) noexcept;
-    void _setInputGainSelection();
+    static inline std::int32_t HX711::_convertFromTwosComplement(const std::uint32_t val) noexcept {
+        return (std::int32_t)(-(raw & +_MIN_VALUE)) + (std::int32_t)(raw & _MAX_VALUE);
+    }
+
+    static inline uint _calculatePulses(const Gain g) noexcept {
+        return _PULSES.at(g) - _BITS_PER_CONVERSION_PERIOD;
+    }
+
+    inline void HX711::_setInputGainSelection() {
+
+        const auto pulses = _calculatePulses(this->_gain);
+
+        for(auto i = decltype(pulses){0}; i < pulses; ++i) {
+            this->_pulseClockNoRead();
+        }
+
+    }
+
     void _pulseClockNoRead();
     bool _readBit() const;
     void _readBits(std::int32_t* const v);
@@ -98,29 +113,62 @@ public:
     HX711(const HX711& that) = delete;
     HX711& operator=(const HX711& that) = delete;
 
-    virtual ~HX711();
+    inline virtual ~HX711() {
+        try {
+            this->close();
+        }
+        catch(...) {
+            //do not allow propagation
+        }
+    }
 
     void init();
     void close();
 
-    void setStrictTiming(const bool strict) noexcept;
-    bool isStrictTiming() const noexcept;
+    inline void HX711::setStrictTiming(const bool strict) noexcept {
+        std::lock_guard<std::mutex> lock(this->_commLock);
+        this->_strictTiming = strict;
+    }
 
-    void useDelays(const bool use) noexcept;
-    bool isUsingDelays() const noexcept;
+    inline bool HX711::isStrictTiming() const noexcept {
+        return this->_strictTiming;
+    }
 
-    int getDataPin() const noexcept;
-    int getClockPin() const noexcept;
+    inline void HX711::useDelays(const bool use) noexcept {
+        this->_useDelays = use;
+    }
 
-    Gain getGain() const noexcept;
+    inline bool HX711::isUsingDelays() const noexcept {
+        return this->_useDelays;
+    }
+
+    inline int HX711::getDataPin() const noexcept {
+        return this->_dataPin;
+    }
+
+    inline int HX711::getClockPin() const noexcept {
+        return this->_clockPin;
+    }
+
+    inline Gain HX711::getGain() const noexcept {
+        return this->_gain;
+    }
+
     void setGain(const Gain g);
 
     bool isReady() const;
     virtual bool waitReady(const std::chrono::nanoseconds timeout = std::chrono::seconds(1)) const;
     std::int32_t readValue();
 
-    void powerDown();
-    void powerUp();
+    inline void HX711::powerDown() {
+        std::lock_guard<std::mutex> lock(this->_commLock);
+        Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
+    }
+
+    inline void HX711::powerUp() {
+        std::lock_guard<std::mutex> lock(this->_commLock);
+        Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
+    }
 
 };
 };
