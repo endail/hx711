@@ -43,44 +43,124 @@ enum class GpioLevel : bool {
 
 class Utility {
 protected:
+
     static constexpr const char* const _VERSION = "2.11.0";
-    static void _throwGpioExIfErr(const int code);
+
+    static inline void _throwGpioExIfErr(const int code) {
+        if(code < 0) {
+            throw GpioException(::lguErrorText(code));
+        }
+    }
+
     Utility();
 
 
 public:
 
-    static const char* getVersion() noexcept;
+    static inline const char* getVersion() noexcept {
+        return _VERSION;
+    }
 
-    static int openGpioHandle(const int chip);
-    static void closeGpioHandle(const int chip);
-    static void openGpioInput(const int handle, const int pin);
-    static void openGpioOutput(const int handle, const int pin);
-    static void closeGpioPin(const int handle, const int pin);
-    static GpioLevel readGpio(const int handle, const int pin);
-    static void writeGpio(const int handle, const int pin, const GpioLevel lev);
+    static inline int openGpioHandle(const int chip) {
+        const auto code = ::lgGpiochipOpen(chip);
+        _throwGpioExIfErr(code);
+        return code;
+    }
+
+    static inline void closeGpioHandle(const int chip) {
+        _throwGpioExIfErr(::lgGpiochipClose(chip));
+    }
+
+    static inline void openGpioInput(
+        const int handle,
+        const int pin) {
+            _throwGpioExIfErr(::lgGpioClaimInput(handle, LG_SET_PULL_UP, pin));
+    }
+
+    static inline void openGpioOutput(
+        const int handle,
+        const int pin) {
+            _throwGpioExIfErr(::lgGpioClaimOutput(handle, 0, pin, 0));
+    }
+
+    static inline void closeGpioPin(
+        const int handle,
+        const int pin) {
+            _throwGpioExIfErr(::lgGpioFree(handle, pin));
+    }
+
+    static inline GpioLevel readGpio(
+        const int handle,
+        const int pin) {
+
+            const auto code = ::lgGpioRead(handle, pin);
+            _throwGpioExIfErr(code);
+            //lgGpioRead returns 0 for low and 1 for high
+            //underlying GpioLevel is bool type
+            return static_cast<GpioLevel>(code);
+
+    }
+
+    static inline void writeGpio(
+        const int handle,
+        const int pin,
+        const GpioLevel lev) {
+            _throwGpioExIfErr(::lgGpioWrite(handle, pin, static_cast<int>(lev)));
+    }
 
     /**
      * Sleep for ns nanoseconds. The _sleep/_delay functions are
      * an attempt to be analogous to usleep/udelay in the kernel.
      * https://www.kernel.org/doc/html/v5.10/timers/timers-howto.html
      */
-    static void sleep(const std::chrono::nanoseconds ns) noexcept;
+    static inline void sleep(const std::chrono::nanoseconds ns) noexcept {
+        std::this_thread::sleep_for(ns);
+    }
+
     static void delay(const std::chrono::nanoseconds ns) noexcept;
 
-    static std::chrono::nanoseconds getnanos() noexcept;
+    static inline std::chrono::nanoseconds getnanos() noexcept {
+        timespec ts;
+        ::clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+        return timespec_to_nanos(&ts);
+    }
 
-    static std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts) noexcept;
+    static inline std::chrono::nanoseconds timespec_to_nanos(const timespec* const ts) noexcept {
+        using namespace std::chrono;
+        return duration_cast<nanoseconds>(seconds(ts->tv_sec)) + nanoseconds(ts->tv_nsec);
+    }
 
-    static void timespecclear(timespec* const tsp) noexcept;
-    static bool timespecisset(const timespec* const tsp) noexcept;
-    static bool timespecisvalid(const timespec* const tsp) noexcept;
-    static int timespeccmp(const timespec* const tsp, const timespec* const usp) noexcept;
-    static void timespecadd(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept;
-    static void timespecsub(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept;
+    static inline void timespecclear(timespec* const tsp) noexcept {
+        tsp->tv_sec = tsp->tv_nsec = 0;
+    }
+
+    static inline bool timespecisset(const timespec* const tsp) noexcept {
+        return tsp->tv_sec || tsp->tv_nsec;
+    }
+
+    static inline bool timespecisvalid(const timespec* const tsp) noexcept {
+        using namespace std::chrono;
+        return tsp->tv_nsec >= 0 && tsp->tv_nsec < nanoseconds::period::den;
+    }
+
+    static int timespeccmp(
+        const timespec* const tsp,
+        const timespec* const usp) noexcept;
+
+    static void timespecadd(
+        const timespec* const tsp,
+        const timespec* const usp,
+        timespec* const vsp) noexcept;
+
+    static void timespecsub(
+        const timespec* const tsp,
+        const timespec* const usp,
+        timespec* const vsp) noexcept;
 
     static void setThreadPriority(
-        const int pri, const int policy, const pthread_t th) noexcept;
+        const int pri,
+        const int policy,
+        const pthread_t th) noexcept;
 
     template <typename T>
     static double average(const std::vector<T>* const vals) noexcept {
@@ -149,5 +229,6 @@ public:
     }
 
 };
+
 };
 #endif

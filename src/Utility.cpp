@@ -33,56 +33,6 @@
 
 namespace HX711 {
 
-constexpr const char* const Utility::_VERSION;
-
-void Utility::_throwGpioExIfErr(const int code) {
-    if(code < 0) {
-        throw GpioException(::lguErrorText(code));
-    }
-}
-
-const char* Utility::getVersion() noexcept {
-    return _VERSION;
-}
-
-int Utility::openGpioHandle(const int chip) {
-    const auto code = ::lgGpiochipOpen(chip);
-    _throwGpioExIfErr(code);
-    return code;
-}
-
-void Utility::closeGpioHandle(const int chip) {
-    _throwGpioExIfErr(::lgGpiochipClose(chip));
-}
-
-void Utility::openGpioInput(const int handle, const int pin) {
-    _throwGpioExIfErr(::lgGpioClaimInput(handle, LG_SET_PULL_UP, pin));
-}
-
-void Utility::openGpioOutput(const int handle, const int pin) {
-    _throwGpioExIfErr(::lgGpioClaimOutput(handle, 0, pin, 0));
-}
-
-void Utility::closeGpioPin(const int handle, const int pin) {
-    _throwGpioExIfErr(::lgGpioFree(handle, pin));
-}
-
-GpioLevel Utility::readGpio(const int handle, const int pin) {
-    const auto code = ::lgGpioRead(handle, pin);
-    _throwGpioExIfErr(code);
-    //lgGpioRead returns 0 for low and 1 for high
-    //underlying GpioLevel is bool type
-    return static_cast<GpioLevel>(code);
-}
-
-void Utility::writeGpio(const int handle, const int pin, const GpioLevel lev) {
-    _throwGpioExIfErr(::lgGpioWrite(handle, pin, static_cast<int>(lev)));
-}
-
-void Utility::sleep(const std::chrono::nanoseconds ns) noexcept {
-    std::this_thread::sleep_for(ns);
-}
-
 void Utility::delay(const std::chrono::nanoseconds ns) noexcept {
 
     using namespace std::chrono;
@@ -135,109 +85,96 @@ void Utility::delay(const std::chrono::nanoseconds ns) noexcept {
 
 }
 
-std::chrono::nanoseconds Utility::getnanos() noexcept {
-    timespec ts;
-    ::clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    return timespec_to_nanos(&ts);
-}
+int Utility::timespeccmp(
+    const timespec* const tsp,
+    const timespec* const usp) noexcept {
 
-std::chrono::nanoseconds Utility::timespec_to_nanos(const timespec* const ts) noexcept {
-    using namespace std::chrono;
-    return duration_cast<nanoseconds>(seconds(ts->tv_sec)) + nanoseconds(ts->tv_nsec);
-}
+        if(tsp->tv_sec < usp->tv_sec) {
+            return -1;
+        }
+        else if(tsp->tv_sec > usp->tv_sec) {
+            return 1;
+        }
 
-void Utility::timespecclear(timespec* const tsp) noexcept {
-    tsp->tv_sec = tsp->tv_nsec = 0;
-}
+        if(tsp->tv_nsec < usp->tv_nsec) {
+            return -1;
+        }
+        else if(tsp->tv_nsec > usp->tv_nsec) {
+            return 1;
+        }
 
-bool Utility::timespecisset(const timespec* const tsp) noexcept {
-    return tsp->tv_sec || tsp->tv_nsec;
-}
-
-bool Utility::timespecisvalid(const timespec* const tsp) noexcept {
-    using namespace std::chrono;
-    return tsp->tv_nsec >= 0 && tsp->tv_nsec < nanoseconds::period::den;
-}
-
-int Utility::timespeccmp(const timespec* const tsp, const timespec* const usp) noexcept {
-
-    if(tsp->tv_sec < usp->tv_sec) {
-        return -1;
-    }
-    else if(tsp->tv_sec > usp->tv_sec) {
-        return 1;
-    }
-
-    if(tsp->tv_nsec < usp->tv_nsec) {
-        return -1;
-    }
-    else if(tsp->tv_nsec > usp->tv_nsec) {
-        return 1;
-    }
-
-    return 0;
+        return 0;
 
 }
 
-void Utility::timespecadd(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept {
+void Utility::timespecadd(
+    const timespec* const tsp,
+    const timespec* const usp,
+    timespec* const vsp) noexcept {
 
-    using namespace std::chrono;
+        using namespace std::chrono;
 
-    vsp->tv_sec = tsp->tv_sec + usp->tv_sec;
-    vsp->tv_nsec = tsp->tv_nsec + usp->tv_nsec;
+        vsp->tv_sec = tsp->tv_sec + usp->tv_sec;
+        vsp->tv_nsec = tsp->tv_nsec + usp->tv_nsec;
 
-    if(vsp->tv_nsec >= nanoseconds::period::den) {
-        vsp->tv_sec++;
-        vsp->tv_nsec -= nanoseconds::period::den;
-    }
-
-}
-
-void Utility::timespecsub(const timespec* const tsp, const timespec* const usp, timespec* const vsp) noexcept {
-
-    using namespace std::chrono;
-
-    vsp->tv_sec = tsp->tv_sec - usp->tv_sec;
-    vsp->tv_nsec = tsp->tv_nsec - usp->tv_nsec;
-
-    if(vsp->tv_nsec < 0) {
-        vsp->tv_sec--;
-        vsp->tv_nsec += nanoseconds::period::den;
-    }
+        if(vsp->tv_nsec >= nanoseconds::period::den) {
+            vsp->tv_sec++;
+            vsp->tv_nsec -= nanoseconds::period::den;
+        }
 
 }
 
-void Utility::setThreadPriority(const int pri, const int policy, const pthread_t th) noexcept {
+void Utility::timespecsub(
+    const timespec* const tsp,
+    const timespec* const usp,
+    timespec* const vsp) noexcept {
 
-    struct sched_param schParams = {
-        pri
-    };
+        using namespace std::chrono;
 
-    /**
-     * Leaving this here for future readers.
-     * 
-     * Any processes or threads using SCHED_FIFO or SCHED_RR shall be 
-     * unaffected by a call to setpriority().
-     * https://linux.die.net/man/3/setpriority
-     * 
-     * ::setpriority(PRIO_PROCESS, 0, PRIO_MAX);
-     */
+        vsp->tv_sec = tsp->tv_sec - usp->tv_sec;
+        vsp->tv_nsec = tsp->tv_nsec - usp->tv_nsec;
 
-    /**
-     * This may return...
-     * 
-     * EPERM  The caller does not have appropriate privileges to set the
-     * specified scheduling policy and parameters.
-     * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
-     * 
-     * If this occurs, is it still acceptable to continue at a reduced
-     * priority? Yes. Use sudo if needed or calling code can temporarily
-     * elevate permissions.
-     */
-    ::pthread_setschedparam(
-        th,
-        policy,
-        &schParams);
+        if(vsp->tv_nsec < 0) {
+            vsp->tv_sec--;
+            vsp->tv_nsec += nanoseconds::period::den;
+        }
+
+}
+
+void Utility::setThreadPriority(
+    const int pri,
+    const int policy,
+    const pthread_t th) noexcept {
+
+        struct sched_param schParams = {
+            pri
+        };
+
+        /**
+         * Leaving this here for future readers.
+         * 
+         * Any processes or threads using SCHED_FIFO or SCHED_RR shall be 
+         * unaffected by a call to setpriority().
+         * https://linux.die.net/man/3/setpriority
+         * 
+         * ::setpriority(PRIO_PROCESS, 0, PRIO_MAX);
+         */
+
+        /**
+         * This may return...
+         * 
+         * EPERM  The caller does not have appropriate privileges to set the
+         * specified scheduling policy and parameters.
+         * https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html
+         * 
+         * If this occurs, is it still acceptable to continue at a reduced
+         * priority? Yes. Use sudo if needed or calling code can temporarily
+         * elevate permissions.
+         */
+        ::pthread_setschedparam(
+            th,
+            policy,
+            &schParams);
 
 }
 
