@@ -60,11 +60,6 @@ enum class Rate : unsigned char {
     OTHER
 };
 
-enum class Format : unsigned char {
-    MSB,
-    LSB
-};
-
 class HX711 {
 protected:
 
@@ -88,7 +83,6 @@ protected:
     Gain _gain;
     bool _strictTiming;
     bool _useDelays;
-    Format _bitFormat;
 
     static val_t _convertFromTwosComplement(const val_t val) noexcept;
     static unsigned char _calculatePulses(const Gain g) noexcept;
@@ -117,9 +111,6 @@ public:
 
     void useDelays(const bool use) noexcept;
     bool isUsingDelays() const noexcept;
-
-    Format getFormat() const noexcept;
-    void setFormat(const Format bitFormat) noexcept;
 
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
