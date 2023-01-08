@@ -30,7 +30,6 @@
 #include "../include/IntegrityException.h"
 #include "../include/TimeoutException.h"
 #include "../include/Utility.h"
-#include "../include/Value.h"
 #include "../include/Watcher.h"
 
 namespace HX711 {
@@ -79,7 +78,7 @@ void* Watcher::_watchPin(void* const watcherPtr) {
 
     std::unique_lock<std::mutex> stateLock(self->_pinWatchLock, std::defer_lock);
     std::unique_lock<std::mutex> valsLock(self->valuesLock, std::defer_lock);
-    Value v;
+    std::int32_t v;
 
     for(;;) {
 

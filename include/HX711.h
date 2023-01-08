@@ -27,7 +27,6 @@
 #include <cstdint>
 #include <mutex>
 #include <unordered_map>
-#include "Value.h"
 
 namespace HX711 {
 
@@ -84,14 +83,22 @@ protected:
     bool _strictTiming;
     bool _useDelays;
 
-    static val_t _convertFromTwosComplement(const val_t val) noexcept;
+    static std::int32_t _convertFromTwosComplement(const std::uint32_t val) noexcept;
     static unsigned char _calculatePulses(const Gain g) noexcept;
     void _setInputGainSelection();
     bool _readBit() const;
-    void _readBits(val_t* const v);
+    void _readBits(std::int32_t* const v);
 
 
 public:
+
+    static inline bool isMinSaturated(const std::int32_t v) noexcept {
+        return v == _MIN_VALUE;
+    }
+
+    static inline bool isMaxSaturated(const std::int32_t v) noexcept {
+        return v == _MAX_VALUE;
+    }
 
     HX711(
         const int dataPin,
@@ -121,7 +128,7 @@ public:
 
     bool isReady() const;
     virtual bool waitReady(const std::chrono::nanoseconds timeout = std::chrono::seconds(1)) const;
-    Value readValue();
+    std::int32_t readValue();
 
     void powerDown();
     void powerUp();

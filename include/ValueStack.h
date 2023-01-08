@@ -26,7 +26,6 @@
 #include <chrono>
 #include <cstdint>
 #include <list>
-#include "Value.h"
 
 namespace HX711 {
 class ValueStack {
@@ -53,8 +52,8 @@ public:
         const std::size_t maxSize = _DEFAULT_MAX_SIZE,
         const std::chrono::nanoseconds maxAge = _DEFAULT_MAX_AGE) noexcept;
 
-    void push(const Value val) noexcept;
-    Value pop() noexcept;
+    void push(const std::int32_t val) noexcept;
+    std::int32_t pop() noexcept;
     std::size_t size() const noexcept;
     void clear() noexcept;
     bool empty() const noexcept;

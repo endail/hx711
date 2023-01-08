@@ -33,7 +33,7 @@ using namespace std;
 std::size_t samples;
 std::string unit;
 double knownWeight;
-Value zeroValue;
+int zeroValue;
 SimpleHX711* hx;
 
 int main(int argc, char** argv) {
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 
     const double raw = hx->read(Options(samples));
     const double refUnitFloat = (raw - zeroValue) / knownWeight;
-    Value refUnit = static_cast<Value>(round(refUnitFloat));
+    int refUnit = static_cast<int>(round(refUnitFloat));
     delete hx;
 
     if(refUnit == 0) {

@@ -23,7 +23,6 @@
 #include <chrono>
 #include <cstdint>
 #include "../include/ValueStack.h"
-#include "../include/Value.h"
 
 namespace HX711 {
 
@@ -52,7 +51,7 @@ ValueStack::ValueStack(
         _maxAge(maxAge) {
 }
 
-void ValueStack::push(const Value val) noexcept {
+void ValueStack::push(const std::int32_t val) noexcept {
 
     this->_update();
 
@@ -68,8 +67,8 @@ void ValueStack::push(const Value val) noexcept {
 
 }
 
-Value ValueStack::pop() noexcept {
-    const Value v = this->_container.front().val;
+std::int32_t ValueStack::pop() noexcept {
+    const std::int32_t v = this->_container.front().val;
     this->_container.pop_front();
     return v;
 }

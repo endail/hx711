@@ -31,7 +31,6 @@
 #include "../include/IntegrityException.h"
 #include "../include/TimeoutException.h"
 #include "../include/Utility.h"
-#include "../include/Value.h"
 
 namespace HX711 {
 
@@ -62,7 +61,7 @@ const std::unordered_map<const Rate, const std::chrono::milliseconds>
         { Rate::HZ_80, std::chrono::milliseconds(50) }
 });
 
-val_t HX711::_convertFromTwosComplement(const val_t val) noexcept {
+std::int32_t HX711::_convertFromTwosComplement(const std::uint32_t val) noexcept {
     return (std::int32_t)(-(raw & +_MIN_VALUE)) + (std::int32_t)(raw & _MAX_VALUE);
 }
 
@@ -118,7 +117,7 @@ bool HX711::_readBit() const {
 
 }
 
-void HX711::_readBits(val_t* const v) {
+void HX711::_readBits(std::int32_t* const v) {
 
     std::lock_guard<std::mutex> lock(this->_commLock);
 
@@ -317,10 +316,10 @@ bool HX711::waitReady(const std::chrono::nanoseconds timeout) const {
 
 }
 
-Value HX711::readValue() {
-    val_t v = 0;
+std::int32_t HX711::readValue() {
+    int32_t v = 0;
     this->_readBits(&v);
-    return Value(_convertFromTwosComplement(v));
+    return _convertFromTwosComplement(v);
 }
 
 void HX711::powerDown() {

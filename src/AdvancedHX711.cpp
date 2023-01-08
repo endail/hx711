@@ -29,7 +29,6 @@
 #include "../include/HX711.h"
 #include "../include/Mass.h"
 #include "../include/Utility.h"
-#include "../include/Value.h"
 #include "../include/Watcher.h"
 
 namespace HX711 {
@@ -37,8 +36,8 @@ namespace HX711 {
 AdvancedHX711::AdvancedHX711(
     const int dataPin,
     const int clockPin,
-    const Value refUnit,
-    const Value offset,
+    const int refUnit,
+    const int offset,
     const Rate rate) : 
         AbstractScale(Mass::Unit::G, refUnit, offset),
         HX711(dataPin, clockPin, rate) {
@@ -51,14 +50,14 @@ AdvancedHX711::~AdvancedHX711() {
     delete this->_wx;
 }
 
-std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeout) {
+std::vector<std::int32_t> AdvancedHX711::getValues(const std::chrono::nanoseconds timeout) {
 
     using namespace std::chrono;
 
     this->_wx->values.clear();
     this->_wx->watch();
 
-    std::vector<Value> vals;
+    std::vector<std::int32_t> vals;
     const auto endTime = steady_clock::now() + timeout;
 
     while(true) {
@@ -87,7 +86,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::chrono::nanoseconds timeo
 
 }
 
-std::vector<Value> AdvancedHX711::getValues(const std::size_t samples) {
+std::vector<std::int32_t> AdvancedHX711::getValues(const std::size_t samples) {
 
     using namespace std::chrono;
 
@@ -103,7 +102,7 @@ std::vector<Value> AdvancedHX711::getValues(const std::size_t samples) {
      * ie. in favour of increasing the watcher's priority
      */
 
-    std::vector<Value> vals;
+    std::vector<std::int32_t> vals;
     vals.reserve(samples);
 
     //while not filled

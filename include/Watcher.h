@@ -28,7 +28,6 @@
 #include <pthread.h>
 #include <sched.h>
 #include "HX711.h"
-#include "Value.h"
 #include "ValueStack.h"
 
 namespace HX711 {

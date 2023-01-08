@@ -27,26 +27,25 @@
 #include "../include/HX711.h"
 #include "../include/Mass.h"
 #include "../include/SimpleHX711.h"
-#include "../include/Value.h"
 
 namespace HX711 {
 
 SimpleHX711::SimpleHX711(
     const int dataPin,
     const int clockPin,
-    const Value refUnit,
-    const Value offset,
+    const int refUnit,
+    const int offset,
     const Rate rate) :
         AbstractScale(Mass::Unit::G, refUnit, offset),
         HX711(dataPin, clockPin, rate) {
             this->connect();
 }
 
-std::vector<Value> SimpleHX711::getValues(const std::chrono::nanoseconds timeout) {
+std::vector<std::int32_t> SimpleHX711::getValues(const std::chrono::nanoseconds timeout) {
 
     using namespace std::chrono;
 
-    std::vector<Value> vals;
+    std::vector<std::int32_t> vals;
     const auto endTime = steady_clock::now() + timeout;
 
     while(true) {
@@ -63,13 +62,13 @@ std::vector<Value> SimpleHX711::getValues(const std::chrono::nanoseconds timeout
 
 }
 
-std::vector<Value> SimpleHX711::getValues(const std::size_t samples) {
+std::vector<std::int32_t> SimpleHX711::getValues(const std::size_t samples) {
     
     if(samples == 0) {
         throw std::range_error("samples must be at least 1");
     }
     
-    std::vector<Value> vals;
+    std::vector<std::int32_t> vals;
     vals.reserve(samples);
     
     for(std::size_t i = 0; i < samples; ++i) {

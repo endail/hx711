@@ -28,7 +28,6 @@
 #include "../include/AbstractScale.h"
 #include "../include/Mass.h"
 #include "../include/Utility.h"
-#include "../include/Value.h"
 
 namespace HX711 {
 
@@ -49,8 +48,8 @@ Options::Options(const std::chrono::nanoseconds t, const ReadType rt) noexcept
 
 AbstractScale::AbstractScale(
     const Mass::Unit massUnit,
-    const Value refUnit,
-    const Value offset) noexcept : 
+    const int refUnit,
+    const int offset) noexcept : 
         _massUnit(massUnit),
         _refUnit(refUnit),
         _offset(offset) {
@@ -64,11 +63,11 @@ Mass::Unit AbstractScale::getUnit() const noexcept {
     return this->_massUnit;
 }
 
-Value AbstractScale::getReferenceUnit() const noexcept {
+int AbstractScale::getReferenceUnit() const noexcept {
     return this->_refUnit;
 }
 
-void AbstractScale::setReferenceUnit(const Value refUnit) {
+void AbstractScale::setReferenceUnit(const int refUnit) {
 
     if(refUnit == 0) {
         throw std::invalid_argument("reference unit cannot be 0");
@@ -78,11 +77,11 @@ void AbstractScale::setReferenceUnit(const Value refUnit) {
 
 }
 
-Value AbstractScale::getOffset() const noexcept {
+int AbstractScale::getOffset() const noexcept {
     return this->_offset;
 }
 
-void AbstractScale::setOffset(const Value offset) noexcept {
+void AbstractScale::setOffset(const int offset) noexcept {
     this->_offset = offset;
 }
 
@@ -92,7 +91,7 @@ double AbstractScale::normalise(const double v) const noexcept {
 
 double AbstractScale::read(const Options o) {
 
-    std::vector<Value> vals;
+    std::vector<std::int32_t> vals;
 
     switch(o.stratType) {
         case StrategyType::Samples:
@@ -127,7 +126,7 @@ void AbstractScale::zero(const Options o) {
 
     try {
         this->setReferenceUnit(1);
-        this->setOffset(static_cast<Value>(
+        this->setOffset(static_cast<std::int32_t>(
             std::round(this->read(o))));
         this->setReferenceUnit(refBackup);
     }

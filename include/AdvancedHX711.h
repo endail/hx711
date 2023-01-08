@@ -27,7 +27,6 @@
 #include <cstdint>
 #include "AbstractScale.h"
 #include "HX711.h"
-#include "Value.h"
 #include "Watcher.h"
 
 namespace HX711 {
@@ -40,14 +39,14 @@ public:
     AdvancedHX711(
         const int dataPin,
         const int clockPin,
-        const Value refUnit = 1,
-        const Value offset = 0,
+        const int refUnit = 1,
+        const int offset = 0,
         const Rate rate = Rate::HZ_10);
 
     virtual ~AdvancedHX711();
 
-    virtual std::vector<Value> getValues(const std::chrono::nanoseconds timeout) override;
-    virtual std::vector<Value> getValues(const std::size_t samples) override;
+    virtual std::vector<std::int32_t> getValues(const std::chrono::nanoseconds timeout) override;
+    virtual std::vector<std::int32_t> getValues(const std::size_t samples) override;
 
 };
 };
