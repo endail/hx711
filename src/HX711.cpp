@@ -345,13 +345,6 @@ void HX711::powerDown() {
 
     std::lock_guard<std::mutex> lock(this->_commLock);
 
-    /**
-     * The delay between low to high is probably not necessary, but it
-     * should help to keep the underlying code from optimising it away -
-     * if does at all.
-     */
-    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-    Utility::delay(std::chrono::microseconds(1));
     Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
 
     /**
