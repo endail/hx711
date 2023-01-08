@@ -31,16 +31,6 @@
 namespace HX711 {
 
 /**
- * Datasheet
- * https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf
- */
-
-enum class Channel : unsigned char {
-    A,
-    B
-};
-
-/**
  * Datasheet pg. 4
  */
 enum class Gain : unsigned char {
@@ -78,13 +68,12 @@ protected:
     const int _clockPin;
     const Rate _rate;
     std::mutex _commLock;
-    Channel _channel;
     Gain _gain;
     bool _strictTiming;
     bool _useDelays;
 
     static std::int32_t _convertFromTwosComplement(const std::uint32_t val) noexcept;
-    static unsigned char _calculatePulses(const Gain g) noexcept;
+    static uint _calculatePulses(const Gain g) noexcept;
     void _setInputGainSelection();
     bool _readBit() const;
     void _readBits(std::int32_t* const v);
@@ -122,9 +111,8 @@ public:
     int getDataPin() const noexcept;
     int getClockPin() const noexcept;
 
-    Channel getChannel() const noexcept;
     Gain getGain() const noexcept;
-    void setConfig(const Channel c = Channel::A, const Gain g = Gain::GAIN_128);
+    void setGain(const Gain g);
 
     bool isReady() const;
     virtual bool waitReady(const std::chrono::nanoseconds timeout = std::chrono::seconds(1)) const;

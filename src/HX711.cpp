@@ -65,7 +65,7 @@ std::int32_t HX711::_convertFromTwosComplement(const std::uint32_t val) noexcept
     return (std::int32_t)(-(raw & +_MIN_VALUE)) + (std::int32_t)(raw & _MAX_VALUE);
 }
 
-unsigned char HX711::_calculatePulses(const Gain g) noexcept {
+uint HX711::_calculatePulses(const Gain g) noexcept {
     return _PULSES.at(g) - _BITS_PER_CONVERSION_PERIOD;
 }
 
@@ -139,15 +139,17 @@ void HX711::_readBits(std::int32_t* const v) {
 
 }
 
-HX711::HX711(const int dataPin, const int clockPin, const Rate rate) noexcept :
-    _gpioHandle(-1),
-    _dataPin(dataPin),
-    _clockPin(clockPin),
-    _rate(rate),
-    _channel(Channel::A),
-    _gain(Gain::GAIN_128),
-    _strictTiming(false),
-    _useDelays(false) {
+HX711::HX711(
+    const int dataPin,
+    const int clockPin,
+    const Rate rate) noexcept :
+        _gpioHandle(-1),
+        _dataPin(dataPin),
+        _clockPin(clockPin),
+        _rate(rate),
+        _gain(Gain::GAIN_128),
+        _strictTiming(false),
+        _useDelays(false) {
 }
 
 HX711::~HX711() {
@@ -171,7 +173,7 @@ void HX711::connect() {
     Utility::openGpioInput(this->_gpioHandle, this->_dataPin);
     Utility::openGpioOutput(this->_gpioHandle, this->_clockPin);
 
-    this->setConfig(this->_channel, this->_gain);
+    this->setConfig(this->_gain);
 
 }
 
@@ -214,27 +216,14 @@ int HX711::getClockPin() const noexcept {
     return this->_clockPin;
 }
 
-Channel HX711::getChannel() const noexcept {
-    return this->_channel;
-}
-
 Gain HX711::getGain() const noexcept {
     return this->_gain;
 }
 
-void HX711::setConfig(const Channel c, const Gain g) {
+void HX711::setGain(const Gain g) {
 
-    if(c == Channel::A && g == Gain::GAIN_32) {
-        throw std::invalid_argument("Channel A can only use a gain of 128 or 64");
-    }
-    else if(c == Channel::B && g != Gain::GAIN_32) {
-        throw std::invalid_argument("Channel B can only use a gain of 32");
-    }
-
-    const auto backupChannel = this->_channel;
     const auto backupGain = this->_gain;
 
-    this->_channel = c;
     this->_gain = g;
 
     /**
@@ -267,7 +256,6 @@ void HX711::setConfig(const Channel c, const Gain g) {
 
     }
     catch(const std::exception& e) {
-        this->_channel = backupChannel;
         this->_gain = backupGain;
         throw;
     }
