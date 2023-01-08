@@ -311,7 +311,7 @@ bool HX711::waitReady(const std::chrono::nanoseconds timeout) const {
 
     using namespace std::chrono;
 
-    const auto maxEnd = high_resolution_clock::now();
+    const auto maxEnd = steady_clock::now();
 
     while(true) {
 
@@ -319,7 +319,7 @@ bool HX711::waitReady(const std::chrono::nanoseconds timeout) const {
             return true;
         }
 
-        if(high_resolution_clock::now() >= maxEnd) {
+        if(steady_clock::now() >= maxEnd) {
             return false;
         }
 
