@@ -61,24 +61,6 @@ const std::unordered_map<const Rate, const std::chrono::milliseconds>
         { Rate::HZ_80, std::chrono::milliseconds(50) }
 });
 
-std::int32_t HX711::_convertFromTwosComplement(const std::uint32_t val) noexcept {
-    return (std::int32_t)(-(raw & +_MIN_VALUE)) + (std::int32_t)(raw & _MAX_VALUE);
-}
-
-uint HX711::_calculatePulses(const Gain g) noexcept {
-    return _PULSES.at(g) - _BITS_PER_CONVERSION_PERIOD;
-}
-
-void HX711::_setInputGainSelection() {
-
-    const auto pulses = _calculatePulses(this->_gain);
-
-    for(auto i = decltype(pulses){0}; i < pulses; ++i) {
-        this->_pulseClockNoRead();
-    }
-
-}
-
 void HX711::_pulseClockNoRead() {
 
     //first, clock pin is set high to make DOUT ready to be read from
@@ -170,17 +152,6 @@ HX711::HX711(
         _useDelays(false) {
 }
 
-HX711::~HX711() {
-
-    try {
-        this->close();
-    }
-    catch(...) {
-        //do not allow propagation
-    }
-
-}
-
 void HX711::init() {
 
     if(this->_gpioHandle >= 0) {
@@ -207,35 +178,6 @@ void HX711::close() {
 
     this->_gpioHandle = -1;
 
-}
-
-void HX711::setStrictTiming(const bool strict) noexcept {
-    std::lock_guard<std::mutex> lock(this->_commLock);
-    this->_strictTiming = strict;
-}
-
-bool HX711::isStrictTiming() const noexcept {
-    return this->_strictTiming;
-}
-
-void HX711::useDelays(const bool use) noexcept {
-    this->_useDelays = use;
-}
-
-bool HX711::isUsingDelays() const noexcept {
-    return this->_useDelays;
-}
-
-int HX711::getDataPin() const noexcept {
-    return this->_dataPin;
-}
-
-int HX711::getClockPin() const noexcept {
-    return this->_clockPin;
-}
-
-Gain HX711::getGain() const noexcept {
-    return this->_gain;
 }
 
 void HX711::setGain(const Gain g) {
@@ -326,27 +268,6 @@ std::int32_t HX711::readValue() {
     int32_t v = 0;
     this->_readBits(&v);
     return _convertFromTwosComplement(v);
-}
-
-void HX711::powerDown() {
-
-    std::lock_guard<std::mutex> lock(this->_commLock);
-
-    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
-
-}
-
-void HX711::powerUp() {
-
-    std::lock_guard<std::mutex> lock(this->_commLock);
-
-    /**
-     * "When PD_SCK returns to low,
-     * chip will reset and enter normal operation mode"
-     * Datasheet pg. 5
-     */
-    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
-
 }
 
 };
