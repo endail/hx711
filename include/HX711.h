@@ -68,6 +68,8 @@ enum class Format : unsigned char {
 class HX711 {
 protected:
 
+    static const std::int32_t _MIN_VALUE = -0x800000;
+    static const std::int32_t _MAX_VALUE = 0x7fffff;
     static const unsigned char _BITS_PER_CONVERSION_PERIOD = 24;
     static const std::unordered_map<const Gain, const unsigned char> _PULSES;
     static constexpr auto _T1 = std::chrono::nanoseconds(100);

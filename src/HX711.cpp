@@ -63,7 +63,7 @@ const std::unordered_map<const Rate, const std::chrono::milliseconds>
 });
 
 val_t HX711::_convertFromTwosComplement(const val_t val) noexcept {
-    return -(val & 0x800000) + (val & 0x7fffff);
+    return (std::int32_t)(-(raw & +_MIN_VALUE)) + (std::int32_t)(raw & _MAX_VALUE);
 }
 
 unsigned char HX711::_calculatePulses(const Gain g) noexcept {
