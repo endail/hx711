@@ -75,6 +75,7 @@ protected:
     static std::int32_t _convertFromTwosComplement(const std::uint32_t val) noexcept;
     static uint _calculatePulses(const Gain g) noexcept;
     void _setInputGainSelection();
+    void _pulseClockNoRead();
     bool _readBit() const;
     void _readBits(std::int32_t* const v);
 

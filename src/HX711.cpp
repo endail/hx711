@@ -74,12 +74,12 @@ void HX711::_setInputGainSelection() {
     const auto pulses = _calculatePulses(this->_gain);
 
     for(auto i = decltype(pulses){0}; i < pulses; ++i) {
-        this->_readBit();
+        this->_pulseClockNoRead();
     }
 
 }
 
-bool HX711::_readBit() const {
+void HX711::_pulseClock() {
 
     //first, clock pin is set high to make DOUT ready to be read from
     //and the current ACTUAL time is noted for later
@@ -100,6 +100,24 @@ bool HX711::_readBit() const {
     //was held high for longer than 60us, the chip will have entered
     //power down mode. This means the currently read bit, and
     //consequently the entire value, is unreliable.
+    if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
+        throw IntegrityException("bit integrity failure");
+    }
+
+}
+
+bool HX711::_readBit() const {
+
+    const auto startNanos = Utility::getnanos();
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::HIGH);
+
+    if(this->_useDelays) {
+        Utility::delay(std::max(_T2, _T3));
+    }
+
+    Utility::writeGpio(this->_gpioHandle, this->_clockPin, GpioLevel::LOW);
+    const auto diff = Utility::getnanos() - startNanos;
+
     if(this->_strictTiming && diff >= _POWER_DOWN_TIMEOUT) {
         throw IntegrityException("bit integrity failure");
     }
