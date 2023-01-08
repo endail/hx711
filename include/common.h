@@ -20,15 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "AbstractScale.h"
-#include "AdvancedHX711.h"
 #include "GpioException.h"
 #include "HX711.h"
 #include "IntegrityException.h"
-#include "Mass.h"
-#include "SimpleHX711.h"
 #include "TimeoutException.h"
 #include "Utility.h"
-#include "Value.h"
-#include "ValueStack.h"
 #include "Watcher.h"
