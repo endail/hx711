@@ -117,15 +117,15 @@ bool HX711::_readBit() const {
 
 }
 
-void HX711::_readBits(std::int32_t* const v) {
+std::uint32_t HX711::_readBits() {
 
     std::lock_guard<std::mutex> lock(this->_commLock);
 
-    //The datasheet notes a tiny delay between DOUT going low and the
-    //initial clock pin change
     if(this->_useDelays) {
         Utility::delay(_T1);
     }
+
+    std::uint32_t v = 0;
 
     //msb first
     for(auto i = decltype(_BITS_PER_CONVERSION_PERIOD){0};
@@ -136,6 +136,45 @@ void HX711::_readBits(std::int32_t* const v) {
     }
 
     this->_setInputGainSelection();
+
+    return v;
+
+}
+
+bool HX711::_isReady() const {
+
+    /**
+     * HX711 will be "ready" when DOUT is low.
+     * "Ready" means "data is ready for retrieval".
+     * Datasheet pg. 4
+     * 
+     * This should be a one-shot test. Any follow-ups
+     * or looping for checking if the sensor is ready
+     * over time can/should be done by other calling code
+     */
+    return Utility::readGpio(
+        this->_gpioHandle,
+        this->_dataPin) == GpioLevel::LOW;
+
+}
+
+bool HX711::_waitReady(const std::chrono::microseconds timeout) const {
+
+    using namespace std::chrono;
+
+    const auto maxEnd = steady_clock::now();
+
+    while(true) {
+
+        if(this->_isReady()) {
+            return true;
+        }
+
+        if(steady_clock::now() >= maxEnd) {
+            return false;
+        }
+
+    }
 
 }
 
@@ -162,8 +201,6 @@ void HX711::init() {
     Utility::openGpioInput(this->_gpioHandle, this->_dataPin);
     Utility::openGpioOutput(this->_gpioHandle, this->_clockPin);
 
-    this->setConfig(this->_gain);
-
 }
 
 void HX711::close() {
@@ -181,93 +218,24 @@ void HX711::close() {
 }
 
 void HX711::setGain(const Gain g) {
-
-    const auto backupGain = this->_gain;
-
     this->_gain = g;
-
-    /**
-     * If the attempt to set the gain fails, it should
-     * revert back to whatever it was before
-     */
-    try {
-
-        /**
-         * A read must take place to set the gain at the
-         * hardware level. See datasheet pg. 4 "Serial
-         * Interface".
-         */
-        this->waitReady();
-        this->readValue();
-
-        /**
-         * If PD_SCK pulse number is changed during
-         * the current conversion period, power down should
-         * be executed after current conversion period is
-         * completed. This is to ensure that the change is
-         * saved. When chip returns back to normal
-         * operation from power down, it will return to the
-         * set up conditions of the last change.
-         * 
-         * Datasheet pg. 5
-         */
-        this->powerDown();
-        this->powerUp();
-
-    }
-    catch(const std::exception& e) {
-        this->_gain = backupGain;
-        throw;
-    }
-
+    this->getValue();
 }
 
-bool HX711::isReady() const {
-
-    /**
-     * HX711 will be "ready" when DOUT is low.
-     * "Ready" means "data is ready for retrieval".
-     * Datasheet pg. 4
-     * 
-     * This should be a one-shot test. Any follow-ups
-     * or looping for checking if the sensor is ready
-     * over time can/should be done by other calling code
-     */
-    try {
-        return Utility::readGpio(
-            this->_gpioHandle,
-            this->_dataPin) == GpioLevel::LOW;
-    }
-    catch(const GpioException& ex) {
-        return false;
-    }
-
+std::int32_t HX711::getValue() {
+    while(!this->_isReady());
+    return _convertFromTwosComplement(this->_readBits());
 }
 
-bool HX711::waitReady(const std::chrono::nanoseconds timeout) const {
+std::int32_t HX711::getValueTimeout(const std::chrono::microseconds timeout) {
 
-    using namespace std::chrono;
-
-    const auto maxEnd = steady_clock::now();
-
-    while(true) {
-
-        if(this->isReady()) {
-            return true;
-        }
-
-        if(steady_clock::now() >= maxEnd) {
-            return false;
-        }
-
+    if(this->_waitReady(timeout)) {
+        return _convertFromTwosComplement(this->_readBits());
     }
-
-}
-
-std::int32_t HX711::readValue() {
-    int32_t v = 0;
-    this->_readBits(&v);
-    return _convertFromTwosComplement(v);
+    else {
+        throw TimeoutException();
+    }
+    
 }
 
 };

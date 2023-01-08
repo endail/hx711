@@ -92,8 +92,10 @@ protected:
 
     void _pulseClockNoRead();
     bool _readBit() const;
-    void _readBits(std::int32_t* const v);
+    std::uint32_t _readBits();
 
+    bool _isReady() const;
+    bool _waitReady(const std::chrono::microseconds timeout = std::chrono::seconds(1)) const;
 
 public:
 
@@ -156,9 +158,9 @@ public:
 
     void setGain(const Gain g);
 
-    bool isReady() const;
-    virtual bool waitReady(const std::chrono::nanoseconds timeout = std::chrono::seconds(1)) const;
-    std::int32_t readValue();
+    std::int32_t getValue();
+
+    std::vector<std::int32_t> getValueTimeout(const std::chrono::microseconds timeout = std::chrono::seconds(1));
 
     inline void HX711::powerDown() {
         std::lock_guard<std::mutex> lock(this->_commLock);
