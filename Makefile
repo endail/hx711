@@ -87,7 +87,7 @@ ifeq ($(IS_PI),1)
 endif
 
 ifeq ($(IS_GHA),1)
-# gha needs these additional libs
+# gha needs these additional libs 
 	LIBS := $(LIBS) -lrt -lcrypt
 endif
 
