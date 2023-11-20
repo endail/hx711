@@ -106,7 +106,7 @@ all:	dirs \
 build: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
 
 .PHONY execs:
-execs: hx711calibration test
+execs: hx711calibration test jakob
 
 .PHONY: clean
 clean:
@@ -212,7 +212,13 @@ test: $(BUILDDIR)/SimpleHX711Test.o $(BUILDDIR)/AdvancedHX711Test.o
 		-L $(BUILDDIR)/static \
 		-lhx711 $(LIBS)
 
-
+.PHONY: jakob
+jakob: $(BUILDDIR)/jakob.o
+	$(CXX) $(CXXFLAGS) $(INC) \
+		-o $(BINDIR)/jakob \
+		$(BUILDDIR)/jakob.o \
+		-L $(BUILDDIR)/static \
+		-lhx711 $(LIBS)
 
 .PHONY: install
 install: $(BUILDDIR)/static/libhx711.a $(BUILDDIR)/shared/libhx711.so
