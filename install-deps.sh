@@ -5,8 +5,13 @@ if [ `id -u` -ne 0 ]; then
     exit 1;
 fi
 
+ldconfig -p;
+ldconfig;
+ldconfig -p;
+
+
 # build and install liblgpio if not found
-if ! $(ldconfig -p | grep -q liblgpio); then
+#if ! $(ldconfig -p | grep -q liblgpio); then
     wget https://github.com/joan2937/lg/archive/master.zip;
     unzip master.zip;
     cd lg-master;
@@ -14,6 +19,6 @@ if ! $(ldconfig -p | grep -q liblgpio); then
     make install;
     ldconfig;
     cd ..;
-else
-    echo "liblgpio already installed";
-fi
+#else
+#    echo "liblgpio already installed";
+#fi
