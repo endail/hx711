@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         base_image: ["raspios_lite:latest"]
-        cpu: [arm1176, cortex-a8]
+        cpu: [arm1176, cortex-a7, cortex-a8, cortex-a53]
 
     steps:
     
@@ -27,13 +27,16 @@ jobs:
         ref: ${{ github.ref }}
     
     - name: Build RPI environment
-      uses: pguyot/arm-runner-action@v2
+      uses: pguyot/arm-runner-action@v2.5.2
       with:
         commands: ./gh-actions-rpi-cmd.sh
         base_image: ${{ matrix.base_image }}
         image_additional_mb: 10000
         cpu: ${{ matrix.cpu }}
         optimize_image: false
+        shell: /bin/bash
+        exit_on_fail: false
+        debug: true
 
     - name: cppcheck
       uses: deep5050/cppcheck-action@main
