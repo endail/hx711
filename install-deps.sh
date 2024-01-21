@@ -9,7 +9,7 @@ fi
 #ldconfig;
 #ldconfig -p;
 
-apt-get install -y lgpio-dev;
+apt-get install -y liblgpio-dev;
 
 # build and install liblgpio if not found
 #if ! $(ldconfig -p | grep -q liblgpio); then
