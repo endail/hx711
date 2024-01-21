@@ -5,20 +5,21 @@ if [ `id -u` -ne 0 ]; then
     exit 1;
 fi
 
-ldconfig -p;
-ldconfig;
-ldconfig -p;
+#ldconfig -p;
+#ldconfig;
+#ldconfig -p;
 
+apt-get install -y lgpio-dev;
 
 # build and install liblgpio if not found
 #if ! $(ldconfig -p | grep -q liblgpio); then
-    wget https://github.com/joan2937/lg/archive/master.zip;
-    unzip master.zip;
-    cd lg-master;
-    make;
-    make install;
-    ldconfig;
-    cd ..;
+#    wget https://github.com/joan2937/lg/archive/master.zip;
+#    unzip master.zip;
+#    cd lg-master;
+#    make;
+#    make install;
+#    ldconfig;
+#    cd ..;
 #else
 #    echo "liblgpio already installed";
 #fi
