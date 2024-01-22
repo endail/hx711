@@ -18,17 +18,21 @@ The .gif above illustrates the output of the test code where I applied pressure 
 
 ## Build and Install
 
+[lgpio](http://abyz.me.uk/lg/index.html) is required to be installed. It may be available to you via apt:
+
+```console
+sudo apt-get install -y liblgpio-dev
+```
+
+If it is not available, manually build and install it by following the instructions [here](https://abyz.me.uk/lg/download.html#Download&Install).
+
 ```console
 pi@raspberrypi:~ $ git clone --depth=1 https://github.com/endail/hx711
 pi@raspberrypi:~ $ cd hx711
 pi@raspberrypi:~/hx711 $ make && sudo make install
 ```
 
-There is a script in the project directory you can use to install lgpio if you need to. Run the following command prior to `make && sudo make install` above.
-
-```console
-pi@raspberrypi:~/hx711 $ sudo ./install-deps.sh
-```
+You may need to run `ldconfig` at this point if you attempt to compile a program and `libhx711` is not found.
 
 ## Use
 
